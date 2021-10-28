@@ -32,6 +32,10 @@ module.exports = function handleTickValueDefaults(containerIn, containerOut, coe
     } else if(axType !== 'multicategory') {
         var tickvals = coerce('tickvals');
         if(tickvals === undefined) containerOut.tickmode = 'auto';
-        else coerce('ticktext');
+        else {
+            coerce('ticktext');
+            var _nticks=readInput('nticks')
+            if(_nticks !== undefined) coerce('nticks');
+        }
     }
 };

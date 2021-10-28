@@ -971,6 +971,25 @@ function arrayTicks(ax) {
         ax.dtick = 'L' + Math.pow(10, Math.floor(Math.min(ax.range[0], ax.range[1])) - 1);
     }
 
+    // array ticks with nticks set
+    if (ax.nticks) {
+        var nticksMin = Math.max(Math.min(tickVal2l(vals[0]), tickVal2l(vals.at(-1))), tickMin);
+        var nticksMax = Math.min(Math.max(tickVal2l(vals[0]), tickVal2l(vals.at(-1))), tickMax);
+        if (nticksMin >= nticksMax) return [];
+        var dtick = (nticksMax - nticksMin) / (ax.nticks - 1);
+        var k = 0;
+        for (var i = 0; i < ax.nticks; i++) {
+            var tickvalue = nticksMin + i * dtick;
+            var diffvalue_min = Math.abs(tickvalue - tickVal2l(vals[k]));
+            while (k < vals.length - 1) {
+                var diffvalue = Math.abs(tickvalue - tickVal2l(vals[k + 1]));
+                if (diffvalue >= diffvalue_min) break;
+                k++;
+                diffvalue_min = diffvalue;
+            }
+            if ((j > 0 && ticksOut[j - 1].x != k) || j==0) ticksOut[j++] = tickTextObj(ax, tickVal2l(vals[k]), String(text[k]));
+        }
+    } else {
     for(var i = 0; i < vals.length; i++) {
         var vali = tickVal2l(vals[i]);
         if(vali > tickMin && vali < tickMax) {
@@ -978,6 +997,7 @@ function arrayTicks(ax) {
             else ticksOut[j] = tickTextObj(ax, vali, String(text[i]));
             j++;
         }
+    }
     }
 
     if(j < vals.length) ticksOut.splice(j, vals.length - j);
