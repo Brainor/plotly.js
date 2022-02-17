@@ -9,6 +9,87 @@ To see all merged commits on the master branch that will be part of the next plo
 
 where X.Y.Z is the semver of most recent plotly.js release.
 
+## [2.9.0] -- 2022-02-04
+
+### Added
+ - Implement `ticklabelstep` to reduce labels on 2D axes and colorbars [[#6088](https://github.com/plotly/plotly.js/pull/6088)]
+
+### Changed
+ - Display the version of plotly.js when hovering over the modebar [[#6077](https://github.com/plotly/plotly.js/pull/6077)]
+ - Various dependency updates as listed under [the v2.9.0 milestone](https://github.com/plotly/plotly.js/milestone/69?closed=1)
+
+### Fixed
+ - Fix vertical spacing of legend items in horizontal mode [[#6094](https://github.com/plotly/plotly.js/pull/6094)]
+
+
+## [2.8.3] -- 2021-12-20
+
+### Fixed
+ - Correct formatted x/y `texttempate` for `histogram` trace [[#6070](https://github.com/plotly/plotly.js/pull/6070)]
+
+
+## [2.8.2] -- 2021-12-20
+
+### Fixed
+ - Fix missing x/y `texttemplate` for `histogram`, `bar`, `funnel` and `waterfall` traces [[#6069](https://github.com/plotly/plotly.js/pull/6069)]
+
+
+## [2.8.1] -- 2021-12-15
+
+### Fixed
+ - Do not exceed layout font size when `textfont` is set to "auto" for `heatmap`, `histogram2d`, `contour` and
+   `histogram2dcontour` traces [[#6061](https://github.com/plotly/plotly.js/pull/6061)]
+
+
+## [2.8.0] -- 2021-12-10
+
+### Added
+ - Introduce horizontal colorbars [[#6024](https://github.com/plotly/plotly.js/pull/6024)]
+ - Implement `legend.grouptitlefont` and `hoverlabel.grouptitlefont` [[#6040](https://github.com/plotly/plotly.js/pull/6040)]
+ - Add `texttemplate` and `textfont` to `heatmap` and `histogram2d` traces as well as
+   `histogram2dcontour` and `contour` traces when `coloring` is set "heatmap" [[#6028](https://github.com/plotly/plotly.js/pull/6028)]
+
+### Fixed
+ - Fix to discard negative values from `pie` chart post-aggregation instead of during summation [[#6051](https://github.com/plotly/plotly.js/pull/6051)],
+   with thanks to @destiny-wu for the contribution!
+
+
+## [2.7.0] -- 2021-12-02
+
+### Added
+ - Add `texttemplate`, `textposition`, `textfont`, `textangle`,
+   `outsidetextfont`, `insidetextfont`, `insidetextanchor`,
+   `constraintext` and `cliponaxis` to `histogram` trace [[#6038](https://github.com/plotly/plotly.js/pull/6038)]
+
+### Changed
+ - Bump `probe-image-size` module to v7.2.2 [[#6036](https://github.com/plotly/plotly.js/pull/6036)]
+
+### Fixed
+ - Fix mapbox derived coordinate for Retina displays [[#6039](https://github.com/plotly/plotly.js/pull/6039)]
+ - Fix interaction between `uirevision` and `autorange`. Because we push `autorange` and `range` back into `layout`,
+   there can be times it looks like we're applying GUI-driven changes on top of explicit autorange and other times
+   it's an implicit autorange, even though the user's intent was always implicit. This fix treats them as equivalent. [[#6046](https://github.com/plotly/plotly.js/pull/6046)]
+
+
+## [2.6.4] -- 2021-11-26
+
+### Fixed
+ - Avoid bar with text to jump when selected [[#6043](https://github.com/plotly/plotly.js/pull/6043)]
+
+
+## [2.6.3] -- 2021-11-12
+
+### Fixed
+ - Fix hover events in Shadow DOM [[#6021](https://github.com/plotly/plotly.js/pull/6021)],
+   with thanks to @SabineWren for the contribution!
+
+
+## [2.6.2] -- 2021-11-05
+
+### Fixed
+ - Fix loading issue in [orca](https://github.com/plotly/orca) (regression introduced in 2.6.0) [[#6011](https://github.com/plotly/plotly.js/pull/6011)]
+
+
 ## [2.6.1] -- 2021-11-03
 
 ### Fixed

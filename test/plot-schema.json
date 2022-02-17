@@ -1202,6 +1202,16 @@
       "min": 0,
       "valType": "integer"
      },
+     "orientation": {
+      "description": "Sets the orientation of the colorbar.",
+      "dflt": "v",
+      "editType": "colorbars",
+      "valType": "enumerated",
+      "values": [
+       "h",
+       "v"
+      ]
+     },
      "outlinecolor": {
       "description": "Sets the axis line color.",
       "dflt": "#444",
@@ -1385,7 +1395,7 @@
       ]
      },
      "ticklabelposition": {
-      "description": "Determines where tick labels are drawn.",
+      "description": "Determines where tick labels are drawn relative to the ticks. Left and right options are used when `orientation` is *h*, top and bottom when `orientation` is *v*.",
       "dflt": "outside",
       "editType": "colorbars",
       "valType": "enumerated",
@@ -1394,9 +1404,20 @@
        "inside",
        "outside top",
        "inside top",
+       "outside left",
+       "inside left",
+       "outside right",
+       "inside right",
        "outside bottom",
        "inside bottom"
       ]
+     },
+     "ticklabelstep": {
+      "description": "Sets the spacing between tick labels as compared to the spacing between ticks. A value of 1 (default) means each tick gets a label. A value of 2 means shows every 2nd label. A larger value n means only every nth tick is labeled. `tick0` determines which labels are shown. Not implemented for axes with `type` *log* or *multicategory*, or when `tickmode` is *array*.",
+      "dflt": 1,
+      "editType": "colorbars",
+      "min": 1,
+      "valType": "integer"
      },
      "ticklen": {
       "description": "Sets the tick length (in px).",
@@ -1491,8 +1512,7 @@
       },
       "role": "object",
       "side": {
-       "description": "Determines the location of color bar's title with respect to the color bar. Note that the title's location used to be set by the now deprecated `titleside` attribute.",
-       "dflt": "top",
+       "description": "Determines the location of color bar's title with respect to the color bar. Defaults to *top* when `orientation` if *v* and  defaults to *right* when `orientation` if *h*. Note that the title's location used to be set by the now deprecated `titleside` attribute.",
        "editType": "colorbars",
        "valType": "enumerated",
        "values": [
@@ -1508,16 +1528,14 @@
       }
      },
      "x": {
-      "description": "Sets the x position of the color bar (in plot fraction).",
-      "dflt": 1.02,
+      "description": "Sets the x position of the color bar (in plot fraction). Defaults to 1.02 when `orientation` is *v* and 0.5 when `orientation` is *h*.",
       "editType": "colorbars",
       "max": 3,
       "min": -2,
       "valType": "number"
      },
      "xanchor": {
-      "description": "Sets this color bar's horizontal position anchor. This anchor binds the `x` position to the *left*, *center* or *right* of the color bar.",
-      "dflt": "left",
+      "description": "Sets this color bar's horizontal position anchor. This anchor binds the `x` position to the *left*, *center* or *right* of the color bar. Defaults to *left* when `orientation` is *v* and *center* when `orientation` is *h*.",
       "editType": "colorbars",
       "valType": "enumerated",
       "values": [
@@ -1534,16 +1552,14 @@
       "valType": "number"
      },
      "y": {
-      "description": "Sets the y position of the color bar (in plot fraction).",
-      "dflt": 0.5,
+      "description": "Sets the y position of the color bar (in plot fraction). Defaults to 0.5 when `orientation` is *v* and 1.02 when `orientation` is *h*.",
       "editType": "colorbars",
       "max": 3,
       "min": -2,
       "valType": "number"
      },
      "yanchor": {
-      "description": "Sets this color bar's vertical position anchor This anchor binds the `y` position to the *top*, *middle* or *bottom* of the color bar.",
-      "dflt": "middle",
+      "description": "Sets this color bar's vertical position anchor This anchor binds the `y` position to the *top*, *middle* or *bottom* of the color bar. Defaults to *middle* when `orientation` is *v* and *bottom* when `orientation` is *h*.",
       "editType": "colorbars",
       "valType": "enumerated",
       "values": [
@@ -2494,6 +2510,27 @@
       "valType": "number"
      }
     },
+    "grouptitlefont": {
+     "color": {
+      "editType": "none",
+      "valType": "color"
+     },
+     "description": "Sets the font for group titles in hover (unified modes). Defaults to `hoverlabel.font`.",
+     "editType": "none",
+     "family": {
+      "description": "HTML font family - the typeface that will be applied by the web browser. The web browser will only be able to apply a font if it is available on the system which it operates. Provide multiple font families, separated by commas, to indicate the preference in which to apply fonts if they aren't available on the system. The Chart Studio Cloud (at https://chart-studio.plotly.com or on-premise) generates images on a server, where only a select number of fonts are installed and supported. These include *Arial*, *Balto*, *Courier New*, *Droid Sans*,, *Droid Serif*, *Droid Sans Mono*, *Gravitas One*, *Old Standard TT*, *Open Sans*, *Overpass*, *PT Sans Narrow*, *Raleway*, *Times New Roman*.",
+      "editType": "none",
+      "noBlank": true,
+      "strict": true,
+      "valType": "string"
+     },
+     "role": "object",
+     "size": {
+      "editType": "none",
+      "min": 1,
+      "valType": "number"
+     }
+    },
     "namelength": {
      "description": "Sets the default length (in number of characters) of the trace name in the hover labels for all traces. -1 shows the whole name regardless of length. 0-3 shows the first 0-3 characters, and an integer >3 will show the whole name if it is less than that many characters, but if it is longer, will truncate to `namelength - 3` characters and add an ellipsis.",
      "dflt": 15,
@@ -2692,6 +2729,27 @@
       "toggleitem",
       "togglegroup"
      ]
+    },
+    "grouptitlefont": {
+     "color": {
+      "editType": "legend",
+      "valType": "color"
+     },
+     "description": "Sets the font for group titles in legend. Defaults to `legend.font` with its size increased about 10%.",
+     "editType": "legend",
+     "family": {
+      "description": "HTML font family - the typeface that will be applied by the web browser. The web browser will only be able to apply a font if it is available on the system which it operates. Provide multiple font families, separated by commas, to indicate the preference in which to apply fonts if they aren't available on the system. The Chart Studio Cloud (at https://chart-studio.plotly.com or on-premise) generates images on a server, where only a select number of fonts are installed and supported. These include *Arial*, *Balto*, *Courier New*, *Droid Sans*,, *Droid Serif*, *Droid Sans Mono*, *Gravitas One*, *Old Standard TT*, *Open Sans*, *Overpass*, *PT Sans Narrow*, *Raleway*, *Times New Roman*.",
+      "editType": "legend",
+      "noBlank": true,
+      "strict": true,
+      "valType": "string"
+     },
+     "role": "object",
+     "size": {
+      "editType": "legend",
+      "min": 1,
+      "valType": "number"
+     }
     },
     "itemclick": {
      "description": "Determines the behavior on legend item click. *toggle* toggles the visibility of the item clicked on the graph. *toggleothers* makes the clicked item the sole visible item on the graph. *false* disables legend item click interactions.",
@@ -3739,6 +3797,13 @@
       },
       "role": "object"
      },
+     "ticklabelstep": {
+      "description": "Sets the spacing between tick labels as compared to the spacing between ticks. A value of 1 (default) means each tick gets a label. A value of 2 means shows every 2nd label. A larger value n means only every nth tick is labeled. `tick0` determines which labels are shown. Not implemented for axes with `type` *log* or *multicategory*, or when `tickmode` is *array*.",
+      "dflt": 1,
+      "editType": "plot",
+      "min": 1,
+      "valType": "integer"
+     },
      "ticklen": {
       "description": "Sets the tick length (in px).",
       "dflt": 5,
@@ -4316,6 +4381,13 @@
        }
       },
       "role": "object"
+     },
+     "ticklabelstep": {
+      "description": "Sets the spacing between tick labels as compared to the spacing between ticks. A value of 1 (default) means each tick gets a label. A value of 2 means shows every 2nd label. A larger value n means only every nth tick is labeled. `tick0` determines which labels are shown. Not implemented for axes with `type` *log* or *multicategory*, or when `tickmode` is *array*.",
+      "dflt": 1,
+      "editType": "plot",
+      "min": 1,
+      "valType": "integer"
      },
      "ticklen": {
       "description": "Sets the tick length (in px).",
@@ -8025,6 +8097,13 @@
       },
       "role": "object"
      },
+     "ticklabelstep": {
+      "description": "Sets the spacing between tick labels as compared to the spacing between ticks. A value of 1 (default) means each tick gets a label. A value of 2 means shows every 2nd label. A larger value n means only every nth tick is labeled. `tick0` determines which labels are shown. Not implemented for axes with `type` *log* or *multicategory*, or when `tickmode` is *array*.",
+      "dflt": 1,
+      "editType": "plot",
+      "min": 1,
+      "valType": "integer"
+     },
      "ticklen": {
       "description": "Sets the tick length (in px).",
       "dflt": 5,
@@ -8401,6 +8480,13 @@
        }
       },
       "role": "object"
+     },
+     "ticklabelstep": {
+      "description": "Sets the spacing between tick labels as compared to the spacing between ticks. A value of 1 (default) means each tick gets a label. A value of 2 means shows every 2nd label. A larger value n means only every nth tick is labeled. `tick0` determines which labels are shown. Not implemented for axes with `type` *log* or *multicategory*, or when `tickmode` is *array*.",
+      "dflt": 1,
+      "editType": "plot",
+      "min": 1,
+      "valType": "integer"
      },
      "ticklen": {
       "description": "Sets the tick length (in px).",
@@ -8784,6 +8870,13 @@
        }
       },
       "role": "object"
+     },
+     "ticklabelstep": {
+      "description": "Sets the spacing between tick labels as compared to the spacing between ticks. A value of 1 (default) means each tick gets a label. A value of 2 means shows every 2nd label. A larger value n means only every nth tick is labeled. `tick0` determines which labels are shown. Not implemented for axes with `type` *log* or *multicategory*, or when `tickmode` is *array*.",
+      "dflt": 1,
+      "editType": "plot",
+      "min": 1,
+      "valType": "integer"
      },
      "ticklen": {
       "description": "Sets the tick length (in px).",
@@ -10400,6 +10493,13 @@
       "inside bottom"
      ]
     },
+    "ticklabelstep": {
+     "description": "Sets the spacing between tick labels as compared to the spacing between ticks. A value of 1 (default) means each tick gets a label. A value of 2 means shows every 2nd label. A larger value n means only every nth tick is labeled. `tick0` determines which labels are shown. Not implemented for axes with `type` *log* or *multicategory*, or when `tickmode` is *array*.",
+     "dflt": 1,
+     "editType": "ticks",
+     "min": 1,
+     "valType": "integer"
+    },
     "ticklen": {
      "description": "Sets the tick length (in px).",
      "dflt": 5,
@@ -11257,6 +11357,13 @@
       "inside bottom"
      ]
     },
+    "ticklabelstep": {
+     "description": "Sets the spacing between tick labels as compared to the spacing between ticks. A value of 1 (default) means each tick gets a label. A value of 2 means shows every 2nd label. A larger value n means only every nth tick is labeled. `tick0` determines which labels are shown. Not implemented for axes with `type` *log* or *multicategory*, or when `tickmode` is *array*.",
+     "dflt": 1,
+     "editType": "ticks",
+     "min": 1,
+     "valType": "integer"
+    },
     "ticklen": {
      "description": "Sets the tick length (in px).",
      "dflt": 5,
@@ -12098,6 +12205,16 @@
        "min": 0,
        "valType": "integer"
       },
+      "orientation": {
+       "description": "Sets the orientation of the colorbar.",
+       "dflt": "v",
+       "editType": "colorbars",
+       "valType": "enumerated",
+       "values": [
+        "h",
+        "v"
+       ]
+      },
       "outlinecolor": {
        "description": "Sets the axis line color.",
        "dflt": "#444",
@@ -12281,7 +12398,7 @@
        ]
       },
       "ticklabelposition": {
-       "description": "Determines where tick labels are drawn.",
+       "description": "Determines where tick labels are drawn relative to the ticks. Left and right options are used when `orientation` is *h*, top and bottom when `orientation` is *v*.",
        "dflt": "outside",
        "editType": "colorbars",
        "valType": "enumerated",
@@ -12290,9 +12407,20 @@
         "inside",
         "outside top",
         "inside top",
+        "outside left",
+        "inside left",
+        "outside right",
+        "inside right",
         "outside bottom",
         "inside bottom"
        ]
+      },
+      "ticklabelstep": {
+       "description": "Sets the spacing between tick labels as compared to the spacing between ticks. A value of 1 (default) means each tick gets a label. A value of 2 means shows every 2nd label. A larger value n means only every nth tick is labeled. `tick0` determines which labels are shown. Not implemented for axes with `type` *log* or *multicategory*, or when `tickmode` is *array*.",
+       "dflt": 1,
+       "editType": "colorbars",
+       "min": 1,
+       "valType": "integer"
       },
       "ticklen": {
        "description": "Sets the tick length (in px).",
@@ -12387,8 +12515,7 @@
        },
        "role": "object",
        "side": {
-        "description": "Determines the location of color bar's title with respect to the color bar. Note that the title's location used to be set by the now deprecated `titleside` attribute.",
-        "dflt": "top",
+        "description": "Determines the location of color bar's title with respect to the color bar. Defaults to *top* when `orientation` if *v* and  defaults to *right* when `orientation` if *h*. Note that the title's location used to be set by the now deprecated `titleside` attribute.",
         "editType": "colorbars",
         "valType": "enumerated",
         "values": [
@@ -12404,16 +12531,14 @@
        }
       },
       "x": {
-       "description": "Sets the x position of the color bar (in plot fraction).",
-       "dflt": 1.02,
+       "description": "Sets the x position of the color bar (in plot fraction). Defaults to 1.02 when `orientation` is *v* and 0.5 when `orientation` is *h*.",
        "editType": "colorbars",
        "max": 3,
        "min": -2,
        "valType": "number"
       },
       "xanchor": {
-       "description": "Sets this color bar's horizontal position anchor. This anchor binds the `x` position to the *left*, *center* or *right* of the color bar.",
-       "dflt": "left",
+       "description": "Sets this color bar's horizontal position anchor. This anchor binds the `x` position to the *left*, *center* or *right* of the color bar. Defaults to *left* when `orientation` is *v* and *center* when `orientation` is *h*.",
        "editType": "colorbars",
        "valType": "enumerated",
        "values": [
@@ -12430,16 +12555,14 @@
        "valType": "number"
       },
       "y": {
-       "description": "Sets the y position of the color bar (in plot fraction).",
-       "dflt": 0.5,
+       "description": "Sets the y position of the color bar (in plot fraction). Defaults to 0.5 when `orientation` is *v* and 1.02 when `orientation` is *h*.",
        "editType": "colorbars",
        "max": 3,
        "min": -2,
        "valType": "number"
       },
       "yanchor": {
-       "description": "Sets this color bar's vertical position anchor This anchor binds the `y` position to the *top*, *middle* or *bottom* of the color bar.",
-       "dflt": "middle",
+       "description": "Sets this color bar's vertical position anchor This anchor binds the `y` position to the *top*, *middle* or *bottom* of the color bar. Defaults to *middle* when `orientation` is *v* and *bottom* when `orientation` is *h*.",
        "editType": "colorbars",
        "valType": "enumerated",
        "values": [
@@ -13597,6 +13720,16 @@
        "min": 0,
        "valType": "integer"
       },
+      "orientation": {
+       "description": "Sets the orientation of the colorbar.",
+       "dflt": "v",
+       "editType": "colorbars",
+       "valType": "enumerated",
+       "values": [
+        "h",
+        "v"
+       ]
+      },
       "outlinecolor": {
        "description": "Sets the axis line color.",
        "dflt": "#444",
@@ -13780,7 +13913,7 @@
        ]
       },
       "ticklabelposition": {
-       "description": "Determines where tick labels are drawn.",
+       "description": "Determines where tick labels are drawn relative to the ticks. Left and right options are used when `orientation` is *h*, top and bottom when `orientation` is *v*.",
        "dflt": "outside",
        "editType": "colorbars",
        "valType": "enumerated",
@@ -13789,9 +13922,20 @@
         "inside",
         "outside top",
         "inside top",
+        "outside left",
+        "inside left",
+        "outside right",
+        "inside right",
         "outside bottom",
         "inside bottom"
        ]
+      },
+      "ticklabelstep": {
+       "description": "Sets the spacing between tick labels as compared to the spacing between ticks. A value of 1 (default) means each tick gets a label. A value of 2 means shows every 2nd label. A larger value n means only every nth tick is labeled. `tick0` determines which labels are shown. Not implemented for axes with `type` *log* or *multicategory*, or when `tickmode` is *array*.",
+       "dflt": 1,
+       "editType": "colorbars",
+       "min": 1,
+       "valType": "integer"
       },
       "ticklen": {
        "description": "Sets the tick length (in px).",
@@ -13886,8 +14030,7 @@
        },
        "role": "object",
        "side": {
-        "description": "Determines the location of color bar's title with respect to the color bar. Note that the title's location used to be set by the now deprecated `titleside` attribute.",
-        "dflt": "top",
+        "description": "Determines the location of color bar's title with respect to the color bar. Defaults to *top* when `orientation` if *v* and  defaults to *right* when `orientation` if *h*. Note that the title's location used to be set by the now deprecated `titleside` attribute.",
         "editType": "colorbars",
         "valType": "enumerated",
         "values": [
@@ -13903,16 +14046,14 @@
        }
       },
       "x": {
-       "description": "Sets the x position of the color bar (in plot fraction).",
-       "dflt": 1.02,
+       "description": "Sets the x position of the color bar (in plot fraction). Defaults to 1.02 when `orientation` is *v* and 0.5 when `orientation` is *h*.",
        "editType": "colorbars",
        "max": 3,
        "min": -2,
        "valType": "number"
       },
       "xanchor": {
-       "description": "Sets this color bar's horizontal position anchor. This anchor binds the `x` position to the *left*, *center* or *right* of the color bar.",
-       "dflt": "left",
+       "description": "Sets this color bar's horizontal position anchor. This anchor binds the `x` position to the *left*, *center* or *right* of the color bar. Defaults to *left* when `orientation` is *v* and *center* when `orientation` is *h*.",
        "editType": "colorbars",
        "valType": "enumerated",
        "values": [
@@ -13929,16 +14070,14 @@
        "valType": "number"
       },
       "y": {
-       "description": "Sets the y position of the color bar (in plot fraction).",
-       "dflt": 0.5,
+       "description": "Sets the y position of the color bar (in plot fraction). Defaults to 0.5 when `orientation` is *v* and 1.02 when `orientation` is *h*.",
        "editType": "colorbars",
        "max": 3,
        "min": -2,
        "valType": "number"
       },
       "yanchor": {
-       "description": "Sets this color bar's vertical position anchor This anchor binds the `y` position to the *top*, *middle* or *bottom* of the color bar.",
-       "dflt": "middle",
+       "description": "Sets this color bar's vertical position anchor This anchor binds the `y` position to the *top*, *middle* or *bottom* of the color bar. Defaults to *middle* when `orientation` is *v* and *bottom* when `orientation` is *h*.",
        "editType": "colorbars",
        "valType": "enumerated",
        "values": [
@@ -17712,6 +17851,16 @@
       "min": 0,
       "valType": "integer"
      },
+     "orientation": {
+      "description": "Sets the orientation of the colorbar.",
+      "dflt": "v",
+      "editType": "colorbars",
+      "valType": "enumerated",
+      "values": [
+       "h",
+       "v"
+      ]
+     },
      "outlinecolor": {
       "description": "Sets the axis line color.",
       "dflt": "#444",
@@ -17895,7 +18044,7 @@
       ]
      },
      "ticklabelposition": {
-      "description": "Determines where tick labels are drawn.",
+      "description": "Determines where tick labels are drawn relative to the ticks. Left and right options are used when `orientation` is *h*, top and bottom when `orientation` is *v*.",
       "dflt": "outside",
       "editType": "colorbars",
       "valType": "enumerated",
@@ -17904,9 +18053,20 @@
        "inside",
        "outside top",
        "inside top",
+       "outside left",
+       "inside left",
+       "outside right",
+       "inside right",
        "outside bottom",
        "inside bottom"
       ]
+     },
+     "ticklabelstep": {
+      "description": "Sets the spacing between tick labels as compared to the spacing between ticks. A value of 1 (default) means each tick gets a label. A value of 2 means shows every 2nd label. A larger value n means only every nth tick is labeled. `tick0` determines which labels are shown. Not implemented for axes with `type` *log* or *multicategory*, or when `tickmode` is *array*.",
+      "dflt": 1,
+      "editType": "colorbars",
+      "min": 1,
+      "valType": "integer"
      },
      "ticklen": {
       "description": "Sets the tick length (in px).",
@@ -18001,8 +18161,7 @@
       },
       "role": "object",
       "side": {
-       "description": "Determines the location of color bar's title with respect to the color bar. Note that the title's location used to be set by the now deprecated `titleside` attribute.",
-       "dflt": "top",
+       "description": "Determines the location of color bar's title with respect to the color bar. Defaults to *top* when `orientation` if *v* and  defaults to *right* when `orientation` if *h*. Note that the title's location used to be set by the now deprecated `titleside` attribute.",
        "editType": "colorbars",
        "valType": "enumerated",
        "values": [
@@ -18018,16 +18177,14 @@
       }
      },
      "x": {
-      "description": "Sets the x position of the color bar (in plot fraction).",
-      "dflt": 1.02,
+      "description": "Sets the x position of the color bar (in plot fraction). Defaults to 1.02 when `orientation` is *v* and 0.5 when `orientation` is *h*.",
       "editType": "colorbars",
       "max": 3,
       "min": -2,
       "valType": "number"
      },
      "xanchor": {
-      "description": "Sets this color bar's horizontal position anchor. This anchor binds the `x` position to the *left*, *center* or *right* of the color bar.",
-      "dflt": "left",
+      "description": "Sets this color bar's horizontal position anchor. This anchor binds the `x` position to the *left*, *center* or *right* of the color bar. Defaults to *left* when `orientation` is *v* and *center* when `orientation` is *h*.",
       "editType": "colorbars",
       "valType": "enumerated",
       "values": [
@@ -18044,16 +18201,14 @@
       "valType": "number"
      },
      "y": {
-      "description": "Sets the y position of the color bar (in plot fraction).",
-      "dflt": 0.5,
+      "description": "Sets the y position of the color bar (in plot fraction). Defaults to 0.5 when `orientation` is *v* and 1.02 when `orientation` is *h*.",
       "editType": "colorbars",
       "max": 3,
       "min": -2,
       "valType": "number"
      },
      "yanchor": {
-      "description": "Sets this color bar's vertical position anchor This anchor binds the `y` position to the *top*, *middle* or *bottom* of the color bar.",
-      "dflt": "middle",
+      "description": "Sets this color bar's vertical position anchor This anchor binds the `y` position to the *top*, *middle* or *bottom* of the color bar. Defaults to *middle* when `orientation` is *v* and *bottom* when `orientation` is *h*.",
       "editType": "colorbars",
       "valType": "enumerated",
       "values": [
@@ -18689,6 +18844,16 @@
       "min": 0,
       "valType": "integer"
      },
+     "orientation": {
+      "description": "Sets the orientation of the colorbar.",
+      "dflt": "v",
+      "editType": "colorbars",
+      "valType": "enumerated",
+      "values": [
+       "h",
+       "v"
+      ]
+     },
      "outlinecolor": {
       "description": "Sets the axis line color.",
       "dflt": "#444",
@@ -18872,7 +19037,7 @@
       ]
      },
      "ticklabelposition": {
-      "description": "Determines where tick labels are drawn.",
+      "description": "Determines where tick labels are drawn relative to the ticks. Left and right options are used when `orientation` is *h*, top and bottom when `orientation` is *v*.",
       "dflt": "outside",
       "editType": "colorbars",
       "valType": "enumerated",
@@ -18881,9 +19046,20 @@
        "inside",
        "outside top",
        "inside top",
+       "outside left",
+       "inside left",
+       "outside right",
+       "inside right",
        "outside bottom",
        "inside bottom"
       ]
+     },
+     "ticklabelstep": {
+      "description": "Sets the spacing between tick labels as compared to the spacing between ticks. A value of 1 (default) means each tick gets a label. A value of 2 means shows every 2nd label. A larger value n means only every nth tick is labeled. `tick0` determines which labels are shown. Not implemented for axes with `type` *log* or *multicategory*, or when `tickmode` is *array*.",
+      "dflt": 1,
+      "editType": "colorbars",
+      "min": 1,
+      "valType": "integer"
      },
      "ticklen": {
       "description": "Sets the tick length (in px).",
@@ -18978,8 +19154,7 @@
       },
       "role": "object",
       "side": {
-       "description": "Determines the location of color bar's title with respect to the color bar. Note that the title's location used to be set by the now deprecated `titleside` attribute.",
-       "dflt": "top",
+       "description": "Determines the location of color bar's title with respect to the color bar. Defaults to *top* when `orientation` if *v* and  defaults to *right* when `orientation` if *h*. Note that the title's location used to be set by the now deprecated `titleside` attribute.",
        "editType": "colorbars",
        "valType": "enumerated",
        "values": [
@@ -18995,16 +19170,14 @@
       }
      },
      "x": {
-      "description": "Sets the x position of the color bar (in plot fraction).",
-      "dflt": 1.02,
+      "description": "Sets the x position of the color bar (in plot fraction). Defaults to 1.02 when `orientation` is *v* and 0.5 when `orientation` is *h*.",
       "editType": "colorbars",
       "max": 3,
       "min": -2,
       "valType": "number"
      },
      "xanchor": {
-      "description": "Sets this color bar's horizontal position anchor. This anchor binds the `x` position to the *left*, *center* or *right* of the color bar.",
-      "dflt": "left",
+      "description": "Sets this color bar's horizontal position anchor. This anchor binds the `x` position to the *left*, *center* or *right* of the color bar. Defaults to *left* when `orientation` is *v* and *center* when `orientation` is *h*.",
       "editType": "colorbars",
       "valType": "enumerated",
       "values": [
@@ -19021,16 +19194,14 @@
       "valType": "number"
      },
      "y": {
-      "description": "Sets the y position of the color bar (in plot fraction).",
-      "dflt": 0.5,
+      "description": "Sets the y position of the color bar (in plot fraction). Defaults to 0.5 when `orientation` is *v* and 1.02 when `orientation` is *h*.",
       "editType": "colorbars",
       "max": 3,
       "min": -2,
       "valType": "number"
      },
      "yanchor": {
-      "description": "Sets this color bar's vertical position anchor This anchor binds the `y` position to the *top*, *middle* or *bottom* of the color bar.",
-      "dflt": "middle",
+      "description": "Sets this color bar's vertical position anchor This anchor binds the `y` position to the *top*, *middle* or *bottom* of the color bar. Defaults to *middle* when `orientation` is *v* and *bottom* when `orientation` is *h*.",
       "editType": "colorbars",
       "valType": "enumerated",
       "values": [
@@ -19695,6 +19866,16 @@
       "min": 0,
       "valType": "integer"
      },
+     "orientation": {
+      "description": "Sets the orientation of the colorbar.",
+      "dflt": "v",
+      "editType": "colorbars",
+      "valType": "enumerated",
+      "values": [
+       "h",
+       "v"
+      ]
+     },
      "outlinecolor": {
       "description": "Sets the axis line color.",
       "dflt": "#444",
@@ -19878,7 +20059,7 @@
       ]
      },
      "ticklabelposition": {
-      "description": "Determines where tick labels are drawn.",
+      "description": "Determines where tick labels are drawn relative to the ticks. Left and right options are used when `orientation` is *h*, top and bottom when `orientation` is *v*.",
       "dflt": "outside",
       "editType": "colorbars",
       "valType": "enumerated",
@@ -19887,9 +20068,20 @@
        "inside",
        "outside top",
        "inside top",
+       "outside left",
+       "inside left",
+       "outside right",
+       "inside right",
        "outside bottom",
        "inside bottom"
       ]
+     },
+     "ticklabelstep": {
+      "description": "Sets the spacing between tick labels as compared to the spacing between ticks. A value of 1 (default) means each tick gets a label. A value of 2 means shows every 2nd label. A larger value n means only every nth tick is labeled. `tick0` determines which labels are shown. Not implemented for axes with `type` *log* or *multicategory*, or when `tickmode` is *array*.",
+      "dflt": 1,
+      "editType": "colorbars",
+      "min": 1,
+      "valType": "integer"
      },
      "ticklen": {
       "description": "Sets the tick length (in px).",
@@ -19984,8 +20176,7 @@
       },
       "role": "object",
       "side": {
-       "description": "Determines the location of color bar's title with respect to the color bar. Note that the title's location used to be set by the now deprecated `titleside` attribute.",
-       "dflt": "top",
+       "description": "Determines the location of color bar's title with respect to the color bar. Defaults to *top* when `orientation` if *v* and  defaults to *right* when `orientation` if *h*. Note that the title's location used to be set by the now deprecated `titleside` attribute.",
        "editType": "colorbars",
        "valType": "enumerated",
        "values": [
@@ -20001,16 +20192,14 @@
       }
      },
      "x": {
-      "description": "Sets the x position of the color bar (in plot fraction).",
-      "dflt": 1.02,
+      "description": "Sets the x position of the color bar (in plot fraction). Defaults to 1.02 when `orientation` is *v* and 0.5 when `orientation` is *h*.",
       "editType": "colorbars",
       "max": 3,
       "min": -2,
       "valType": "number"
      },
      "xanchor": {
-      "description": "Sets this color bar's horizontal position anchor. This anchor binds the `x` position to the *left*, *center* or *right* of the color bar.",
-      "dflt": "left",
+      "description": "Sets this color bar's horizontal position anchor. This anchor binds the `x` position to the *left*, *center* or *right* of the color bar. Defaults to *left* when `orientation` is *v* and *center* when `orientation` is *h*.",
       "editType": "colorbars",
       "valType": "enumerated",
       "values": [
@@ -20027,16 +20216,14 @@
       "valType": "number"
      },
      "y": {
-      "description": "Sets the y position of the color bar (in plot fraction).",
-      "dflt": 0.5,
+      "description": "Sets the y position of the color bar (in plot fraction). Defaults to 0.5 when `orientation` is *v* and 1.02 when `orientation` is *h*.",
       "editType": "colorbars",
       "max": 3,
       "min": -2,
       "valType": "number"
      },
      "yanchor": {
-      "description": "Sets this color bar's vertical position anchor This anchor binds the `y` position to the *top*, *middle* or *bottom* of the color bar.",
-      "dflt": "middle",
+      "description": "Sets this color bar's vertical position anchor This anchor binds the `y` position to the *top*, *middle* or *bottom* of the color bar. Defaults to *middle* when `orientation` is *v* and *bottom* when `orientation` is *h*.",
       "editType": "colorbars",
       "valType": "enumerated",
       "values": [
@@ -20719,6 +20906,16 @@
       "min": 0,
       "valType": "integer"
      },
+     "orientation": {
+      "description": "Sets the orientation of the colorbar.",
+      "dflt": "v",
+      "editType": "colorbars",
+      "valType": "enumerated",
+      "values": [
+       "h",
+       "v"
+      ]
+     },
      "outlinecolor": {
       "description": "Sets the axis line color.",
       "dflt": "#444",
@@ -20902,7 +21099,7 @@
       ]
      },
      "ticklabelposition": {
-      "description": "Determines where tick labels are drawn.",
+      "description": "Determines where tick labels are drawn relative to the ticks. Left and right options are used when `orientation` is *h*, top and bottom when `orientation` is *v*.",
       "dflt": "outside",
       "editType": "colorbars",
       "valType": "enumerated",
@@ -20911,9 +21108,20 @@
        "inside",
        "outside top",
        "inside top",
+       "outside left",
+       "inside left",
+       "outside right",
+       "inside right",
        "outside bottom",
        "inside bottom"
       ]
+     },
+     "ticklabelstep": {
+      "description": "Sets the spacing between tick labels as compared to the spacing between ticks. A value of 1 (default) means each tick gets a label. A value of 2 means shows every 2nd label. A larger value n means only every nth tick is labeled. `tick0` determines which labels are shown. Not implemented for axes with `type` *log* or *multicategory*, or when `tickmode` is *array*.",
+      "dflt": 1,
+      "editType": "colorbars",
+      "min": 1,
+      "valType": "integer"
      },
      "ticklen": {
       "description": "Sets the tick length (in px).",
@@ -21008,8 +21216,7 @@
       },
       "role": "object",
       "side": {
-       "description": "Determines the location of color bar's title with respect to the color bar. Note that the title's location used to be set by the now deprecated `titleside` attribute.",
-       "dflt": "top",
+       "description": "Determines the location of color bar's title with respect to the color bar. Defaults to *top* when `orientation` if *v* and  defaults to *right* when `orientation` if *h*. Note that the title's location used to be set by the now deprecated `titleside` attribute.",
        "editType": "colorbars",
        "valType": "enumerated",
        "values": [
@@ -21025,16 +21232,14 @@
       }
      },
      "x": {
-      "description": "Sets the x position of the color bar (in plot fraction).",
-      "dflt": 1.02,
+      "description": "Sets the x position of the color bar (in plot fraction). Defaults to 1.02 when `orientation` is *v* and 0.5 when `orientation` is *h*.",
       "editType": "colorbars",
       "max": 3,
       "min": -2,
       "valType": "number"
      },
      "xanchor": {
-      "description": "Sets this color bar's horizontal position anchor. This anchor binds the `x` position to the *left*, *center* or *right* of the color bar.",
-      "dflt": "left",
+      "description": "Sets this color bar's horizontal position anchor. This anchor binds the `x` position to the *left*, *center* or *right* of the color bar. Defaults to *left* when `orientation` is *v* and *center* when `orientation` is *h*.",
       "editType": "colorbars",
       "valType": "enumerated",
       "values": [
@@ -21051,16 +21256,14 @@
       "valType": "number"
      },
      "y": {
-      "description": "Sets the y position of the color bar (in plot fraction).",
-      "dflt": 0.5,
+      "description": "Sets the y position of the color bar (in plot fraction). Defaults to 0.5 when `orientation` is *v* and 1.02 when `orientation` is *h*.",
       "editType": "colorbars",
       "max": 3,
       "min": -2,
       "valType": "number"
      },
      "yanchor": {
-      "description": "Sets this color bar's vertical position anchor This anchor binds the `y` position to the *top*, *middle* or *bottom* of the color bar.",
-      "dflt": "middle",
+      "description": "Sets this color bar's vertical position anchor This anchor binds the `y` position to the *top*, *middle* or *bottom* of the color bar. Defaults to *middle* when `orientation` is *v* and *bottom* when `orientation` is *h*.",
       "editType": "colorbars",
       "valType": "enumerated",
       "values": [
@@ -21558,9 +21761,38 @@
      "editType": "calc",
      "valType": "data_array"
     },
+    "textfont": {
+     "color": {
+      "dflt": "auto",
+      "editType": "style",
+      "valType": "color"
+     },
+     "description": "For this trace it only has an effect if `coloring` is set to *heatmap*. Sets the text font.",
+     "editType": "plot",
+     "family": {
+      "description": "HTML font family - the typeface that will be applied by the web browser. The web browser will only be able to apply a font if it is available on the system which it operates. Provide multiple font families, separated by commas, to indicate the preference in which to apply fonts if they aren't available on the system. The Chart Studio Cloud (at https://chart-studio.plotly.com or on-premise) generates images on a server, where only a select number of fonts are installed and supported. These include *Arial*, *Balto*, *Courier New*, *Droid Sans*,, *Droid Serif*, *Droid Sans Mono*, *Gravitas One*, *Old Standard TT*, *Open Sans*, *Overpass*, *PT Sans Narrow*, *Raleway*, *Times New Roman*.",
+      "editType": "plot",
+      "noBlank": true,
+      "strict": true,
+      "valType": "string"
+     },
+     "role": "object",
+     "size": {
+      "dflt": "auto",
+      "editType": "plot",
+      "min": 1,
+      "valType": "number"
+     }
+    },
     "textsrc": {
      "description": "Sets the source reference on Chart Studio Cloud for `text`.",
      "editType": "none",
+     "valType": "string"
+    },
+    "texttemplate": {
+     "description": "For this trace it only has an effect if `coloring` is set to *heatmap*. Template string used for rendering the information text that appear on points. Note that this will override `textinfo`. Variables are inserted using %{variable}, for example \"y: %{y}\". Numbers are formatted using d3-format's syntax %{variable:d3-format}, for example \"Price: %{y:$.2f}\". https://github.com/d3/d3-format/tree/v1.4.5#d3-format for details on the formatting syntax. Dates are formatted using d3-time-format's syntax %{variable|d3-time-format}, for example \"Day: %{2019-01-01|%A}\". https://github.com/d3/d3-time-format/tree/v2.2.3#locale_format for details on the date formatting syntax. Every attributes that can be specified per-point (the ones that are `arrayOk: true`) are available. variables `x`, `y`, `z` and `text`.",
+     "dflt": "",
+     "editType": "plot",
      "valType": "string"
     },
     "transforms": {
@@ -22055,6 +22287,16 @@
       "min": 0,
       "valType": "integer"
      },
+     "orientation": {
+      "description": "Sets the orientation of the colorbar.",
+      "dflt": "v",
+      "editType": "colorbars",
+      "valType": "enumerated",
+      "values": [
+       "h",
+       "v"
+      ]
+     },
      "outlinecolor": {
       "description": "Sets the axis line color.",
       "dflt": "#444",
@@ -22238,7 +22480,7 @@
       ]
      },
      "ticklabelposition": {
-      "description": "Determines where tick labels are drawn.",
+      "description": "Determines where tick labels are drawn relative to the ticks. Left and right options are used when `orientation` is *h*, top and bottom when `orientation` is *v*.",
       "dflt": "outside",
       "editType": "colorbars",
       "valType": "enumerated",
@@ -22247,9 +22489,20 @@
        "inside",
        "outside top",
        "inside top",
+       "outside left",
+       "inside left",
+       "outside right",
+       "inside right",
        "outside bottom",
        "inside bottom"
       ]
+     },
+     "ticklabelstep": {
+      "description": "Sets the spacing between tick labels as compared to the spacing between ticks. A value of 1 (default) means each tick gets a label. A value of 2 means shows every 2nd label. A larger value n means only every nth tick is labeled. `tick0` determines which labels are shown. Not implemented for axes with `type` *log* or *multicategory*, or when `tickmode` is *array*.",
+      "dflt": 1,
+      "editType": "colorbars",
+      "min": 1,
+      "valType": "integer"
      },
      "ticklen": {
       "description": "Sets the tick length (in px).",
@@ -22344,8 +22597,7 @@
       },
       "role": "object",
       "side": {
-       "description": "Determines the location of color bar's title with respect to the color bar. Note that the title's location used to be set by the now deprecated `titleside` attribute.",
-       "dflt": "top",
+       "description": "Determines the location of color bar's title with respect to the color bar. Defaults to *top* when `orientation` if *v* and  defaults to *right* when `orientation` if *h*. Note that the title's location used to be set by the now deprecated `titleside` attribute.",
        "editType": "colorbars",
        "valType": "enumerated",
        "values": [
@@ -22361,16 +22613,14 @@
       }
      },
      "x": {
-      "description": "Sets the x position of the color bar (in plot fraction).",
-      "dflt": 1.02,
+      "description": "Sets the x position of the color bar (in plot fraction). Defaults to 1.02 when `orientation` is *v* and 0.5 when `orientation` is *h*.",
       "editType": "colorbars",
       "max": 3,
       "min": -2,
       "valType": "number"
      },
      "xanchor": {
-      "description": "Sets this color bar's horizontal position anchor. This anchor binds the `x` position to the *left*, *center* or *right* of the color bar.",
-      "dflt": "left",
+      "description": "Sets this color bar's horizontal position anchor. This anchor binds the `x` position to the *left*, *center* or *right* of the color bar. Defaults to *left* when `orientation` is *v* and *center* when `orientation` is *h*.",
       "editType": "colorbars",
       "valType": "enumerated",
       "values": [
@@ -22387,16 +22637,14 @@
       "valType": "number"
      },
      "y": {
-      "description": "Sets the y position of the color bar (in plot fraction).",
-      "dflt": 0.5,
+      "description": "Sets the y position of the color bar (in plot fraction). Defaults to 0.5 when `orientation` is *v* and 1.02 when `orientation` is *h*.",
       "editType": "colorbars",
       "max": 3,
       "min": -2,
       "valType": "number"
      },
      "yanchor": {
-      "description": "Sets this color bar's vertical position anchor This anchor binds the `y` position to the *top*, *middle* or *bottom* of the color bar.",
-      "dflt": "middle",
+      "description": "Sets this color bar's vertical position anchor This anchor binds the `y` position to the *top*, *middle* or *bottom* of the color bar. Defaults to *middle* when `orientation` is *v* and *bottom* when `orientation` is *h*.",
       "editType": "colorbars",
       "valType": "enumerated",
       "values": [
@@ -22991,6 +23239,16 @@
       "min": 0,
       "valType": "integer"
      },
+     "orientation": {
+      "description": "Sets the orientation of the colorbar.",
+      "dflt": "v",
+      "editType": "colorbars",
+      "valType": "enumerated",
+      "values": [
+       "h",
+       "v"
+      ]
+     },
      "outlinecolor": {
       "description": "Sets the axis line color.",
       "dflt": "#444",
@@ -23174,7 +23432,7 @@
       ]
      },
      "ticklabelposition": {
-      "description": "Determines where tick labels are drawn.",
+      "description": "Determines where tick labels are drawn relative to the ticks. Left and right options are used when `orientation` is *h*, top and bottom when `orientation` is *v*.",
       "dflt": "outside",
       "editType": "colorbars",
       "valType": "enumerated",
@@ -23183,9 +23441,20 @@
        "inside",
        "outside top",
        "inside top",
+       "outside left",
+       "inside left",
+       "outside right",
+       "inside right",
        "outside bottom",
        "inside bottom"
       ]
+     },
+     "ticklabelstep": {
+      "description": "Sets the spacing between tick labels as compared to the spacing between ticks. A value of 1 (default) means each tick gets a label. A value of 2 means shows every 2nd label. A larger value n means only every nth tick is labeled. `tick0` determines which labels are shown. Not implemented for axes with `type` *log* or *multicategory*, or when `tickmode` is *array*.",
+      "dflt": 1,
+      "editType": "colorbars",
+      "min": 1,
+      "valType": "integer"
      },
      "ticklen": {
       "description": "Sets the tick length (in px).",
@@ -23280,8 +23549,7 @@
       },
       "role": "object",
       "side": {
-       "description": "Determines the location of color bar's title with respect to the color bar. Note that the title's location used to be set by the now deprecated `titleside` attribute.",
-       "dflt": "top",
+       "description": "Determines the location of color bar's title with respect to the color bar. Defaults to *top* when `orientation` if *v* and  defaults to *right* when `orientation` if *h*. Note that the title's location used to be set by the now deprecated `titleside` attribute.",
        "editType": "colorbars",
        "valType": "enumerated",
        "values": [
@@ -23297,16 +23565,14 @@
       }
      },
      "x": {
-      "description": "Sets the x position of the color bar (in plot fraction).",
-      "dflt": 1.02,
+      "description": "Sets the x position of the color bar (in plot fraction). Defaults to 1.02 when `orientation` is *v* and 0.5 when `orientation` is *h*.",
       "editType": "colorbars",
       "max": 3,
       "min": -2,
       "valType": "number"
      },
      "xanchor": {
-      "description": "Sets this color bar's horizontal position anchor. This anchor binds the `x` position to the *left*, *center* or *right* of the color bar.",
-      "dflt": "left",
+      "description": "Sets this color bar's horizontal position anchor. This anchor binds the `x` position to the *left*, *center* or *right* of the color bar. Defaults to *left* when `orientation` is *v* and *center* when `orientation` is *h*.",
       "editType": "colorbars",
       "valType": "enumerated",
       "values": [
@@ -23323,16 +23589,14 @@
       "valType": "number"
      },
      "y": {
-      "description": "Sets the y position of the color bar (in plot fraction).",
-      "dflt": 0.5,
+      "description": "Sets the y position of the color bar (in plot fraction). Defaults to 0.5 when `orientation` is *v* and 1.02 when `orientation` is *h*.",
       "editType": "colorbars",
       "max": 3,
       "min": -2,
       "valType": "number"
      },
      "yanchor": {
-      "description": "Sets this color bar's vertical position anchor This anchor binds the `y` position to the *top*, *middle* or *bottom* of the color bar.",
-      "dflt": "middle",
+      "description": "Sets this color bar's vertical position anchor This anchor binds the `y` position to the *top*, *middle* or *bottom* of the color bar. Defaults to *middle* when `orientation` is *v* and *bottom* when `orientation` is *h*.",
       "editType": "colorbars",
       "valType": "enumerated",
       "values": [
@@ -24270,6 +24534,16 @@
        "min": 0,
        "valType": "integer"
       },
+      "orientation": {
+       "description": "Sets the orientation of the colorbar.",
+       "dflt": "v",
+       "editType": "colorbars",
+       "valType": "enumerated",
+       "values": [
+        "h",
+        "v"
+       ]
+      },
       "outlinecolor": {
        "description": "Sets the axis line color.",
        "dflt": "#444",
@@ -24453,7 +24727,7 @@
        ]
       },
       "ticklabelposition": {
-       "description": "Determines where tick labels are drawn.",
+       "description": "Determines where tick labels are drawn relative to the ticks. Left and right options are used when `orientation` is *h*, top and bottom when `orientation` is *v*.",
        "dflt": "outside",
        "editType": "colorbars",
        "valType": "enumerated",
@@ -24462,9 +24736,20 @@
         "inside",
         "outside top",
         "inside top",
+        "outside left",
+        "inside left",
+        "outside right",
+        "inside right",
         "outside bottom",
         "inside bottom"
        ]
+      },
+      "ticklabelstep": {
+       "description": "Sets the spacing between tick labels as compared to the spacing between ticks. A value of 1 (default) means each tick gets a label. A value of 2 means shows every 2nd label. A larger value n means only every nth tick is labeled. `tick0` determines which labels are shown. Not implemented for axes with `type` *log* or *multicategory*, or when `tickmode` is *array*.",
+       "dflt": 1,
+       "editType": "colorbars",
+       "min": 1,
+       "valType": "integer"
       },
       "ticklen": {
        "description": "Sets the tick length (in px).",
@@ -24559,8 +24844,7 @@
        },
        "role": "object",
        "side": {
-        "description": "Determines the location of color bar's title with respect to the color bar. Note that the title's location used to be set by the now deprecated `titleside` attribute.",
-        "dflt": "top",
+        "description": "Determines the location of color bar's title with respect to the color bar. Defaults to *top* when `orientation` if *v* and  defaults to *right* when `orientation` if *h*. Note that the title's location used to be set by the now deprecated `titleside` attribute.",
         "editType": "colorbars",
         "valType": "enumerated",
         "values": [
@@ -24576,16 +24860,14 @@
        }
       },
       "x": {
-       "description": "Sets the x position of the color bar (in plot fraction).",
-       "dflt": 1.02,
+       "description": "Sets the x position of the color bar (in plot fraction). Defaults to 1.02 when `orientation` is *v* and 0.5 when `orientation` is *h*.",
        "editType": "colorbars",
        "max": 3,
        "min": -2,
        "valType": "number"
       },
       "xanchor": {
-       "description": "Sets this color bar's horizontal position anchor. This anchor binds the `x` position to the *left*, *center* or *right* of the color bar.",
-       "dflt": "left",
+       "description": "Sets this color bar's horizontal position anchor. This anchor binds the `x` position to the *left*, *center* or *right* of the color bar. Defaults to *left* when `orientation` is *v* and *center* when `orientation` is *h*.",
        "editType": "colorbars",
        "valType": "enumerated",
        "values": [
@@ -24602,16 +24884,14 @@
        "valType": "number"
       },
       "y": {
-       "description": "Sets the y position of the color bar (in plot fraction).",
-       "dflt": 0.5,
+       "description": "Sets the y position of the color bar (in plot fraction). Defaults to 0.5 when `orientation` is *v* and 1.02 when `orientation` is *h*.",
        "editType": "colorbars",
        "max": 3,
        "min": -2,
        "valType": "number"
       },
       "yanchor": {
-       "description": "Sets this color bar's vertical position anchor This anchor binds the `y` position to the *top*, *middle* or *bottom* of the color bar.",
-       "dflt": "middle",
+       "description": "Sets this color bar's vertical position anchor This anchor binds the `y` position to the *top*, *middle* or *bottom* of the color bar. Defaults to *middle* when `orientation` is *v* and *bottom* when `orientation` is *h*.",
        "editType": "colorbars",
        "valType": "enumerated",
        "values": [
@@ -25964,6 +26244,16 @@
       "min": 0,
       "valType": "integer"
      },
+     "orientation": {
+      "description": "Sets the orientation of the colorbar.",
+      "dflt": "v",
+      "editType": "colorbars",
+      "valType": "enumerated",
+      "values": [
+       "h",
+       "v"
+      ]
+     },
      "outlinecolor": {
       "description": "Sets the axis line color.",
       "dflt": "#444",
@@ -26147,7 +26437,7 @@
       ]
      },
      "ticklabelposition": {
-      "description": "Determines where tick labels are drawn.",
+      "description": "Determines where tick labels are drawn relative to the ticks. Left and right options are used when `orientation` is *h*, top and bottom when `orientation` is *v*.",
       "dflt": "outside",
       "editType": "colorbars",
       "valType": "enumerated",
@@ -26156,9 +26446,20 @@
        "inside",
        "outside top",
        "inside top",
+       "outside left",
+       "inside left",
+       "outside right",
+       "inside right",
        "outside bottom",
        "inside bottom"
       ]
+     },
+     "ticklabelstep": {
+      "description": "Sets the spacing between tick labels as compared to the spacing between ticks. A value of 1 (default) means each tick gets a label. A value of 2 means shows every 2nd label. A larger value n means only every nth tick is labeled. `tick0` determines which labels are shown. Not implemented for axes with `type` *log* or *multicategory*, or when `tickmode` is *array*.",
+      "dflt": 1,
+      "editType": "colorbars",
+      "min": 1,
+      "valType": "integer"
      },
      "ticklen": {
       "description": "Sets the tick length (in px).",
@@ -26253,8 +26554,7 @@
       },
       "role": "object",
       "side": {
-       "description": "Determines the location of color bar's title with respect to the color bar. Note that the title's location used to be set by the now deprecated `titleside` attribute.",
-       "dflt": "top",
+       "description": "Determines the location of color bar's title with respect to the color bar. Defaults to *top* when `orientation` if *v* and  defaults to *right* when `orientation` if *h*. Note that the title's location used to be set by the now deprecated `titleside` attribute.",
        "editType": "colorbars",
        "valType": "enumerated",
        "values": [
@@ -26270,16 +26570,14 @@
       }
      },
      "x": {
-      "description": "Sets the x position of the color bar (in plot fraction).",
-      "dflt": 1.02,
+      "description": "Sets the x position of the color bar (in plot fraction). Defaults to 1.02 when `orientation` is *v* and 0.5 when `orientation` is *h*.",
       "editType": "colorbars",
       "max": 3,
       "min": -2,
       "valType": "number"
      },
      "xanchor": {
-      "description": "Sets this color bar's horizontal position anchor. This anchor binds the `x` position to the *left*, *center* or *right* of the color bar.",
-      "dflt": "left",
+      "description": "Sets this color bar's horizontal position anchor. This anchor binds the `x` position to the *left*, *center* or *right* of the color bar. Defaults to *left* when `orientation` is *v* and *center* when `orientation` is *h*.",
       "editType": "colorbars",
       "valType": "enumerated",
       "values": [
@@ -26296,16 +26594,14 @@
       "valType": "number"
      },
      "y": {
-      "description": "Sets the y position of the color bar (in plot fraction).",
-      "dflt": 0.5,
+      "description": "Sets the y position of the color bar (in plot fraction). Defaults to 0.5 when `orientation` is *v* and 1.02 when `orientation` is *h*.",
       "editType": "colorbars",
       "max": 3,
       "min": -2,
       "valType": "number"
      },
      "yanchor": {
-      "description": "Sets this color bar's vertical position anchor This anchor binds the `y` position to the *top*, *middle* or *bottom* of the color bar.",
-      "dflt": "middle",
+      "description": "Sets this color bar's vertical position anchor This anchor binds the `y` position to the *top*, *middle* or *bottom* of the color bar. Defaults to *middle* when `orientation` is *v* and *bottom* when `orientation` is *h*.",
       "editType": "colorbars",
       "valType": "enumerated",
       "values": [
@@ -26630,9 +26926,38 @@
      "editType": "calc",
      "valType": "data_array"
     },
+    "textfont": {
+     "color": {
+      "dflt": "auto",
+      "editType": "style",
+      "valType": "color"
+     },
+     "description": "Sets the text font.",
+     "editType": "plot",
+     "family": {
+      "description": "HTML font family - the typeface that will be applied by the web browser. The web browser will only be able to apply a font if it is available on the system which it operates. Provide multiple font families, separated by commas, to indicate the preference in which to apply fonts if they aren't available on the system. The Chart Studio Cloud (at https://chart-studio.plotly.com or on-premise) generates images on a server, where only a select number of fonts are installed and supported. These include *Arial*, *Balto*, *Courier New*, *Droid Sans*,, *Droid Serif*, *Droid Sans Mono*, *Gravitas One*, *Old Standard TT*, *Open Sans*, *Overpass*, *PT Sans Narrow*, *Raleway*, *Times New Roman*.",
+      "editType": "plot",
+      "noBlank": true,
+      "strict": true,
+      "valType": "string"
+     },
+     "role": "object",
+     "size": {
+      "dflt": "auto",
+      "editType": "plot",
+      "min": 1,
+      "valType": "number"
+     }
+    },
     "textsrc": {
      "description": "Sets the source reference on Chart Studio Cloud for `text`.",
      "editType": "none",
+     "valType": "string"
+    },
+    "texttemplate": {
+     "description": "Template string used for rendering the information text that appear on points. Note that this will override `textinfo`. Variables are inserted using %{variable}, for example \"y: %{y}\". Numbers are formatted using d3-format's syntax %{variable:d3-format}, for example \"Price: %{y:$.2f}\". https://github.com/d3/d3-format/tree/v1.4.5#d3-format for details on the formatting syntax. Dates are formatted using d3-time-format's syntax %{variable|d3-time-format}, for example \"Day: %{2019-01-01|%A}\". https://github.com/d3/d3-time-format/tree/v2.2.3#locale_format for details on the date formatting syntax. Every attributes that can be specified per-point (the ones that are `arrayOk: true`) are available. variables `x`, `y`, `z` and `text`.",
+     "dflt": "",
+     "editType": "plot",
      "valType": "string"
     },
     "transforms": {
@@ -27083,6 +27408,16 @@
       "min": 0,
       "valType": "integer"
      },
+     "orientation": {
+      "description": "Sets the orientation of the colorbar.",
+      "dflt": "v",
+      "editType": "calc",
+      "valType": "enumerated",
+      "values": [
+       "h",
+       "v"
+      ]
+     },
      "outlinecolor": {
       "description": "Sets the axis line color.",
       "dflt": "#444",
@@ -27266,7 +27601,7 @@
       ]
      },
      "ticklabelposition": {
-      "description": "Determines where tick labels are drawn.",
+      "description": "Determines where tick labels are drawn relative to the ticks. Left and right options are used when `orientation` is *h*, top and bottom when `orientation` is *v*.",
       "dflt": "outside",
       "editType": "calc",
       "valType": "enumerated",
@@ -27275,9 +27610,20 @@
        "inside",
        "outside top",
        "inside top",
+       "outside left",
+       "inside left",
+       "outside right",
+       "inside right",
        "outside bottom",
        "inside bottom"
       ]
+     },
+     "ticklabelstep": {
+      "description": "Sets the spacing between tick labels as compared to the spacing between ticks. A value of 1 (default) means each tick gets a label. A value of 2 means shows every 2nd label. A larger value n means only every nth tick is labeled. `tick0` determines which labels are shown. Not implemented for axes with `type` *log* or *multicategory*, or when `tickmode` is *array*.",
+      "dflt": 1,
+      "editType": "calc",
+      "min": 1,
+      "valType": "integer"
      },
      "ticklen": {
       "description": "Sets the tick length (in px).",
@@ -27372,8 +27718,7 @@
       },
       "role": "object",
       "side": {
-       "description": "Determines the location of color bar's title with respect to the color bar. Note that the title's location used to be set by the now deprecated `titleside` attribute.",
-       "dflt": "top",
+       "description": "Determines the location of color bar's title with respect to the color bar. Defaults to *top* when `orientation` if *v* and  defaults to *right* when `orientation` if *h*. Note that the title's location used to be set by the now deprecated `titleside` attribute.",
        "editType": "calc",
        "valType": "enumerated",
        "values": [
@@ -27389,16 +27734,14 @@
       }
      },
      "x": {
-      "description": "Sets the x position of the color bar (in plot fraction).",
-      "dflt": 1.02,
+      "description": "Sets the x position of the color bar (in plot fraction). Defaults to 1.02 when `orientation` is *v* and 0.5 when `orientation` is *h*.",
       "editType": "calc",
       "max": 3,
       "min": -2,
       "valType": "number"
      },
      "xanchor": {
-      "description": "Sets this color bar's horizontal position anchor. This anchor binds the `x` position to the *left*, *center* or *right* of the color bar.",
-      "dflt": "left",
+      "description": "Sets this color bar's horizontal position anchor. This anchor binds the `x` position to the *left*, *center* or *right* of the color bar. Defaults to *left* when `orientation` is *v* and *center* when `orientation` is *h*.",
       "editType": "calc",
       "valType": "enumerated",
       "values": [
@@ -27415,16 +27758,14 @@
       "valType": "number"
      },
      "y": {
-      "description": "Sets the y position of the color bar (in plot fraction).",
-      "dflt": 0.5,
+      "description": "Sets the y position of the color bar (in plot fraction). Defaults to 0.5 when `orientation` is *v* and 1.02 when `orientation` is *h*.",
       "editType": "calc",
       "max": 3,
       "min": -2,
       "valType": "number"
      },
      "yanchor": {
-      "description": "Sets this color bar's vertical position anchor This anchor binds the `y` position to the *top*, *middle* or *bottom* of the color bar.",
-      "dflt": "middle",
+      "description": "Sets this color bar's vertical position anchor This anchor binds the `y` position to the *top*, *middle* or *bottom* of the color bar. Defaults to *middle* when `orientation` is *v* and *bottom* when `orientation` is *h*.",
       "editType": "calc",
       "valType": "enumerated",
       "values": [
@@ -27922,6 +28263,24 @@
      "editType": "calc",
      "valType": "string"
     },
+    "cliponaxis": {
+     "description": "Determines whether the text nodes are clipped about the subplot axes. To show the text nodes above axis lines and tick labels, make sure to set `xaxis.layer` and `yaxis.layer` to *below traces*.",
+     "dflt": true,
+     "editType": "plot",
+     "valType": "boolean"
+    },
+    "constraintext": {
+     "description": "Constrain the size of text inside or outside a bar to be no larger than the bar itself.",
+     "dflt": "both",
+     "editType": "calc",
+     "valType": "enumerated",
+     "values": [
+      "inside",
+      "outside",
+      "both",
+      "none"
+     ]
+    },
     "cumulative": {
      "currentbin": {
       "description": "Only applies if cumulative is enabled. Sets whether the current bin is included, excluded, or has half of its value included in the current cumulative value. *include* is the default for compatibility with various other tools, however it introduces a half-bin bias to the results. *exclude* makes the opposite half-bin bias, and *half* removes it.",
@@ -28338,6 +28697,38 @@
      "editType": "none",
      "valType": "string"
     },
+    "insidetextanchor": {
+     "description": "Determines if texts are kept at center or start/end points in `textposition` *inside* mode.",
+     "dflt": "end",
+     "editType": "plot",
+     "valType": "enumerated",
+     "values": [
+      "end",
+      "middle",
+      "start"
+     ]
+    },
+    "insidetextfont": {
+     "color": {
+      "editType": "style",
+      "valType": "color"
+     },
+     "description": "Sets the font used for `text` lying inside the bar.",
+     "editType": "plot",
+     "family": {
+      "description": "HTML font family - the typeface that will be applied by the web browser. The web browser will only be able to apply a font if it is available on the system which it operates. Provide multiple font families, separated by commas, to indicate the preference in which to apply fonts if they aren't available on the system. The Chart Studio Cloud (at https://chart-studio.plotly.com or on-premise) generates images on a server, where only a select number of fonts are installed and supported. These include *Arial*, *Balto*, *Courier New*, *Droid Sans*,, *Droid Serif*, *Droid Sans Mono*, *Gravitas One*, *Old Standard TT*, *Open Sans*, *Overpass*, *PT Sans Narrow*, *Raleway*, *Times New Roman*.",
+      "editType": "plot",
+      "noBlank": true,
+      "strict": true,
+      "valType": "string"
+     },
+     "role": "object",
+     "size": {
+      "editType": "plot",
+      "min": 1,
+      "valType": "number"
+     }
+    },
     "legendgroup": {
      "description": "Sets the legend group for this trace. Traces part of the same legend group hide/show at the same time when toggling legend items.",
      "dflt": "",
@@ -28546,6 +28937,16 @@
        "min": 0,
        "valType": "integer"
       },
+      "orientation": {
+       "description": "Sets the orientation of the colorbar.",
+       "dflt": "v",
+       "editType": "colorbars",
+       "valType": "enumerated",
+       "values": [
+        "h",
+        "v"
+       ]
+      },
       "outlinecolor": {
        "description": "Sets the axis line color.",
        "dflt": "#444",
@@ -28729,7 +29130,7 @@
        ]
       },
       "ticklabelposition": {
-       "description": "Determines where tick labels are drawn.",
+       "description": "Determines where tick labels are drawn relative to the ticks. Left and right options are used when `orientation` is *h*, top and bottom when `orientation` is *v*.",
        "dflt": "outside",
        "editType": "colorbars",
        "valType": "enumerated",
@@ -28738,9 +29139,20 @@
         "inside",
         "outside top",
         "inside top",
+        "outside left",
+        "inside left",
+        "outside right",
+        "inside right",
         "outside bottom",
         "inside bottom"
        ]
+      },
+      "ticklabelstep": {
+       "description": "Sets the spacing between tick labels as compared to the spacing between ticks. A value of 1 (default) means each tick gets a label. A value of 2 means shows every 2nd label. A larger value n means only every nth tick is labeled. `tick0` determines which labels are shown. Not implemented for axes with `type` *log* or *multicategory*, or when `tickmode` is *array*.",
+       "dflt": 1,
+       "editType": "colorbars",
+       "min": 1,
+       "valType": "integer"
       },
       "ticklen": {
        "description": "Sets the tick length (in px).",
@@ -28835,8 +29247,7 @@
        },
        "role": "object",
        "side": {
-        "description": "Determines the location of color bar's title with respect to the color bar. Note that the title's location used to be set by the now deprecated `titleside` attribute.",
-        "dflt": "top",
+        "description": "Determines the location of color bar's title with respect to the color bar. Defaults to *top* when `orientation` if *v* and  defaults to *right* when `orientation` if *h*. Note that the title's location used to be set by the now deprecated `titleside` attribute.",
         "editType": "colorbars",
         "valType": "enumerated",
         "values": [
@@ -28852,16 +29263,14 @@
        }
       },
       "x": {
-       "description": "Sets the x position of the color bar (in plot fraction).",
-       "dflt": 1.02,
+       "description": "Sets the x position of the color bar (in plot fraction). Defaults to 1.02 when `orientation` is *v* and 0.5 when `orientation` is *h*.",
        "editType": "colorbars",
        "max": 3,
        "min": -2,
        "valType": "number"
       },
       "xanchor": {
-       "description": "Sets this color bar's horizontal position anchor. This anchor binds the `x` position to the *left*, *center* or *right* of the color bar.",
-       "dflt": "left",
+       "description": "Sets this color bar's horizontal position anchor. This anchor binds the `x` position to the *left*, *center* or *right* of the color bar. Defaults to *left* when `orientation` is *v* and *center* when `orientation` is *h*.",
        "editType": "colorbars",
        "valType": "enumerated",
        "values": [
@@ -28878,16 +29287,14 @@
        "valType": "number"
       },
       "y": {
-       "description": "Sets the y position of the color bar (in plot fraction).",
-       "dflt": 0.5,
+       "description": "Sets the y position of the color bar (in plot fraction). Defaults to 0.5 when `orientation` is *v* and 1.02 when `orientation` is *h*.",
        "editType": "colorbars",
        "max": 3,
        "min": -2,
        "valType": "number"
       },
       "yanchor": {
-       "description": "Sets this color bar's vertical position anchor This anchor binds the `y` position to the *top*, *middle* or *bottom* of the color bar.",
-       "dflt": "middle",
+       "description": "Sets this color bar's vertical position anchor This anchor binds the `y` position to the *top*, *middle* or *bottom* of the color bar. Defaults to *middle* when `orientation` is *v* and *bottom* when `orientation` is *h*.",
        "editType": "colorbars",
        "valType": "enumerated",
        "values": [
@@ -29182,6 +29589,27 @@
       "h"
      ]
     },
+    "outsidetextfont": {
+     "color": {
+      "editType": "style",
+      "valType": "color"
+     },
+     "description": "Sets the font used for `text` lying outside the bar.",
+     "editType": "plot",
+     "family": {
+      "description": "HTML font family - the typeface that will be applied by the web browser. The web browser will only be able to apply a font if it is available on the system which it operates. Provide multiple font families, separated by commas, to indicate the preference in which to apply fonts if they aren't available on the system. The Chart Studio Cloud (at https://chart-studio.plotly.com or on-premise) generates images on a server, where only a select number of fonts are installed and supported. These include *Arial*, *Balto*, *Courier New*, *Droid Sans*,, *Droid Serif*, *Droid Sans Mono*, *Gravitas One*, *Old Standard TT*, *Open Sans*, *Overpass*, *PT Sans Narrow*, *Raleway*, *Times New Roman*.",
+      "editType": "plot",
+      "noBlank": true,
+      "strict": true,
+      "valType": "string"
+     },
+     "role": "object",
+     "size": {
+      "editType": "plot",
+      "min": 1,
+      "valType": "number"
+     }
+    },
     "selected": {
      "editType": "style",
      "marker": {
@@ -29248,9 +29676,55 @@
      "editType": "calc",
      "valType": "string"
     },
+    "textangle": {
+     "description": "Sets the angle of the tick labels with respect to the bar. For example, a `tickangle` of -90 draws the tick labels vertically. With *auto* the texts may automatically be rotated to fit with the maximum size in bars.",
+     "dflt": "auto",
+     "editType": "plot",
+     "valType": "angle"
+    },
+    "textfont": {
+     "color": {
+      "editType": "style",
+      "valType": "color"
+     },
+     "description": "Sets the text font.",
+     "editType": "plot",
+     "family": {
+      "description": "HTML font family - the typeface that will be applied by the web browser. The web browser will only be able to apply a font if it is available on the system which it operates. Provide multiple font families, separated by commas, to indicate the preference in which to apply fonts if they aren't available on the system. The Chart Studio Cloud (at https://chart-studio.plotly.com or on-premise) generates images on a server, where only a select number of fonts are installed and supported. These include *Arial*, *Balto*, *Courier New*, *Droid Sans*,, *Droid Serif*, *Droid Sans Mono*, *Gravitas One*, *Old Standard TT*, *Open Sans*, *Overpass*, *PT Sans Narrow*, *Raleway*, *Times New Roman*.",
+      "editType": "plot",
+      "noBlank": true,
+      "strict": true,
+      "valType": "string"
+     },
+     "role": "object",
+     "size": {
+      "editType": "plot",
+      "min": 1,
+      "valType": "number"
+     }
+    },
+    "textposition": {
+     "arrayOk": false,
+     "description": "Specifies the location of the `text`. *inside* positions `text` inside, next to the bar end (rotated and scaled if needed). *outside* positions `text` outside, next to the bar end (scaled if needed), unless there is another bar stacked on this one, then the text gets pushed inside. *auto* tries to position `text` inside the bar, but if the bar is too small and no bar is stacked on this one the text is moved outside. If *none*, no text appears.",
+     "dflt": "auto",
+     "editType": "calc",
+     "valType": "enumerated",
+     "values": [
+      "inside",
+      "outside",
+      "auto",
+      "none"
+     ]
+    },
     "textsrc": {
      "description": "Sets the source reference on Chart Studio Cloud for `text`.",
      "editType": "none",
+     "valType": "string"
+    },
+    "texttemplate": {
+     "description": "Template string used for rendering the information text that appear on points. Note that this will override `textinfo`. Variables are inserted using %{variable}, for example \"y: %{y}\". Numbers are formatted using d3-format's syntax %{variable:d3-format}, for example \"Price: %{y:$.2f}\". https://github.com/d3/d3-format/tree/v1.4.5#d3-format for details on the formatting syntax. Dates are formatted using d3-time-format's syntax %{variable|d3-time-format}, for example \"Day: %{2019-01-01|%A}\". https://github.com/d3/d3-time-format/tree/v2.2.3#locale_format for details on the date formatting syntax. Every attributes that can be specified per-point (the ones that are `arrayOk: true`) are available. variables `label` and `value`.",
+     "dflt": "",
+     "editType": "plot",
      "valType": "string"
     },
     "transforms": {
@@ -29647,6 +30121,16 @@
       "min": 0,
       "valType": "integer"
      },
+     "orientation": {
+      "description": "Sets the orientation of the colorbar.",
+      "dflt": "v",
+      "editType": "colorbars",
+      "valType": "enumerated",
+      "values": [
+       "h",
+       "v"
+      ]
+     },
      "outlinecolor": {
       "description": "Sets the axis line color.",
       "dflt": "#444",
@@ -29830,7 +30314,7 @@
       ]
      },
      "ticklabelposition": {
-      "description": "Determines where tick labels are drawn.",
+      "description": "Determines where tick labels are drawn relative to the ticks. Left and right options are used when `orientation` is *h*, top and bottom when `orientation` is *v*.",
       "dflt": "outside",
       "editType": "colorbars",
       "valType": "enumerated",
@@ -29839,9 +30323,20 @@
        "inside",
        "outside top",
        "inside top",
+       "outside left",
+       "inside left",
+       "outside right",
+       "inside right",
        "outside bottom",
        "inside bottom"
       ]
+     },
+     "ticklabelstep": {
+      "description": "Sets the spacing between tick labels as compared to the spacing between ticks. A value of 1 (default) means each tick gets a label. A value of 2 means shows every 2nd label. A larger value n means only every nth tick is labeled. `tick0` determines which labels are shown. Not implemented for axes with `type` *log* or *multicategory*, or when `tickmode` is *array*.",
+      "dflt": 1,
+      "editType": "colorbars",
+      "min": 1,
+      "valType": "integer"
      },
      "ticklen": {
       "description": "Sets the tick length (in px).",
@@ -29936,8 +30431,7 @@
       },
       "role": "object",
       "side": {
-       "description": "Determines the location of color bar's title with respect to the color bar. Note that the title's location used to be set by the now deprecated `titleside` attribute.",
-       "dflt": "top",
+       "description": "Determines the location of color bar's title with respect to the color bar. Defaults to *top* when `orientation` if *v* and  defaults to *right* when `orientation` if *h*. Note that the title's location used to be set by the now deprecated `titleside` attribute.",
        "editType": "colorbars",
        "valType": "enumerated",
        "values": [
@@ -29953,16 +30447,14 @@
       }
      },
      "x": {
-      "description": "Sets the x position of the color bar (in plot fraction).",
-      "dflt": 1.02,
+      "description": "Sets the x position of the color bar (in plot fraction). Defaults to 1.02 when `orientation` is *v* and 0.5 when `orientation` is *h*.",
       "editType": "colorbars",
       "max": 3,
       "min": -2,
       "valType": "number"
      },
      "xanchor": {
-      "description": "Sets this color bar's horizontal position anchor. This anchor binds the `x` position to the *left*, *center* or *right* of the color bar.",
-      "dflt": "left",
+      "description": "Sets this color bar's horizontal position anchor. This anchor binds the `x` position to the *left*, *center* or *right* of the color bar. Defaults to *left* when `orientation` is *v* and *center* when `orientation` is *h*.",
       "editType": "colorbars",
       "valType": "enumerated",
       "values": [
@@ -29979,16 +30471,14 @@
       "valType": "number"
      },
      "y": {
-      "description": "Sets the y position of the color bar (in plot fraction).",
-      "dflt": 0.5,
+      "description": "Sets the y position of the color bar (in plot fraction). Defaults to 0.5 when `orientation` is *v* and 1.02 when `orientation` is *h*.",
       "editType": "colorbars",
       "max": 3,
       "min": -2,
       "valType": "number"
      },
      "yanchor": {
-      "description": "Sets this color bar's vertical position anchor This anchor binds the `y` position to the *top*, *middle* or *bottom* of the color bar.",
-      "dflt": "middle",
+      "description": "Sets this color bar's vertical position anchor This anchor binds the `y` position to the *top*, *middle* or *bottom* of the color bar. Defaults to *middle* when `orientation` is *v* and *bottom* when `orientation` is *h*.",
       "editType": "colorbars",
       "valType": "enumerated",
       "values": [
@@ -30322,6 +30812,35 @@
       "strict": true,
       "valType": "string"
      }
+    },
+    "textfont": {
+     "color": {
+      "dflt": "auto",
+      "editType": "style",
+      "valType": "color"
+     },
+     "description": "Sets the text font.",
+     "editType": "plot",
+     "family": {
+      "description": "HTML font family - the typeface that will be applied by the web browser. The web browser will only be able to apply a font if it is available on the system which it operates. Provide multiple font families, separated by commas, to indicate the preference in which to apply fonts if they aren't available on the system. The Chart Studio Cloud (at https://chart-studio.plotly.com or on-premise) generates images on a server, where only a select number of fonts are installed and supported. These include *Arial*, *Balto*, *Courier New*, *Droid Sans*,, *Droid Serif*, *Droid Sans Mono*, *Gravitas One*, *Old Standard TT*, *Open Sans*, *Overpass*, *PT Sans Narrow*, *Raleway*, *Times New Roman*.",
+      "editType": "plot",
+      "noBlank": true,
+      "strict": true,
+      "valType": "string"
+     },
+     "role": "object",
+     "size": {
+      "dflt": "auto",
+      "editType": "plot",
+      "min": 1,
+      "valType": "number"
+     }
+    },
+    "texttemplate": {
+     "description": "Template string used for rendering the information text that appear on points. Note that this will override `textinfo`. Variables are inserted using %{variable}, for example \"y: %{y}\". Numbers are formatted using d3-format's syntax %{variable:d3-format}, for example \"Price: %{y:$.2f}\". https://github.com/d3/d3-format/tree/v1.4.5#d3-format for details on the formatting syntax. Dates are formatted using d3-time-format's syntax %{variable|d3-time-format}, for example \"Day: %{2019-01-01|%A}\". https://github.com/d3/d3-time-format/tree/v2.2.3#locale_format for details on the date formatting syntax. Every attributes that can be specified per-point (the ones that are `arrayOk: true`) are available. variable `z`",
+     "dflt": "",
+     "editType": "plot",
+     "valType": "string"
     },
     "transforms": {
      "items": {
@@ -30738,6 +31257,16 @@
       "min": 0,
       "valType": "integer"
      },
+     "orientation": {
+      "description": "Sets the orientation of the colorbar.",
+      "dflt": "v",
+      "editType": "colorbars",
+      "valType": "enumerated",
+      "values": [
+       "h",
+       "v"
+      ]
+     },
      "outlinecolor": {
       "description": "Sets the axis line color.",
       "dflt": "#444",
@@ -30921,7 +31450,7 @@
       ]
      },
      "ticklabelposition": {
-      "description": "Determines where tick labels are drawn.",
+      "description": "Determines where tick labels are drawn relative to the ticks. Left and right options are used when `orientation` is *h*, top and bottom when `orientation` is *v*.",
       "dflt": "outside",
       "editType": "colorbars",
       "valType": "enumerated",
@@ -30930,9 +31459,20 @@
        "inside",
        "outside top",
        "inside top",
+       "outside left",
+       "inside left",
+       "outside right",
+       "inside right",
        "outside bottom",
        "inside bottom"
       ]
+     },
+     "ticklabelstep": {
+      "description": "Sets the spacing between tick labels as compared to the spacing between ticks. A value of 1 (default) means each tick gets a label. A value of 2 means shows every 2nd label. A larger value n means only every nth tick is labeled. `tick0` determines which labels are shown. Not implemented for axes with `type` *log* or *multicategory*, or when `tickmode` is *array*.",
+      "dflt": 1,
+      "editType": "colorbars",
+      "min": 1,
+      "valType": "integer"
      },
      "ticklen": {
       "description": "Sets the tick length (in px).",
@@ -31027,8 +31567,7 @@
       },
       "role": "object",
       "side": {
-       "description": "Determines the location of color bar's title with respect to the color bar. Note that the title's location used to be set by the now deprecated `titleside` attribute.",
-       "dflt": "top",
+       "description": "Determines the location of color bar's title with respect to the color bar. Defaults to *top* when `orientation` if *v* and  defaults to *right* when `orientation` if *h*. Note that the title's location used to be set by the now deprecated `titleside` attribute.",
        "editType": "colorbars",
        "valType": "enumerated",
        "values": [
@@ -31044,16 +31583,14 @@
       }
      },
      "x": {
-      "description": "Sets the x position of the color bar (in plot fraction).",
-      "dflt": 1.02,
+      "description": "Sets the x position of the color bar (in plot fraction). Defaults to 1.02 when `orientation` is *v* and 0.5 when `orientation` is *h*.",
       "editType": "colorbars",
       "max": 3,
       "min": -2,
       "valType": "number"
      },
      "xanchor": {
-      "description": "Sets this color bar's horizontal position anchor. This anchor binds the `x` position to the *left*, *center* or *right* of the color bar.",
-      "dflt": "left",
+      "description": "Sets this color bar's horizontal position anchor. This anchor binds the `x` position to the *left*, *center* or *right* of the color bar. Defaults to *left* when `orientation` is *v* and *center* when `orientation` is *h*.",
       "editType": "colorbars",
       "valType": "enumerated",
       "values": [
@@ -31070,16 +31607,14 @@
       "valType": "number"
      },
      "y": {
-      "description": "Sets the y position of the color bar (in plot fraction).",
-      "dflt": 0.5,
+      "description": "Sets the y position of the color bar (in plot fraction). Defaults to 0.5 when `orientation` is *v* and 1.02 when `orientation` is *h*.",
       "editType": "colorbars",
       "max": 3,
       "min": -2,
       "valType": "number"
      },
      "yanchor": {
-      "description": "Sets this color bar's vertical position anchor This anchor binds the `y` position to the *top*, *middle* or *bottom* of the color bar.",
-      "dflt": "middle",
+      "description": "Sets this color bar's vertical position anchor This anchor binds the `y` position to the *top*, *middle* or *bottom* of the color bar. Defaults to *middle* when `orientation` is *v* and *bottom* when `orientation` is *h*.",
       "editType": "colorbars",
       "valType": "enumerated",
       "values": [
@@ -31582,6 +32117,35 @@
       "strict": true,
       "valType": "string"
      }
+    },
+    "textfont": {
+     "color": {
+      "dflt": "auto",
+      "editType": "style",
+      "valType": "color"
+     },
+     "description": "For this trace it only has an effect if `coloring` is set to *heatmap*. Sets the text font.",
+     "editType": "plot",
+     "family": {
+      "description": "HTML font family - the typeface that will be applied by the web browser. The web browser will only be able to apply a font if it is available on the system which it operates. Provide multiple font families, separated by commas, to indicate the preference in which to apply fonts if they aren't available on the system. The Chart Studio Cloud (at https://chart-studio.plotly.com or on-premise) generates images on a server, where only a select number of fonts are installed and supported. These include *Arial*, *Balto*, *Courier New*, *Droid Sans*,, *Droid Serif*, *Droid Sans Mono*, *Gravitas One*, *Old Standard TT*, *Open Sans*, *Overpass*, *PT Sans Narrow*, *Raleway*, *Times New Roman*.",
+      "editType": "plot",
+      "noBlank": true,
+      "strict": true,
+      "valType": "string"
+     },
+     "role": "object",
+     "size": {
+      "dflt": "auto",
+      "editType": "plot",
+      "min": 1,
+      "valType": "number"
+     }
+    },
+    "texttemplate": {
+     "description": "For this trace it only has an effect if `coloring` is set to *heatmap*. Template string used for rendering the information text that appear on points. Note that this will override `textinfo`. Variables are inserted using %{variable}, for example \"y: %{y}\". Numbers are formatted using d3-format's syntax %{variable:d3-format}, for example \"Price: %{y:$.2f}\". https://github.com/d3/d3-format/tree/v1.4.5#d3-format for details on the formatting syntax. Dates are formatted using d3-time-format's syntax %{variable|d3-time-format}, for example \"Day: %{2019-01-01|%A}\". https://github.com/d3/d3-time-format/tree/v2.2.3#locale_format for details on the date formatting syntax. Every attributes that can be specified per-point (the ones that are `arrayOk: true`) are available. variables `x`, `y`, `z` and `text`.",
+     "dflt": "",
+     "editType": "plot",
+     "valType": "string"
     },
     "transforms": {
      "items": {
@@ -32336,6 +32900,16 @@
        "min": 0,
        "valType": "integer"
       },
+      "orientation": {
+       "description": "Sets the orientation of the colorbar.",
+       "dflt": "v",
+       "editType": "colorbars",
+       "valType": "enumerated",
+       "values": [
+        "h",
+        "v"
+       ]
+      },
       "outlinecolor": {
        "description": "Sets the axis line color.",
        "dflt": "#444",
@@ -32519,7 +33093,7 @@
        ]
       },
       "ticklabelposition": {
-       "description": "Determines where tick labels are drawn.",
+       "description": "Determines where tick labels are drawn relative to the ticks. Left and right options are used when `orientation` is *h*, top and bottom when `orientation` is *v*.",
        "dflt": "outside",
        "editType": "colorbars",
        "valType": "enumerated",
@@ -32528,9 +33102,20 @@
         "inside",
         "outside top",
         "inside top",
+        "outside left",
+        "inside left",
+        "outside right",
+        "inside right",
         "outside bottom",
         "inside bottom"
        ]
+      },
+      "ticklabelstep": {
+       "description": "Sets the spacing between tick labels as compared to the spacing between ticks. A value of 1 (default) means each tick gets a label. A value of 2 means shows every 2nd label. A larger value n means only every nth tick is labeled. `tick0` determines which labels are shown. Not implemented for axes with `type` *log* or *multicategory*, or when `tickmode` is *array*.",
+       "dflt": 1,
+       "editType": "colorbars",
+       "min": 1,
+       "valType": "integer"
       },
       "ticklen": {
        "description": "Sets the tick length (in px).",
@@ -32625,8 +33210,7 @@
        },
        "role": "object",
        "side": {
-        "description": "Determines the location of color bar's title with respect to the color bar. Note that the title's location used to be set by the now deprecated `titleside` attribute.",
-        "dflt": "top",
+        "description": "Determines the location of color bar's title with respect to the color bar. Defaults to *top* when `orientation` if *v* and  defaults to *right* when `orientation` if *h*. Note that the title's location used to be set by the now deprecated `titleside` attribute.",
         "editType": "colorbars",
         "valType": "enumerated",
         "values": [
@@ -32642,16 +33226,14 @@
        }
       },
       "x": {
-       "description": "Sets the x position of the color bar (in plot fraction).",
-       "dflt": 1.02,
+       "description": "Sets the x position of the color bar (in plot fraction). Defaults to 1.02 when `orientation` is *v* and 0.5 when `orientation` is *h*.",
        "editType": "colorbars",
        "max": 3,
        "min": -2,
        "valType": "number"
       },
       "xanchor": {
-       "description": "Sets this color bar's horizontal position anchor. This anchor binds the `x` position to the *left*, *center* or *right* of the color bar.",
-       "dflt": "left",
+       "description": "Sets this color bar's horizontal position anchor. This anchor binds the `x` position to the *left*, *center* or *right* of the color bar. Defaults to *left* when `orientation` is *v* and *center* when `orientation` is *h*.",
        "editType": "colorbars",
        "valType": "enumerated",
        "values": [
@@ -32668,16 +33250,14 @@
        "valType": "number"
       },
       "y": {
-       "description": "Sets the y position of the color bar (in plot fraction).",
-       "dflt": 0.5,
+       "description": "Sets the y position of the color bar (in plot fraction). Defaults to 0.5 when `orientation` is *v* and 1.02 when `orientation` is *h*.",
        "editType": "colorbars",
        "max": 3,
        "min": -2,
        "valType": "number"
       },
       "yanchor": {
-       "description": "Sets this color bar's vertical position anchor This anchor binds the `y` position to the *top*, *middle* or *bottom* of the color bar.",
-       "dflt": "middle",
+       "description": "Sets this color bar's vertical position anchor This anchor binds the `y` position to the *top*, *middle* or *bottom* of the color bar. Defaults to *middle* when `orientation` is *v* and *bottom* when `orientation` is *h*.",
        "editType": "colorbars",
        "valType": "enumerated",
        "values": [
@@ -33914,6 +34494,13 @@
        },
        "role": "object"
       },
+      "ticklabelstep": {
+       "description": "Sets the spacing between tick labels as compared to the spacing between ticks. A value of 1 (default) means each tick gets a label. A value of 2 means shows every 2nd label. A larger value n means only every nth tick is labeled. `tick0` determines which labels are shown. Not implemented for axes with `type` *log* or *multicategory*, or when `tickmode` is *array*.",
+       "dflt": 1,
+       "editType": "plot",
+       "min": 1,
+       "valType": "integer"
+      },
       "ticklen": {
        "description": "Sets the tick length (in px).",
        "dflt": 5,
@@ -34602,6 +35189,16 @@
       "min": 0,
       "valType": "integer"
      },
+     "orientation": {
+      "description": "Sets the orientation of the colorbar.",
+      "dflt": "v",
+      "editType": "calc",
+      "valType": "enumerated",
+      "values": [
+       "h",
+       "v"
+      ]
+     },
      "outlinecolor": {
       "description": "Sets the axis line color.",
       "dflt": "#444",
@@ -34785,7 +35382,7 @@
       ]
      },
      "ticklabelposition": {
-      "description": "Determines where tick labels are drawn.",
+      "description": "Determines where tick labels are drawn relative to the ticks. Left and right options are used when `orientation` is *h*, top and bottom when `orientation` is *v*.",
       "dflt": "outside",
       "editType": "calc",
       "valType": "enumerated",
@@ -34794,9 +35391,20 @@
        "inside",
        "outside top",
        "inside top",
+       "outside left",
+       "inside left",
+       "outside right",
+       "inside right",
        "outside bottom",
        "inside bottom"
       ]
+     },
+     "ticklabelstep": {
+      "description": "Sets the spacing between tick labels as compared to the spacing between ticks. A value of 1 (default) means each tick gets a label. A value of 2 means shows every 2nd label. A larger value n means only every nth tick is labeled. `tick0` determines which labels are shown. Not implemented for axes with `type` *log* or *multicategory*, or when `tickmode` is *array*.",
+      "dflt": 1,
+      "editType": "calc",
+      "min": 1,
+      "valType": "integer"
      },
      "ticklen": {
       "description": "Sets the tick length (in px).",
@@ -34891,8 +35499,7 @@
       },
       "role": "object",
       "side": {
-       "description": "Determines the location of color bar's title with respect to the color bar. Note that the title's location used to be set by the now deprecated `titleside` attribute.",
-       "dflt": "top",
+       "description": "Determines the location of color bar's title with respect to the color bar. Defaults to *top* when `orientation` if *v* and  defaults to *right* when `orientation` if *h*. Note that the title's location used to be set by the now deprecated `titleside` attribute.",
        "editType": "calc",
        "valType": "enumerated",
        "values": [
@@ -34908,16 +35515,14 @@
       }
      },
      "x": {
-      "description": "Sets the x position of the color bar (in plot fraction).",
-      "dflt": 1.02,
+      "description": "Sets the x position of the color bar (in plot fraction). Defaults to 1.02 when `orientation` is *v* and 0.5 when `orientation` is *h*.",
       "editType": "calc",
       "max": 3,
       "min": -2,
       "valType": "number"
      },
      "xanchor": {
-      "description": "Sets this color bar's horizontal position anchor. This anchor binds the `x` position to the *left*, *center* or *right* of the color bar.",
-      "dflt": "left",
+      "description": "Sets this color bar's horizontal position anchor. This anchor binds the `x` position to the *left*, *center* or *right* of the color bar. Defaults to *left* when `orientation` is *v* and *center* when `orientation` is *h*.",
       "editType": "calc",
       "valType": "enumerated",
       "values": [
@@ -34934,16 +35539,14 @@
       "valType": "number"
      },
      "y": {
-      "description": "Sets the y position of the color bar (in plot fraction).",
-      "dflt": 0.5,
+      "description": "Sets the y position of the color bar (in plot fraction). Defaults to 0.5 when `orientation` is *v* and 1.02 when `orientation` is *h*.",
       "editType": "calc",
       "max": 3,
       "min": -2,
       "valType": "number"
      },
      "yanchor": {
-      "description": "Sets this color bar's vertical position anchor This anchor binds the `y` position to the *top*, *middle* or *bottom* of the color bar.",
-      "dflt": "middle",
+      "description": "Sets this color bar's vertical position anchor This anchor binds the `y` position to the *top*, *middle* or *bottom* of the color bar. Defaults to *middle* when `orientation` is *v* and *bottom* when `orientation` is *h*.",
       "editType": "calc",
       "valType": "enumerated",
       "values": [
@@ -35802,6 +36405,16 @@
       "min": 0,
       "valType": "integer"
      },
+     "orientation": {
+      "description": "Sets the orientation of the colorbar.",
+      "dflt": "v",
+      "editType": "colorbars",
+      "valType": "enumerated",
+      "values": [
+       "h",
+       "v"
+      ]
+     },
      "outlinecolor": {
       "description": "Sets the axis line color.",
       "dflt": "#444",
@@ -35985,7 +36598,7 @@
       ]
      },
      "ticklabelposition": {
-      "description": "Determines where tick labels are drawn.",
+      "description": "Determines where tick labels are drawn relative to the ticks. Left and right options are used when `orientation` is *h*, top and bottom when `orientation` is *v*.",
       "dflt": "outside",
       "editType": "colorbars",
       "valType": "enumerated",
@@ -35994,9 +36607,20 @@
        "inside",
        "outside top",
        "inside top",
+       "outside left",
+       "inside left",
+       "outside right",
+       "inside right",
        "outside bottom",
        "inside bottom"
       ]
+     },
+     "ticklabelstep": {
+      "description": "Sets the spacing between tick labels as compared to the spacing between ticks. A value of 1 (default) means each tick gets a label. A value of 2 means shows every 2nd label. A larger value n means only every nth tick is labeled. `tick0` determines which labels are shown. Not implemented for axes with `type` *log* or *multicategory*, or when `tickmode` is *array*.",
+      "dflt": 1,
+      "editType": "colorbars",
+      "min": 1,
+      "valType": "integer"
      },
      "ticklen": {
       "description": "Sets the tick length (in px).",
@@ -36091,8 +36715,7 @@
       },
       "role": "object",
       "side": {
-       "description": "Determines the location of color bar's title with respect to the color bar. Note that the title's location used to be set by the now deprecated `titleside` attribute.",
-       "dflt": "top",
+       "description": "Determines the location of color bar's title with respect to the color bar. Defaults to *top* when `orientation` if *v* and  defaults to *right* when `orientation` if *h*. Note that the title's location used to be set by the now deprecated `titleside` attribute.",
        "editType": "colorbars",
        "valType": "enumerated",
        "values": [
@@ -36108,16 +36731,14 @@
       }
      },
      "x": {
-      "description": "Sets the x position of the color bar (in plot fraction).",
-      "dflt": 1.02,
+      "description": "Sets the x position of the color bar (in plot fraction). Defaults to 1.02 when `orientation` is *v* and 0.5 when `orientation` is *h*.",
       "editType": "colorbars",
       "max": 3,
       "min": -2,
       "valType": "number"
      },
      "xanchor": {
-      "description": "Sets this color bar's horizontal position anchor. This anchor binds the `x` position to the *left*, *center* or *right* of the color bar.",
-      "dflt": "left",
+      "description": "Sets this color bar's horizontal position anchor. This anchor binds the `x` position to the *left*, *center* or *right* of the color bar. Defaults to *left* when `orientation` is *v* and *center* when `orientation` is *h*.",
       "editType": "colorbars",
       "valType": "enumerated",
       "values": [
@@ -36134,16 +36755,14 @@
       "valType": "number"
      },
      "y": {
-      "description": "Sets the y position of the color bar (in plot fraction).",
-      "dflt": 0.5,
+      "description": "Sets the y position of the color bar (in plot fraction). Defaults to 0.5 when `orientation` is *v* and 1.02 when `orientation` is *h*.",
       "editType": "colorbars",
       "max": 3,
       "min": -2,
       "valType": "number"
      },
      "yanchor": {
-      "description": "Sets this color bar's vertical position anchor This anchor binds the `y` position to the *top*, *middle* or *bottom* of the color bar.",
-      "dflt": "middle",
+      "description": "Sets this color bar's vertical position anchor This anchor binds the `y` position to the *top*, *middle* or *bottom* of the color bar. Defaults to *middle* when `orientation` is *v* and *bottom* when `orientation` is *h*.",
       "editType": "colorbars",
       "valType": "enumerated",
       "values": [
@@ -37756,6 +38375,16 @@
        "min": 0,
        "valType": "integer"
       },
+      "orientation": {
+       "description": "Sets the orientation of the colorbar.",
+       "dflt": "v",
+       "editType": "colorbars",
+       "valType": "enumerated",
+       "values": [
+        "h",
+        "v"
+       ]
+      },
       "outlinecolor": {
        "description": "Sets the axis line color.",
        "dflt": "#444",
@@ -37939,7 +38568,7 @@
        ]
       },
       "ticklabelposition": {
-       "description": "Determines where tick labels are drawn.",
+       "description": "Determines where tick labels are drawn relative to the ticks. Left and right options are used when `orientation` is *h*, top and bottom when `orientation` is *v*.",
        "dflt": "outside",
        "editType": "colorbars",
        "valType": "enumerated",
@@ -37948,9 +38577,20 @@
         "inside",
         "outside top",
         "inside top",
+        "outside left",
+        "inside left",
+        "outside right",
+        "inside right",
         "outside bottom",
         "inside bottom"
        ]
+      },
+      "ticklabelstep": {
+       "description": "Sets the spacing between tick labels as compared to the spacing between ticks. A value of 1 (default) means each tick gets a label. A value of 2 means shows every 2nd label. A larger value n means only every nth tick is labeled. `tick0` determines which labels are shown. Not implemented for axes with `type` *log* or *multicategory*, or when `tickmode` is *array*.",
+       "dflt": 1,
+       "editType": "colorbars",
+       "min": 1,
+       "valType": "integer"
       },
       "ticklen": {
        "description": "Sets the tick length (in px).",
@@ -38045,8 +38685,7 @@
        },
        "role": "object",
        "side": {
-        "description": "Determines the location of color bar's title with respect to the color bar. Note that the title's location used to be set by the now deprecated `titleside` attribute.",
-        "dflt": "top",
+        "description": "Determines the location of color bar's title with respect to the color bar. Defaults to *top* when `orientation` if *v* and  defaults to *right* when `orientation` if *h*. Note that the title's location used to be set by the now deprecated `titleside` attribute.",
         "editType": "colorbars",
         "valType": "enumerated",
         "values": [
@@ -38062,16 +38701,14 @@
        }
       },
       "x": {
-       "description": "Sets the x position of the color bar (in plot fraction).",
-       "dflt": 1.02,
+       "description": "Sets the x position of the color bar (in plot fraction). Defaults to 1.02 when `orientation` is *v* and 0.5 when `orientation` is *h*.",
        "editType": "colorbars",
        "max": 3,
        "min": -2,
        "valType": "number"
       },
       "xanchor": {
-       "description": "Sets this color bar's horizontal position anchor. This anchor binds the `x` position to the *left*, *center* or *right* of the color bar.",
-       "dflt": "left",
+       "description": "Sets this color bar's horizontal position anchor. This anchor binds the `x` position to the *left*, *center* or *right* of the color bar. Defaults to *left* when `orientation` is *v* and *center* when `orientation` is *h*.",
        "editType": "colorbars",
        "valType": "enumerated",
        "values": [
@@ -38088,16 +38725,14 @@
        "valType": "number"
       },
       "y": {
-       "description": "Sets the y position of the color bar (in plot fraction).",
-       "dflt": 0.5,
+       "description": "Sets the y position of the color bar (in plot fraction). Defaults to 0.5 when `orientation` is *v* and 1.02 when `orientation` is *h*.",
        "editType": "colorbars",
        "max": 3,
        "min": -2,
        "valType": "number"
       },
       "yanchor": {
-       "description": "Sets this color bar's vertical position anchor This anchor binds the `y` position to the *top*, *middle* or *bottom* of the color bar.",
-       "dflt": "middle",
+       "description": "Sets this color bar's vertical position anchor This anchor binds the `y` position to the *top*, *middle* or *bottom* of the color bar. Defaults to *middle* when `orientation` is *v* and *bottom* when `orientation` is *h*.",
        "editType": "colorbars",
        "valType": "enumerated",
        "values": [
@@ -38697,6 +39332,16 @@
        "min": 0,
        "valType": "integer"
       },
+      "orientation": {
+       "description": "Sets the orientation of the colorbar.",
+       "dflt": "v",
+       "editType": "colorbars",
+       "valType": "enumerated",
+       "values": [
+        "h",
+        "v"
+       ]
+      },
       "outlinecolor": {
        "description": "Sets the axis line color.",
        "dflt": "#444",
@@ -38880,7 +39525,7 @@
        ]
       },
       "ticklabelposition": {
-       "description": "Determines where tick labels are drawn.",
+       "description": "Determines where tick labels are drawn relative to the ticks. Left and right options are used when `orientation` is *h*, top and bottom when `orientation` is *v*.",
        "dflt": "outside",
        "editType": "colorbars",
        "valType": "enumerated",
@@ -38889,9 +39534,20 @@
         "inside",
         "outside top",
         "inside top",
+        "outside left",
+        "inside left",
+        "outside right",
+        "inside right",
         "outside bottom",
         "inside bottom"
        ]
+      },
+      "ticklabelstep": {
+       "description": "Sets the spacing between tick labels as compared to the spacing between ticks. A value of 1 (default) means each tick gets a label. A value of 2 means shows every 2nd label. A larger value n means only every nth tick is labeled. `tick0` determines which labels are shown. Not implemented for axes with `type` *log* or *multicategory*, or when `tickmode` is *array*.",
+       "dflt": 1,
+       "editType": "colorbars",
+       "min": 1,
+       "valType": "integer"
       },
       "ticklen": {
        "description": "Sets the tick length (in px).",
@@ -38986,8 +39642,7 @@
        },
        "role": "object",
        "side": {
-        "description": "Determines the location of color bar's title with respect to the color bar. Note that the title's location used to be set by the now deprecated `titleside` attribute.",
-        "dflt": "top",
+        "description": "Determines the location of color bar's title with respect to the color bar. Defaults to *top* when `orientation` if *v* and  defaults to *right* when `orientation` if *h*. Note that the title's location used to be set by the now deprecated `titleside` attribute.",
         "editType": "colorbars",
         "valType": "enumerated",
         "values": [
@@ -39003,16 +39658,14 @@
        }
       },
       "x": {
-       "description": "Sets the x position of the color bar (in plot fraction).",
-       "dflt": 1.02,
+       "description": "Sets the x position of the color bar (in plot fraction). Defaults to 1.02 when `orientation` is *v* and 0.5 when `orientation` is *h*.",
        "editType": "colorbars",
        "max": 3,
        "min": -2,
        "valType": "number"
       },
       "xanchor": {
-       "description": "Sets this color bar's horizontal position anchor. This anchor binds the `x` position to the *left*, *center* or *right* of the color bar.",
-       "dflt": "left",
+       "description": "Sets this color bar's horizontal position anchor. This anchor binds the `x` position to the *left*, *center* or *right* of the color bar. Defaults to *left* when `orientation` is *v* and *center* when `orientation` is *h*.",
        "editType": "colorbars",
        "valType": "enumerated",
        "values": [
@@ -39029,16 +39682,14 @@
        "valType": "number"
       },
       "y": {
-       "description": "Sets the y position of the color bar (in plot fraction).",
-       "dflt": 0.5,
+       "description": "Sets the y position of the color bar (in plot fraction). Defaults to 0.5 when `orientation` is *v* and 1.02 when `orientation` is *h*.",
        "editType": "colorbars",
        "max": 3,
        "min": -2,
        "valType": "number"
       },
       "yanchor": {
-       "description": "Sets this color bar's vertical position anchor This anchor binds the `y` position to the *top*, *middle* or *bottom* of the color bar.",
-       "dflt": "middle",
+       "description": "Sets this color bar's vertical position anchor This anchor binds the `y` position to the *top*, *middle* or *bottom* of the color bar. Defaults to *middle* when `orientation` is *v* and *bottom* when `orientation` is *h*.",
        "editType": "colorbars",
        "valType": "enumerated",
        "values": [
@@ -42061,6 +42712,16 @@
        "min": 0,
        "valType": "integer"
       },
+      "orientation": {
+       "description": "Sets the orientation of the colorbar.",
+       "dflt": "v",
+       "editType": "colorbars",
+       "valType": "enumerated",
+       "values": [
+        "h",
+        "v"
+       ]
+      },
       "outlinecolor": {
        "description": "Sets the axis line color.",
        "dflt": "#444",
@@ -42244,7 +42905,7 @@
        ]
       },
       "ticklabelposition": {
-       "description": "Determines where tick labels are drawn.",
+       "description": "Determines where tick labels are drawn relative to the ticks. Left and right options are used when `orientation` is *h*, top and bottom when `orientation` is *v*.",
        "dflt": "outside",
        "editType": "colorbars",
        "valType": "enumerated",
@@ -42253,9 +42914,20 @@
         "inside",
         "outside top",
         "inside top",
+        "outside left",
+        "inside left",
+        "outside right",
+        "inside right",
         "outside bottom",
         "inside bottom"
        ]
+      },
+      "ticklabelstep": {
+       "description": "Sets the spacing between tick labels as compared to the spacing between ticks. A value of 1 (default) means each tick gets a label. A value of 2 means shows every 2nd label. A larger value n means only every nth tick is labeled. `tick0` determines which labels are shown. Not implemented for axes with `type` *log* or *multicategory*, or when `tickmode` is *array*.",
+       "dflt": 1,
+       "editType": "colorbars",
+       "min": 1,
+       "valType": "integer"
       },
       "ticklen": {
        "description": "Sets the tick length (in px).",
@@ -42350,8 +43022,7 @@
        },
        "role": "object",
        "side": {
-        "description": "Determines the location of color bar's title with respect to the color bar. Note that the title's location used to be set by the now deprecated `titleside` attribute.",
-        "dflt": "top",
+        "description": "Determines the location of color bar's title with respect to the color bar. Defaults to *top* when `orientation` if *v* and  defaults to *right* when `orientation` if *h*. Note that the title's location used to be set by the now deprecated `titleside` attribute.",
         "editType": "colorbars",
         "valType": "enumerated",
         "values": [
@@ -42367,16 +43038,14 @@
        }
       },
       "x": {
-       "description": "Sets the x position of the color bar (in plot fraction).",
-       "dflt": 1.02,
+       "description": "Sets the x position of the color bar (in plot fraction). Defaults to 1.02 when `orientation` is *v* and 0.5 when `orientation` is *h*.",
        "editType": "colorbars",
        "max": 3,
        "min": -2,
        "valType": "number"
       },
       "xanchor": {
-       "description": "Sets this color bar's horizontal position anchor. This anchor binds the `x` position to the *left*, *center* or *right* of the color bar.",
-       "dflt": "left",
+       "description": "Sets this color bar's horizontal position anchor. This anchor binds the `x` position to the *left*, *center* or *right* of the color bar. Defaults to *left* when `orientation` is *v* and *center* when `orientation` is *h*.",
        "editType": "colorbars",
        "valType": "enumerated",
        "values": [
@@ -42393,16 +43062,14 @@
        "valType": "number"
       },
       "y": {
-       "description": "Sets the y position of the color bar (in plot fraction).",
-       "dflt": 0.5,
+       "description": "Sets the y position of the color bar (in plot fraction). Defaults to 0.5 when `orientation` is *v* and 1.02 when `orientation` is *h*.",
        "editType": "colorbars",
        "max": 3,
        "min": -2,
        "valType": "number"
       },
       "yanchor": {
-       "description": "Sets this color bar's vertical position anchor This anchor binds the `y` position to the *top*, *middle* or *bottom* of the color bar.",
-       "dflt": "middle",
+       "description": "Sets this color bar's vertical position anchor This anchor binds the `y` position to the *top*, *middle* or *bottom* of the color bar. Defaults to *middle* when `orientation` is *v* and *bottom* when `orientation` is *h*.",
        "editType": "colorbars",
        "valType": "enumerated",
        "values": [
@@ -44241,6 +44908,16 @@
        "min": 0,
        "valType": "integer"
       },
+      "orientation": {
+       "description": "Sets the orientation of the colorbar.",
+       "dflt": "v",
+       "editType": "calc",
+       "valType": "enumerated",
+       "values": [
+        "h",
+        "v"
+       ]
+      },
       "outlinecolor": {
        "description": "Sets the axis line color.",
        "dflt": "#444",
@@ -44424,7 +45101,7 @@
        ]
       },
       "ticklabelposition": {
-       "description": "Determines where tick labels are drawn.",
+       "description": "Determines where tick labels are drawn relative to the ticks. Left and right options are used when `orientation` is *h*, top and bottom when `orientation` is *v*.",
        "dflt": "outside",
        "editType": "calc",
        "valType": "enumerated",
@@ -44433,9 +45110,20 @@
         "inside",
         "outside top",
         "inside top",
+        "outside left",
+        "inside left",
+        "outside right",
+        "inside right",
         "outside bottom",
         "inside bottom"
        ]
+      },
+      "ticklabelstep": {
+       "description": "Sets the spacing between tick labels as compared to the spacing between ticks. A value of 1 (default) means each tick gets a label. A value of 2 means shows every 2nd label. A larger value n means only every nth tick is labeled. `tick0` determines which labels are shown. Not implemented for axes with `type` *log* or *multicategory*, or when `tickmode` is *array*.",
+       "dflt": 1,
+       "editType": "calc",
+       "min": 1,
+       "valType": "integer"
       },
       "ticklen": {
        "description": "Sets the tick length (in px).",
@@ -44530,8 +45218,7 @@
        },
        "role": "object",
        "side": {
-        "description": "Determines the location of color bar's title with respect to the color bar. Note that the title's location used to be set by the now deprecated `titleside` attribute.",
-        "dflt": "top",
+        "description": "Determines the location of color bar's title with respect to the color bar. Defaults to *top* when `orientation` if *v* and  defaults to *right* when `orientation` if *h*. Note that the title's location used to be set by the now deprecated `titleside` attribute.",
         "editType": "calc",
         "valType": "enumerated",
         "values": [
@@ -44547,16 +45234,14 @@
        }
       },
       "x": {
-       "description": "Sets the x position of the color bar (in plot fraction).",
-       "dflt": 1.02,
+       "description": "Sets the x position of the color bar (in plot fraction). Defaults to 1.02 when `orientation` is *v* and 0.5 when `orientation` is *h*.",
        "editType": "calc",
        "max": 3,
        "min": -2,
        "valType": "number"
       },
       "xanchor": {
-       "description": "Sets this color bar's horizontal position anchor. This anchor binds the `x` position to the *left*, *center* or *right* of the color bar.",
-       "dflt": "left",
+       "description": "Sets this color bar's horizontal position anchor. This anchor binds the `x` position to the *left*, *center* or *right* of the color bar. Defaults to *left* when `orientation` is *v* and *center* when `orientation` is *h*.",
        "editType": "calc",
        "valType": "enumerated",
        "values": [
@@ -44573,16 +45258,14 @@
        "valType": "number"
       },
       "y": {
-       "description": "Sets the y position of the color bar (in plot fraction).",
-       "dflt": 0.5,
+       "description": "Sets the y position of the color bar (in plot fraction). Defaults to 0.5 when `orientation` is *v* and 1.02 when `orientation` is *h*.",
        "editType": "calc",
        "max": 3,
        "min": -2,
        "valType": "number"
       },
       "yanchor": {
-       "description": "Sets this color bar's vertical position anchor This anchor binds the `y` position to the *top*, *middle* or *bottom* of the color bar.",
-       "dflt": "middle",
+       "description": "Sets this color bar's vertical position anchor This anchor binds the `y` position to the *top*, *middle* or *bottom* of the color bar. Defaults to *middle* when `orientation` is *v* and *bottom* when `orientation` is *h*.",
        "editType": "calc",
        "valType": "enumerated",
        "values": [
@@ -44814,6 +45497,16 @@
        "min": 0,
        "valType": "integer"
       },
+      "orientation": {
+       "description": "Sets the orientation of the colorbar.",
+       "dflt": "v",
+       "editType": "calc",
+       "valType": "enumerated",
+       "values": [
+        "h",
+        "v"
+       ]
+      },
       "outlinecolor": {
        "description": "Sets the axis line color.",
        "dflt": "#444",
@@ -44997,7 +45690,7 @@
        ]
       },
       "ticklabelposition": {
-       "description": "Determines where tick labels are drawn.",
+       "description": "Determines where tick labels are drawn relative to the ticks. Left and right options are used when `orientation` is *h*, top and bottom when `orientation` is *v*.",
        "dflt": "outside",
        "editType": "calc",
        "valType": "enumerated",
@@ -45006,9 +45699,20 @@
         "inside",
         "outside top",
         "inside top",
+        "outside left",
+        "inside left",
+        "outside right",
+        "inside right",
         "outside bottom",
         "inside bottom"
        ]
+      },
+      "ticklabelstep": {
+       "description": "Sets the spacing between tick labels as compared to the spacing between ticks. A value of 1 (default) means each tick gets a label. A value of 2 means shows every 2nd label. A larger value n means only every nth tick is labeled. `tick0` determines which labels are shown. Not implemented for axes with `type` *log* or *multicategory*, or when `tickmode` is *array*.",
+       "dflt": 1,
+       "editType": "calc",
+       "min": 1,
+       "valType": "integer"
       },
       "ticklen": {
        "description": "Sets the tick length (in px).",
@@ -45103,8 +45807,7 @@
        },
        "role": "object",
        "side": {
-        "description": "Determines the location of color bar's title with respect to the color bar. Note that the title's location used to be set by the now deprecated `titleside` attribute.",
-        "dflt": "top",
+        "description": "Determines the location of color bar's title with respect to the color bar. Defaults to *top* when `orientation` if *v* and  defaults to *right* when `orientation` if *h*. Note that the title's location used to be set by the now deprecated `titleside` attribute.",
         "editType": "calc",
         "valType": "enumerated",
         "values": [
@@ -45120,16 +45823,14 @@
        }
       },
       "x": {
-       "description": "Sets the x position of the color bar (in plot fraction).",
-       "dflt": 1.02,
+       "description": "Sets the x position of the color bar (in plot fraction). Defaults to 1.02 when `orientation` is *v* and 0.5 when `orientation` is *h*.",
        "editType": "calc",
        "max": 3,
        "min": -2,
        "valType": "number"
       },
       "xanchor": {
-       "description": "Sets this color bar's horizontal position anchor. This anchor binds the `x` position to the *left*, *center* or *right* of the color bar.",
-       "dflt": "left",
+       "description": "Sets this color bar's horizontal position anchor. This anchor binds the `x` position to the *left*, *center* or *right* of the color bar. Defaults to *left* when `orientation` is *v* and *center* when `orientation` is *h*.",
        "editType": "calc",
        "valType": "enumerated",
        "values": [
@@ -45146,16 +45847,14 @@
        "valType": "number"
       },
       "y": {
-       "description": "Sets the y position of the color bar (in plot fraction).",
-       "dflt": 0.5,
+       "description": "Sets the y position of the color bar (in plot fraction). Defaults to 0.5 when `orientation` is *v* and 1.02 when `orientation` is *h*.",
        "editType": "calc",
        "max": 3,
        "min": -2,
        "valType": "number"
       },
       "yanchor": {
-       "description": "Sets this color bar's vertical position anchor This anchor binds the `y` position to the *top*, *middle* or *bottom* of the color bar.",
-       "dflt": "middle",
+       "description": "Sets this color bar's vertical position anchor This anchor binds the `y` position to the *top*, *middle* or *bottom* of the color bar. Defaults to *middle* when `orientation` is *v* and *bottom* when `orientation` is *h*.",
        "editType": "calc",
        "valType": "enumerated",
        "values": [
@@ -46240,6 +46939,16 @@
        "min": 0,
        "valType": "integer"
       },
+      "orientation": {
+       "description": "Sets the orientation of the colorbar.",
+       "dflt": "v",
+       "editType": "colorbars",
+       "valType": "enumerated",
+       "values": [
+        "h",
+        "v"
+       ]
+      },
       "outlinecolor": {
        "description": "Sets the axis line color.",
        "dflt": "#444",
@@ -46423,7 +47132,7 @@
        ]
       },
       "ticklabelposition": {
-       "description": "Determines where tick labels are drawn.",
+       "description": "Determines where tick labels are drawn relative to the ticks. Left and right options are used when `orientation` is *h*, top and bottom when `orientation` is *v*.",
        "dflt": "outside",
        "editType": "colorbars",
        "valType": "enumerated",
@@ -46432,9 +47141,20 @@
         "inside",
         "outside top",
         "inside top",
+        "outside left",
+        "inside left",
+        "outside right",
+        "inside right",
         "outside bottom",
         "inside bottom"
        ]
+      },
+      "ticklabelstep": {
+       "description": "Sets the spacing between tick labels as compared to the spacing between ticks. A value of 1 (default) means each tick gets a label. A value of 2 means shows every 2nd label. A larger value n means only every nth tick is labeled. `tick0` determines which labels are shown. Not implemented for axes with `type` *log* or *multicategory*, or when `tickmode` is *array*.",
+       "dflt": 1,
+       "editType": "colorbars",
+       "min": 1,
+       "valType": "integer"
       },
       "ticklen": {
        "description": "Sets the tick length (in px).",
@@ -46529,8 +47249,7 @@
        },
        "role": "object",
        "side": {
-        "description": "Determines the location of color bar's title with respect to the color bar. Note that the title's location used to be set by the now deprecated `titleside` attribute.",
-        "dflt": "top",
+        "description": "Determines the location of color bar's title with respect to the color bar. Defaults to *top* when `orientation` if *v* and  defaults to *right* when `orientation` if *h*. Note that the title's location used to be set by the now deprecated `titleside` attribute.",
         "editType": "colorbars",
         "valType": "enumerated",
         "values": [
@@ -46546,16 +47265,14 @@
        }
       },
       "x": {
-       "description": "Sets the x position of the color bar (in plot fraction).",
-       "dflt": 1.02,
+       "description": "Sets the x position of the color bar (in plot fraction). Defaults to 1.02 when `orientation` is *v* and 0.5 when `orientation` is *h*.",
        "editType": "colorbars",
        "max": 3,
        "min": -2,
        "valType": "number"
       },
       "xanchor": {
-       "description": "Sets this color bar's horizontal position anchor. This anchor binds the `x` position to the *left*, *center* or *right* of the color bar.",
-       "dflt": "left",
+       "description": "Sets this color bar's horizontal position anchor. This anchor binds the `x` position to the *left*, *center* or *right* of the color bar. Defaults to *left* when `orientation` is *v* and *center* when `orientation` is *h*.",
        "editType": "colorbars",
        "valType": "enumerated",
        "values": [
@@ -46572,16 +47289,14 @@
        "valType": "number"
       },
       "y": {
-       "description": "Sets the y position of the color bar (in plot fraction).",
-       "dflt": 0.5,
+       "description": "Sets the y position of the color bar (in plot fraction). Defaults to 0.5 when `orientation` is *v* and 1.02 when `orientation` is *h*.",
        "editType": "colorbars",
        "max": 3,
        "min": -2,
        "valType": "number"
       },
       "yanchor": {
-       "description": "Sets this color bar's vertical position anchor This anchor binds the `y` position to the *top*, *middle* or *bottom* of the color bar.",
-       "dflt": "middle",
+       "description": "Sets this color bar's vertical position anchor This anchor binds the `y` position to the *top*, *middle* or *bottom* of the color bar. Defaults to *middle* when `orientation` is *v* and *bottom* when `orientation` is *h*.",
        "editType": "colorbars",
        "valType": "enumerated",
        "values": [
@@ -48059,6 +48774,16 @@
        "min": 0,
        "valType": "integer"
       },
+      "orientation": {
+       "description": "Sets the orientation of the colorbar.",
+       "dflt": "v",
+       "editType": "calc",
+       "valType": "enumerated",
+       "values": [
+        "h",
+        "v"
+       ]
+      },
       "outlinecolor": {
        "description": "Sets the axis line color.",
        "dflt": "#444",
@@ -48242,7 +48967,7 @@
        ]
       },
       "ticklabelposition": {
-       "description": "Determines where tick labels are drawn.",
+       "description": "Determines where tick labels are drawn relative to the ticks. Left and right options are used when `orientation` is *h*, top and bottom when `orientation` is *v*.",
        "dflt": "outside",
        "editType": "calc",
        "valType": "enumerated",
@@ -48251,9 +48976,20 @@
         "inside",
         "outside top",
         "inside top",
+        "outside left",
+        "inside left",
+        "outside right",
+        "inside right",
         "outside bottom",
         "inside bottom"
        ]
+      },
+      "ticklabelstep": {
+       "description": "Sets the spacing between tick labels as compared to the spacing between ticks. A value of 1 (default) means each tick gets a label. A value of 2 means shows every 2nd label. A larger value n means only every nth tick is labeled. `tick0` determines which labels are shown. Not implemented for axes with `type` *log* or *multicategory*, or when `tickmode` is *array*.",
+       "dflt": 1,
+       "editType": "calc",
+       "min": 1,
+       "valType": "integer"
       },
       "ticklen": {
        "description": "Sets the tick length (in px).",
@@ -48348,8 +49084,7 @@
        },
        "role": "object",
        "side": {
-        "description": "Determines the location of color bar's title with respect to the color bar. Note that the title's location used to be set by the now deprecated `titleside` attribute.",
-        "dflt": "top",
+        "description": "Determines the location of color bar's title with respect to the color bar. Defaults to *top* when `orientation` if *v* and  defaults to *right* when `orientation` if *h*. Note that the title's location used to be set by the now deprecated `titleside` attribute.",
         "editType": "calc",
         "valType": "enumerated",
         "values": [
@@ -48365,16 +49100,14 @@
        }
       },
       "x": {
-       "description": "Sets the x position of the color bar (in plot fraction).",
-       "dflt": 1.02,
+       "description": "Sets the x position of the color bar (in plot fraction). Defaults to 1.02 when `orientation` is *v* and 0.5 when `orientation` is *h*.",
        "editType": "calc",
        "max": 3,
        "min": -2,
        "valType": "number"
       },
       "xanchor": {
-       "description": "Sets this color bar's horizontal position anchor. This anchor binds the `x` position to the *left*, *center* or *right* of the color bar.",
-       "dflt": "left",
+       "description": "Sets this color bar's horizontal position anchor. This anchor binds the `x` position to the *left*, *center* or *right* of the color bar. Defaults to *left* when `orientation` is *v* and *center* when `orientation` is *h*.",
        "editType": "calc",
        "valType": "enumerated",
        "values": [
@@ -48391,16 +49124,14 @@
        "valType": "number"
       },
       "y": {
-       "description": "Sets the y position of the color bar (in plot fraction).",
-       "dflt": 0.5,
+       "description": "Sets the y position of the color bar (in plot fraction). Defaults to 0.5 when `orientation` is *v* and 1.02 when `orientation` is *h*.",
        "editType": "calc",
        "max": 3,
        "min": -2,
        "valType": "number"
       },
       "yanchor": {
-       "description": "Sets this color bar's vertical position anchor This anchor binds the `y` position to the *top*, *middle* or *bottom* of the color bar.",
-       "dflt": "middle",
+       "description": "Sets this color bar's vertical position anchor This anchor binds the `y` position to the *top*, *middle* or *bottom* of the color bar. Defaults to *middle* when `orientation` is *v* and *bottom* when `orientation` is *h*.",
        "editType": "calc",
        "valType": "enumerated",
        "values": [
@@ -50024,6 +50755,16 @@
        "min": 0,
        "valType": "integer"
       },
+      "orientation": {
+       "description": "Sets the orientation of the colorbar.",
+       "dflt": "v",
+       "editType": "calc",
+       "valType": "enumerated",
+       "values": [
+        "h",
+        "v"
+       ]
+      },
       "outlinecolor": {
        "description": "Sets the axis line color.",
        "dflt": "#444",
@@ -50207,7 +50948,7 @@
        ]
       },
       "ticklabelposition": {
-       "description": "Determines where tick labels are drawn.",
+       "description": "Determines where tick labels are drawn relative to the ticks. Left and right options are used when `orientation` is *h*, top and bottom when `orientation` is *v*.",
        "dflt": "outside",
        "editType": "calc",
        "valType": "enumerated",
@@ -50216,9 +50957,20 @@
         "inside",
         "outside top",
         "inside top",
+        "outside left",
+        "inside left",
+        "outside right",
+        "inside right",
         "outside bottom",
         "inside bottom"
        ]
+      },
+      "ticklabelstep": {
+       "description": "Sets the spacing between tick labels as compared to the spacing between ticks. A value of 1 (default) means each tick gets a label. A value of 2 means shows every 2nd label. A larger value n means only every nth tick is labeled. `tick0` determines which labels are shown. Not implemented for axes with `type` *log* or *multicategory*, or when `tickmode` is *array*.",
+       "dflt": 1,
+       "editType": "calc",
+       "min": 1,
+       "valType": "integer"
       },
       "ticklen": {
        "description": "Sets the tick length (in px).",
@@ -50313,8 +51065,7 @@
        },
        "role": "object",
        "side": {
-        "description": "Determines the location of color bar's title with respect to the color bar. Note that the title's location used to be set by the now deprecated `titleside` attribute.",
-        "dflt": "top",
+        "description": "Determines the location of color bar's title with respect to the color bar. Defaults to *top* when `orientation` if *v* and  defaults to *right* when `orientation` if *h*. Note that the title's location used to be set by the now deprecated `titleside` attribute.",
         "editType": "calc",
         "valType": "enumerated",
         "values": [
@@ -50330,16 +51081,14 @@
        }
       },
       "x": {
-       "description": "Sets the x position of the color bar (in plot fraction).",
-       "dflt": 1.02,
+       "description": "Sets the x position of the color bar (in plot fraction). Defaults to 1.02 when `orientation` is *v* and 0.5 when `orientation` is *h*.",
        "editType": "calc",
        "max": 3,
        "min": -2,
        "valType": "number"
       },
       "xanchor": {
-       "description": "Sets this color bar's horizontal position anchor. This anchor binds the `x` position to the *left*, *center* or *right* of the color bar.",
-       "dflt": "left",
+       "description": "Sets this color bar's horizontal position anchor. This anchor binds the `x` position to the *left*, *center* or *right* of the color bar. Defaults to *left* when `orientation` is *v* and *center* when `orientation` is *h*.",
        "editType": "calc",
        "valType": "enumerated",
        "values": [
@@ -50356,16 +51105,14 @@
        "valType": "number"
       },
       "y": {
-       "description": "Sets the y position of the color bar (in plot fraction).",
-       "dflt": 0.5,
+       "description": "Sets the y position of the color bar (in plot fraction). Defaults to 0.5 when `orientation` is *v* and 1.02 when `orientation` is *h*.",
        "editType": "calc",
        "max": 3,
        "min": -2,
        "valType": "number"
       },
       "yanchor": {
-       "description": "Sets this color bar's vertical position anchor This anchor binds the `y` position to the *top*, *middle* or *bottom* of the color bar.",
-       "dflt": "middle",
+       "description": "Sets this color bar's vertical position anchor This anchor binds the `y` position to the *top*, *middle* or *bottom* of the color bar. Defaults to *middle* when `orientation` is *v* and *bottom* when `orientation` is *h*.",
        "editType": "calc",
        "valType": "enumerated",
        "values": [
@@ -51908,6 +52655,16 @@
        "min": 0,
        "valType": "integer"
       },
+      "orientation": {
+       "description": "Sets the orientation of the colorbar.",
+       "dflt": "v",
+       "editType": "calc",
+       "valType": "enumerated",
+       "values": [
+        "h",
+        "v"
+       ]
+      },
       "outlinecolor": {
        "description": "Sets the axis line color.",
        "dflt": "#444",
@@ -52091,7 +52848,7 @@
        ]
       },
       "ticklabelposition": {
-       "description": "Determines where tick labels are drawn.",
+       "description": "Determines where tick labels are drawn relative to the ticks. Left and right options are used when `orientation` is *h*, top and bottom when `orientation` is *v*.",
        "dflt": "outside",
        "editType": "calc",
        "valType": "enumerated",
@@ -52100,9 +52857,20 @@
         "inside",
         "outside top",
         "inside top",
+        "outside left",
+        "inside left",
+        "outside right",
+        "inside right",
         "outside bottom",
         "inside bottom"
        ]
+      },
+      "ticklabelstep": {
+       "description": "Sets the spacing between tick labels as compared to the spacing between ticks. A value of 1 (default) means each tick gets a label. A value of 2 means shows every 2nd label. A larger value n means only every nth tick is labeled. `tick0` determines which labels are shown. Not implemented for axes with `type` *log* or *multicategory*, or when `tickmode` is *array*.",
+       "dflt": 1,
+       "editType": "calc",
+       "min": 1,
+       "valType": "integer"
       },
       "ticklen": {
        "description": "Sets the tick length (in px).",
@@ -52197,8 +52965,7 @@
        },
        "role": "object",
        "side": {
-        "description": "Determines the location of color bar's title with respect to the color bar. Note that the title's location used to be set by the now deprecated `titleside` attribute.",
-        "dflt": "top",
+        "description": "Determines the location of color bar's title with respect to the color bar. Defaults to *top* when `orientation` if *v* and  defaults to *right* when `orientation` if *h*. Note that the title's location used to be set by the now deprecated `titleside` attribute.",
         "editType": "calc",
         "valType": "enumerated",
         "values": [
@@ -52214,16 +52981,14 @@
        }
       },
       "x": {
-       "description": "Sets the x position of the color bar (in plot fraction).",
-       "dflt": 1.02,
+       "description": "Sets the x position of the color bar (in plot fraction). Defaults to 1.02 when `orientation` is *v* and 0.5 when `orientation` is *h*.",
        "editType": "calc",
        "max": 3,
        "min": -2,
        "valType": "number"
       },
       "xanchor": {
-       "description": "Sets this color bar's horizontal position anchor. This anchor binds the `x` position to the *left*, *center* or *right* of the color bar.",
-       "dflt": "left",
+       "description": "Sets this color bar's horizontal position anchor. This anchor binds the `x` position to the *left*, *center* or *right* of the color bar. Defaults to *left* when `orientation` is *v* and *center* when `orientation` is *h*.",
        "editType": "calc",
        "valType": "enumerated",
        "values": [
@@ -52240,16 +53005,14 @@
        "valType": "number"
       },
       "y": {
-       "description": "Sets the y position of the color bar (in plot fraction).",
-       "dflt": 0.5,
+       "description": "Sets the y position of the color bar (in plot fraction). Defaults to 0.5 when `orientation` is *v* and 1.02 when `orientation` is *h*.",
        "editType": "calc",
        "max": 3,
        "min": -2,
        "valType": "number"
       },
       "yanchor": {
-       "description": "Sets this color bar's vertical position anchor This anchor binds the `y` position to the *top*, *middle* or *bottom* of the color bar.",
-       "dflt": "middle",
+       "description": "Sets this color bar's vertical position anchor This anchor binds the `y` position to the *top*, *middle* or *bottom* of the color bar. Defaults to *middle* when `orientation` is *v* and *bottom* when `orientation` is *h*.",
        "editType": "calc",
        "valType": "enumerated",
        "values": [
@@ -53061,6 +53824,16 @@
        "min": 0,
        "valType": "integer"
       },
+      "orientation": {
+       "description": "Sets the orientation of the colorbar.",
+       "dflt": "v",
+       "editType": "colorbars",
+       "valType": "enumerated",
+       "values": [
+        "h",
+        "v"
+       ]
+      },
       "outlinecolor": {
        "description": "Sets the axis line color.",
        "dflt": "#444",
@@ -53244,7 +54017,7 @@
        ]
       },
       "ticklabelposition": {
-       "description": "Determines where tick labels are drawn.",
+       "description": "Determines where tick labels are drawn relative to the ticks. Left and right options are used when `orientation` is *h*, top and bottom when `orientation` is *v*.",
        "dflt": "outside",
        "editType": "colorbars",
        "valType": "enumerated",
@@ -53253,9 +54026,20 @@
         "inside",
         "outside top",
         "inside top",
+        "outside left",
+        "inside left",
+        "outside right",
+        "inside right",
         "outside bottom",
         "inside bottom"
        ]
+      },
+      "ticklabelstep": {
+       "description": "Sets the spacing between tick labels as compared to the spacing between ticks. A value of 1 (default) means each tick gets a label. A value of 2 means shows every 2nd label. A larger value n means only every nth tick is labeled. `tick0` determines which labels are shown. Not implemented for axes with `type` *log* or *multicategory*, or when `tickmode` is *array*.",
+       "dflt": 1,
+       "editType": "colorbars",
+       "min": 1,
+       "valType": "integer"
       },
       "ticklen": {
        "description": "Sets the tick length (in px).",
@@ -53350,8 +54134,7 @@
        },
        "role": "object",
        "side": {
-        "description": "Determines the location of color bar's title with respect to the color bar. Note that the title's location used to be set by the now deprecated `titleside` attribute.",
-        "dflt": "top",
+        "description": "Determines the location of color bar's title with respect to the color bar. Defaults to *top* when `orientation` if *v* and  defaults to *right* when `orientation` if *h*. Note that the title's location used to be set by the now deprecated `titleside` attribute.",
         "editType": "colorbars",
         "valType": "enumerated",
         "values": [
@@ -53367,16 +54150,14 @@
        }
       },
       "x": {
-       "description": "Sets the x position of the color bar (in plot fraction).",
-       "dflt": 1.02,
+       "description": "Sets the x position of the color bar (in plot fraction). Defaults to 1.02 when `orientation` is *v* and 0.5 when `orientation` is *h*.",
        "editType": "colorbars",
        "max": 3,
        "min": -2,
        "valType": "number"
       },
       "xanchor": {
-       "description": "Sets this color bar's horizontal position anchor. This anchor binds the `x` position to the *left*, *center* or *right* of the color bar.",
-       "dflt": "left",
+       "description": "Sets this color bar's horizontal position anchor. This anchor binds the `x` position to the *left*, *center* or *right* of the color bar. Defaults to *left* when `orientation` is *v* and *center* when `orientation` is *h*.",
        "editType": "colorbars",
        "valType": "enumerated",
        "values": [
@@ -53393,16 +54174,14 @@
        "valType": "number"
       },
       "y": {
-       "description": "Sets the y position of the color bar (in plot fraction).",
-       "dflt": 0.5,
+       "description": "Sets the y position of the color bar (in plot fraction). Defaults to 0.5 when `orientation` is *v* and 1.02 when `orientation` is *h*.",
        "editType": "colorbars",
        "max": 3,
        "min": -2,
        "valType": "number"
       },
       "yanchor": {
-       "description": "Sets this color bar's vertical position anchor This anchor binds the `y` position to the *top*, *middle* or *bottom* of the color bar.",
-       "dflt": "middle",
+       "description": "Sets this color bar's vertical position anchor This anchor binds the `y` position to the *top*, *middle* or *bottom* of the color bar. Defaults to *middle* when `orientation` is *v* and *bottom* when `orientation` is *h*.",
        "editType": "colorbars",
        "valType": "enumerated",
        "values": [
@@ -54883,6 +55662,16 @@
        "min": 0,
        "valType": "integer"
       },
+      "orientation": {
+       "description": "Sets the orientation of the colorbar.",
+       "dflt": "v",
+       "editType": "calc",
+       "valType": "enumerated",
+       "values": [
+        "h",
+        "v"
+       ]
+      },
       "outlinecolor": {
        "description": "Sets the axis line color.",
        "dflt": "#444",
@@ -55066,7 +55855,7 @@
        ]
       },
       "ticklabelposition": {
-       "description": "Determines where tick labels are drawn.",
+       "description": "Determines where tick labels are drawn relative to the ticks. Left and right options are used when `orientation` is *h*, top and bottom when `orientation` is *v*.",
        "dflt": "outside",
        "editType": "calc",
        "valType": "enumerated",
@@ -55075,9 +55864,20 @@
         "inside",
         "outside top",
         "inside top",
+        "outside left",
+        "inside left",
+        "outside right",
+        "inside right",
         "outside bottom",
         "inside bottom"
        ]
+      },
+      "ticklabelstep": {
+       "description": "Sets the spacing between tick labels as compared to the spacing between ticks. A value of 1 (default) means each tick gets a label. A value of 2 means shows every 2nd label. A larger value n means only every nth tick is labeled. `tick0` determines which labels are shown. Not implemented for axes with `type` *log* or *multicategory*, or when `tickmode` is *array*.",
+       "dflt": 1,
+       "editType": "calc",
+       "min": 1,
+       "valType": "integer"
       },
       "ticklen": {
        "description": "Sets the tick length (in px).",
@@ -55172,8 +55972,7 @@
        },
        "role": "object",
        "side": {
-        "description": "Determines the location of color bar's title with respect to the color bar. Note that the title's location used to be set by the now deprecated `titleside` attribute.",
-        "dflt": "top",
+        "description": "Determines the location of color bar's title with respect to the color bar. Defaults to *top* when `orientation` if *v* and  defaults to *right* when `orientation` if *h*. Note that the title's location used to be set by the now deprecated `titleside` attribute.",
         "editType": "calc",
         "valType": "enumerated",
         "values": [
@@ -55189,16 +55988,14 @@
        }
       },
       "x": {
-       "description": "Sets the x position of the color bar (in plot fraction).",
-       "dflt": 1.02,
+       "description": "Sets the x position of the color bar (in plot fraction). Defaults to 1.02 when `orientation` is *v* and 0.5 when `orientation` is *h*.",
        "editType": "calc",
        "max": 3,
        "min": -2,
        "valType": "number"
       },
       "xanchor": {
-       "description": "Sets this color bar's horizontal position anchor. This anchor binds the `x` position to the *left*, *center* or *right* of the color bar.",
-       "dflt": "left",
+       "description": "Sets this color bar's horizontal position anchor. This anchor binds the `x` position to the *left*, *center* or *right* of the color bar. Defaults to *left* when `orientation` is *v* and *center* when `orientation` is *h*.",
        "editType": "calc",
        "valType": "enumerated",
        "values": [
@@ -55215,16 +56012,14 @@
        "valType": "number"
       },
       "y": {
-       "description": "Sets the y position of the color bar (in plot fraction).",
-       "dflt": 0.5,
+       "description": "Sets the y position of the color bar (in plot fraction). Defaults to 0.5 when `orientation` is *v* and 1.02 when `orientation` is *h*.",
        "editType": "calc",
        "max": 3,
        "min": -2,
        "valType": "number"
       },
       "yanchor": {
-       "description": "Sets this color bar's vertical position anchor This anchor binds the `y` position to the *top*, *middle* or *bottom* of the color bar.",
-       "dflt": "middle",
+       "description": "Sets this color bar's vertical position anchor This anchor binds the `y` position to the *top*, *middle* or *bottom* of the color bar. Defaults to *middle* when `orientation` is *v* and *bottom* when `orientation` is *h*.",
        "editType": "calc",
        "valType": "enumerated",
        "values": [
@@ -56682,6 +57477,16 @@
        "min": 0,
        "valType": "integer"
       },
+      "orientation": {
+       "description": "Sets the orientation of the colorbar.",
+       "dflt": "v",
+       "editType": "colorbars",
+       "valType": "enumerated",
+       "values": [
+        "h",
+        "v"
+       ]
+      },
       "outlinecolor": {
        "description": "Sets the axis line color.",
        "dflt": "#444",
@@ -56865,7 +57670,7 @@
        ]
       },
       "ticklabelposition": {
-       "description": "Determines where tick labels are drawn.",
+       "description": "Determines where tick labels are drawn relative to the ticks. Left and right options are used when `orientation` is *h*, top and bottom when `orientation` is *v*.",
        "dflt": "outside",
        "editType": "colorbars",
        "valType": "enumerated",
@@ -56874,9 +57679,20 @@
         "inside",
         "outside top",
         "inside top",
+        "outside left",
+        "inside left",
+        "outside right",
+        "inside right",
         "outside bottom",
         "inside bottom"
        ]
+      },
+      "ticklabelstep": {
+       "description": "Sets the spacing between tick labels as compared to the spacing between ticks. A value of 1 (default) means each tick gets a label. A value of 2 means shows every 2nd label. A larger value n means only every nth tick is labeled. `tick0` determines which labels are shown. Not implemented for axes with `type` *log* or *multicategory*, or when `tickmode` is *array*.",
+       "dflt": 1,
+       "editType": "colorbars",
+       "min": 1,
+       "valType": "integer"
       },
       "ticklen": {
        "description": "Sets the tick length (in px).",
@@ -56971,8 +57787,7 @@
        },
        "role": "object",
        "side": {
-        "description": "Determines the location of color bar's title with respect to the color bar. Note that the title's location used to be set by the now deprecated `titleside` attribute.",
-        "dflt": "top",
+        "description": "Determines the location of color bar's title with respect to the color bar. Defaults to *top* when `orientation` if *v* and  defaults to *right* when `orientation` if *h*. Note that the title's location used to be set by the now deprecated `titleside` attribute.",
         "editType": "colorbars",
         "valType": "enumerated",
         "values": [
@@ -56988,16 +57803,14 @@
        }
       },
       "x": {
-       "description": "Sets the x position of the color bar (in plot fraction).",
-       "dflt": 1.02,
+       "description": "Sets the x position of the color bar (in plot fraction). Defaults to 1.02 when `orientation` is *v* and 0.5 when `orientation` is *h*.",
        "editType": "colorbars",
        "max": 3,
        "min": -2,
        "valType": "number"
       },
       "xanchor": {
-       "description": "Sets this color bar's horizontal position anchor. This anchor binds the `x` position to the *left*, *center* or *right* of the color bar.",
-       "dflt": "left",
+       "description": "Sets this color bar's horizontal position anchor. This anchor binds the `x` position to the *left*, *center* or *right* of the color bar. Defaults to *left* when `orientation` is *v* and *center* when `orientation` is *h*.",
        "editType": "colorbars",
        "valType": "enumerated",
        "values": [
@@ -57014,16 +57827,14 @@
        "valType": "number"
       },
       "y": {
-       "description": "Sets the y position of the color bar (in plot fraction).",
-       "dflt": 0.5,
+       "description": "Sets the y position of the color bar (in plot fraction). Defaults to 0.5 when `orientation` is *v* and 1.02 when `orientation` is *h*.",
        "editType": "colorbars",
        "max": 3,
        "min": -2,
        "valType": "number"
       },
       "yanchor": {
-       "description": "Sets this color bar's vertical position anchor This anchor binds the `y` position to the *top*, *middle* or *bottom* of the color bar.",
-       "dflt": "middle",
+       "description": "Sets this color bar's vertical position anchor This anchor binds the `y` position to the *top*, *middle* or *bottom* of the color bar. Defaults to *middle* when `orientation` is *v* and *bottom* when `orientation` is *h*.",
        "editType": "colorbars",
        "valType": "enumerated",
        "values": [
@@ -58507,6 +59318,16 @@
        "min": 0,
        "valType": "integer"
       },
+      "orientation": {
+       "description": "Sets the orientation of the colorbar.",
+       "dflt": "v",
+       "editType": "colorbars",
+       "valType": "enumerated",
+       "values": [
+        "h",
+        "v"
+       ]
+      },
       "outlinecolor": {
        "description": "Sets the axis line color.",
        "dflt": "#444",
@@ -58690,7 +59511,7 @@
        ]
       },
       "ticklabelposition": {
-       "description": "Determines where tick labels are drawn.",
+       "description": "Determines where tick labels are drawn relative to the ticks. Left and right options are used when `orientation` is *h*, top and bottom when `orientation` is *v*.",
        "dflt": "outside",
        "editType": "colorbars",
        "valType": "enumerated",
@@ -58699,9 +59520,20 @@
         "inside",
         "outside top",
         "inside top",
+        "outside left",
+        "inside left",
+        "outside right",
+        "inside right",
         "outside bottom",
         "inside bottom"
        ]
+      },
+      "ticklabelstep": {
+       "description": "Sets the spacing between tick labels as compared to the spacing between ticks. A value of 1 (default) means each tick gets a label. A value of 2 means shows every 2nd label. A larger value n means only every nth tick is labeled. `tick0` determines which labels are shown. Not implemented for axes with `type` *log* or *multicategory*, or when `tickmode` is *array*.",
+       "dflt": 1,
+       "editType": "colorbars",
+       "min": 1,
+       "valType": "integer"
       },
       "ticklen": {
        "description": "Sets the tick length (in px).",
@@ -58796,8 +59628,7 @@
        },
        "role": "object",
        "side": {
-        "description": "Determines the location of color bar's title with respect to the color bar. Note that the title's location used to be set by the now deprecated `titleside` attribute.",
-        "dflt": "top",
+        "description": "Determines the location of color bar's title with respect to the color bar. Defaults to *top* when `orientation` if *v* and  defaults to *right* when `orientation` if *h*. Note that the title's location used to be set by the now deprecated `titleside` attribute.",
         "editType": "colorbars",
         "valType": "enumerated",
         "values": [
@@ -58813,16 +59644,14 @@
        }
       },
       "x": {
-       "description": "Sets the x position of the color bar (in plot fraction).",
-       "dflt": 1.02,
+       "description": "Sets the x position of the color bar (in plot fraction). Defaults to 1.02 when `orientation` is *v* and 0.5 when `orientation` is *h*.",
        "editType": "colorbars",
        "max": 3,
        "min": -2,
        "valType": "number"
       },
       "xanchor": {
-       "description": "Sets this color bar's horizontal position anchor. This anchor binds the `x` position to the *left*, *center* or *right* of the color bar.",
-       "dflt": "left",
+       "description": "Sets this color bar's horizontal position anchor. This anchor binds the `x` position to the *left*, *center* or *right* of the color bar. Defaults to *left* when `orientation` is *v* and *center* when `orientation` is *h*.",
        "editType": "colorbars",
        "valType": "enumerated",
        "values": [
@@ -58839,16 +59668,14 @@
        "valType": "number"
       },
       "y": {
-       "description": "Sets the y position of the color bar (in plot fraction).",
-       "dflt": 0.5,
+       "description": "Sets the y position of the color bar (in plot fraction). Defaults to 0.5 when `orientation` is *v* and 1.02 when `orientation` is *h*.",
        "editType": "colorbars",
        "max": 3,
        "min": -2,
        "valType": "number"
       },
       "yanchor": {
-       "description": "Sets this color bar's vertical position anchor This anchor binds the `y` position to the *top*, *middle* or *bottom* of the color bar.",
-       "dflt": "middle",
+       "description": "Sets this color bar's vertical position anchor This anchor binds the `y` position to the *top*, *middle* or *bottom* of the color bar. Defaults to *middle* when `orientation` is *v* and *bottom* when `orientation` is *h*.",
        "editType": "colorbars",
        "valType": "enumerated",
        "values": [
@@ -60286,6 +61113,16 @@
        "min": 0,
        "valType": "integer"
       },
+      "orientation": {
+       "description": "Sets the orientation of the colorbar.",
+       "dflt": "v",
+       "editType": "colorbars",
+       "valType": "enumerated",
+       "values": [
+        "h",
+        "v"
+       ]
+      },
       "outlinecolor": {
        "description": "Sets the axis line color.",
        "dflt": "#444",
@@ -60469,7 +61306,7 @@
        ]
       },
       "ticklabelposition": {
-       "description": "Determines where tick labels are drawn.",
+       "description": "Determines where tick labels are drawn relative to the ticks. Left and right options are used when `orientation` is *h*, top and bottom when `orientation` is *v*.",
        "dflt": "outside",
        "editType": "colorbars",
        "valType": "enumerated",
@@ -60478,9 +61315,20 @@
         "inside",
         "outside top",
         "inside top",
+        "outside left",
+        "inside left",
+        "outside right",
+        "inside right",
         "outside bottom",
         "inside bottom"
        ]
+      },
+      "ticklabelstep": {
+       "description": "Sets the spacing between tick labels as compared to the spacing between ticks. A value of 1 (default) means each tick gets a label. A value of 2 means shows every 2nd label. A larger value n means only every nth tick is labeled. `tick0` determines which labels are shown. Not implemented for axes with `type` *log* or *multicategory*, or when `tickmode` is *array*.",
+       "dflt": 1,
+       "editType": "colorbars",
+       "min": 1,
+       "valType": "integer"
       },
       "ticklen": {
        "description": "Sets the tick length (in px).",
@@ -60575,8 +61423,7 @@
        },
        "role": "object",
        "side": {
-        "description": "Determines the location of color bar's title with respect to the color bar. Note that the title's location used to be set by the now deprecated `titleside` attribute.",
-        "dflt": "top",
+        "description": "Determines the location of color bar's title with respect to the color bar. Defaults to *top* when `orientation` if *v* and  defaults to *right* when `orientation` if *h*. Note that the title's location used to be set by the now deprecated `titleside` attribute.",
         "editType": "colorbars",
         "valType": "enumerated",
         "values": [
@@ -60592,16 +61439,14 @@
        }
       },
       "x": {
-       "description": "Sets the x position of the color bar (in plot fraction).",
-       "dflt": 1.02,
+       "description": "Sets the x position of the color bar (in plot fraction). Defaults to 1.02 when `orientation` is *v* and 0.5 when `orientation` is *h*.",
        "editType": "colorbars",
        "max": 3,
        "min": -2,
        "valType": "number"
       },
       "xanchor": {
-       "description": "Sets this color bar's horizontal position anchor. This anchor binds the `x` position to the *left*, *center* or *right* of the color bar.",
-       "dflt": "left",
+       "description": "Sets this color bar's horizontal position anchor. This anchor binds the `x` position to the *left*, *center* or *right* of the color bar. Defaults to *left* when `orientation` is *v* and *center* when `orientation` is *h*.",
        "editType": "colorbars",
        "valType": "enumerated",
        "values": [
@@ -60618,16 +61463,14 @@
        "valType": "number"
       },
       "y": {
-       "description": "Sets the y position of the color bar (in plot fraction).",
-       "dflt": 0.5,
+       "description": "Sets the y position of the color bar (in plot fraction). Defaults to 0.5 when `orientation` is *v* and 1.02 when `orientation` is *h*.",
        "editType": "colorbars",
        "max": 3,
        "min": -2,
        "valType": "number"
       },
       "yanchor": {
-       "description": "Sets this color bar's vertical position anchor This anchor binds the `y` position to the *top*, *middle* or *bottom* of the color bar.",
-       "dflt": "middle",
+       "description": "Sets this color bar's vertical position anchor This anchor binds the `y` position to the *top*, *middle* or *bottom* of the color bar. Defaults to *middle* when `orientation` is *v* and *bottom* when `orientation` is *h*.",
        "editType": "colorbars",
        "valType": "enumerated",
        "values": [
@@ -61669,6 +62512,16 @@
       "min": 0,
       "valType": "integer"
      },
+     "orientation": {
+      "description": "Sets the orientation of the colorbar.",
+      "dflt": "v",
+      "editType": "colorbars",
+      "valType": "enumerated",
+      "values": [
+       "h",
+       "v"
+      ]
+     },
      "outlinecolor": {
       "description": "Sets the axis line color.",
       "dflt": "#444",
@@ -61852,7 +62705,7 @@
       ]
      },
      "ticklabelposition": {
-      "description": "Determines where tick labels are drawn.",
+      "description": "Determines where tick labels are drawn relative to the ticks. Left and right options are used when `orientation` is *h*, top and bottom when `orientation` is *v*.",
       "dflt": "outside",
       "editType": "colorbars",
       "valType": "enumerated",
@@ -61861,9 +62714,20 @@
        "inside",
        "outside top",
        "inside top",
+       "outside left",
+       "inside left",
+       "outside right",
+       "inside right",
        "outside bottom",
        "inside bottom"
       ]
+     },
+     "ticklabelstep": {
+      "description": "Sets the spacing between tick labels as compared to the spacing between ticks. A value of 1 (default) means each tick gets a label. A value of 2 means shows every 2nd label. A larger value n means only every nth tick is labeled. `tick0` determines which labels are shown. Not implemented for axes with `type` *log* or *multicategory*, or when `tickmode` is *array*.",
+      "dflt": 1,
+      "editType": "colorbars",
+      "min": 1,
+      "valType": "integer"
      },
      "ticklen": {
       "description": "Sets the tick length (in px).",
@@ -61958,8 +62822,7 @@
       },
       "role": "object",
       "side": {
-       "description": "Determines the location of color bar's title with respect to the color bar. Note that the title's location used to be set by the now deprecated `titleside` attribute.",
-       "dflt": "top",
+       "description": "Determines the location of color bar's title with respect to the color bar. Defaults to *top* when `orientation` if *v* and  defaults to *right* when `orientation` if *h*. Note that the title's location used to be set by the now deprecated `titleside` attribute.",
        "editType": "colorbars",
        "valType": "enumerated",
        "values": [
@@ -61975,16 +62838,14 @@
       }
      },
      "x": {
-      "description": "Sets the x position of the color bar (in plot fraction).",
-      "dflt": 1.02,
+      "description": "Sets the x position of the color bar (in plot fraction). Defaults to 1.02 when `orientation` is *v* and 0.5 when `orientation` is *h*.",
       "editType": "colorbars",
       "max": 3,
       "min": -2,
       "valType": "number"
      },
      "xanchor": {
-      "description": "Sets this color bar's horizontal position anchor. This anchor binds the `x` position to the *left*, *center* or *right* of the color bar.",
-      "dflt": "left",
+      "description": "Sets this color bar's horizontal position anchor. This anchor binds the `x` position to the *left*, *center* or *right* of the color bar. Defaults to *left* when `orientation` is *v* and *center* when `orientation` is *h*.",
       "editType": "colorbars",
       "valType": "enumerated",
       "values": [
@@ -62001,16 +62862,14 @@
       "valType": "number"
      },
      "y": {
-      "description": "Sets the y position of the color bar (in plot fraction).",
-      "dflt": 0.5,
+      "description": "Sets the y position of the color bar (in plot fraction). Defaults to 0.5 when `orientation` is *v* and 1.02 when `orientation` is *h*.",
       "editType": "colorbars",
       "max": 3,
       "min": -2,
       "valType": "number"
      },
      "yanchor": {
-      "description": "Sets this color bar's vertical position anchor This anchor binds the `y` position to the *top*, *middle* or *bottom* of the color bar.",
-      "dflt": "middle",
+      "description": "Sets this color bar's vertical position anchor This anchor binds the `y` position to the *top*, *middle* or *bottom* of the color bar. Defaults to *middle* when `orientation` is *v* and *bottom* when `orientation` is *h*.",
       "editType": "colorbars",
       "valType": "enumerated",
       "values": [
@@ -63106,6 +63965,16 @@
        "min": 0,
        "valType": "integer"
       },
+      "orientation": {
+       "description": "Sets the orientation of the colorbar.",
+       "dflt": "v",
+       "editType": "colorbars",
+       "valType": "enumerated",
+       "values": [
+        "h",
+        "v"
+       ]
+      },
       "outlinecolor": {
        "description": "Sets the axis line color.",
        "dflt": "#444",
@@ -63289,7 +64158,7 @@
        ]
       },
       "ticklabelposition": {
-       "description": "Determines where tick labels are drawn.",
+       "description": "Determines where tick labels are drawn relative to the ticks. Left and right options are used when `orientation` is *h*, top and bottom when `orientation` is *v*.",
        "dflt": "outside",
        "editType": "colorbars",
        "valType": "enumerated",
@@ -63298,9 +64167,20 @@
         "inside",
         "outside top",
         "inside top",
+        "outside left",
+        "inside left",
+        "outside right",
+        "inside right",
         "outside bottom",
         "inside bottom"
        ]
+      },
+      "ticklabelstep": {
+       "description": "Sets the spacing between tick labels as compared to the spacing between ticks. A value of 1 (default) means each tick gets a label. A value of 2 means shows every 2nd label. A larger value n means only every nth tick is labeled. `tick0` determines which labels are shown. Not implemented for axes with `type` *log* or *multicategory*, or when `tickmode` is *array*.",
+       "dflt": 1,
+       "editType": "colorbars",
+       "min": 1,
+       "valType": "integer"
       },
       "ticklen": {
        "description": "Sets the tick length (in px).",
@@ -63395,8 +64275,7 @@
        },
        "role": "object",
        "side": {
-        "description": "Determines the location of color bar's title with respect to the color bar. Note that the title's location used to be set by the now deprecated `titleside` attribute.",
-        "dflt": "top",
+        "description": "Determines the location of color bar's title with respect to the color bar. Defaults to *top* when `orientation` if *v* and  defaults to *right* when `orientation` if *h*. Note that the title's location used to be set by the now deprecated `titleside` attribute.",
         "editType": "colorbars",
         "valType": "enumerated",
         "values": [
@@ -63412,16 +64291,14 @@
        }
       },
       "x": {
-       "description": "Sets the x position of the color bar (in plot fraction).",
-       "dflt": 1.02,
+       "description": "Sets the x position of the color bar (in plot fraction). Defaults to 1.02 when `orientation` is *v* and 0.5 when `orientation` is *h*.",
        "editType": "colorbars",
        "max": 3,
        "min": -2,
        "valType": "number"
       },
       "xanchor": {
-       "description": "Sets this color bar's horizontal position anchor. This anchor binds the `x` position to the *left*, *center* or *right* of the color bar.",
-       "dflt": "left",
+       "description": "Sets this color bar's horizontal position anchor. This anchor binds the `x` position to the *left*, *center* or *right* of the color bar. Defaults to *left* when `orientation` is *v* and *center* when `orientation` is *h*.",
        "editType": "colorbars",
        "valType": "enumerated",
        "values": [
@@ -63438,16 +64315,14 @@
        "valType": "number"
       },
       "y": {
-       "description": "Sets the y position of the color bar (in plot fraction).",
-       "dflt": 0.5,
+       "description": "Sets the y position of the color bar (in plot fraction). Defaults to 0.5 when `orientation` is *v* and 1.02 when `orientation` is *h*.",
        "editType": "colorbars",
        "max": 3,
        "min": -2,
        "valType": "number"
       },
       "yanchor": {
-       "description": "Sets this color bar's vertical position anchor This anchor binds the `y` position to the *top*, *middle* or *bottom* of the color bar.",
-       "dflt": "middle",
+       "description": "Sets this color bar's vertical position anchor This anchor binds the `y` position to the *top*, *middle* or *bottom* of the color bar. Defaults to *middle* when `orientation` is *v* and *bottom* when `orientation` is *h*.",
        "editType": "colorbars",
        "valType": "enumerated",
        "values": [
@@ -63963,6 +64838,16 @@
       "min": 0,
       "valType": "integer"
      },
+     "orientation": {
+      "description": "Sets the orientation of the colorbar.",
+      "dflt": "v",
+      "editType": "calc",
+      "valType": "enumerated",
+      "values": [
+       "h",
+       "v"
+      ]
+     },
      "outlinecolor": {
       "description": "Sets the axis line color.",
       "dflt": "#444",
@@ -64146,7 +65031,7 @@
       ]
      },
      "ticklabelposition": {
-      "description": "Determines where tick labels are drawn.",
+      "description": "Determines where tick labels are drawn relative to the ticks. Left and right options are used when `orientation` is *h*, top and bottom when `orientation` is *v*.",
       "dflt": "outside",
       "editType": "calc",
       "valType": "enumerated",
@@ -64155,9 +65040,20 @@
        "inside",
        "outside top",
        "inside top",
+       "outside left",
+       "inside left",
+       "outside right",
+       "inside right",
        "outside bottom",
        "inside bottom"
       ]
+     },
+     "ticklabelstep": {
+      "description": "Sets the spacing between tick labels as compared to the spacing between ticks. A value of 1 (default) means each tick gets a label. A value of 2 means shows every 2nd label. A larger value n means only every nth tick is labeled. `tick0` determines which labels are shown. Not implemented for axes with `type` *log* or *multicategory*, or when `tickmode` is *array*.",
+      "dflt": 1,
+      "editType": "calc",
+      "min": 1,
+      "valType": "integer"
      },
      "ticklen": {
       "description": "Sets the tick length (in px).",
@@ -64252,8 +65148,7 @@
       },
       "role": "object",
       "side": {
-       "description": "Determines the location of color bar's title with respect to the color bar. Note that the title's location used to be set by the now deprecated `titleside` attribute.",
-       "dflt": "top",
+       "description": "Determines the location of color bar's title with respect to the color bar. Defaults to *top* when `orientation` if *v* and  defaults to *right* when `orientation` if *h*. Note that the title's location used to be set by the now deprecated `titleside` attribute.",
        "editType": "calc",
        "valType": "enumerated",
        "values": [
@@ -64269,16 +65164,14 @@
       }
      },
      "x": {
-      "description": "Sets the x position of the color bar (in plot fraction).",
-      "dflt": 1.02,
+      "description": "Sets the x position of the color bar (in plot fraction). Defaults to 1.02 when `orientation` is *v* and 0.5 when `orientation` is *h*.",
       "editType": "calc",
       "max": 3,
       "min": -2,
       "valType": "number"
      },
      "xanchor": {
-      "description": "Sets this color bar's horizontal position anchor. This anchor binds the `x` position to the *left*, *center* or *right* of the color bar.",
-      "dflt": "left",
+      "description": "Sets this color bar's horizontal position anchor. This anchor binds the `x` position to the *left*, *center* or *right* of the color bar. Defaults to *left* when `orientation` is *v* and *center* when `orientation` is *h*.",
       "editType": "calc",
       "valType": "enumerated",
       "values": [
@@ -64295,16 +65188,14 @@
       "valType": "number"
      },
      "y": {
-      "description": "Sets the y position of the color bar (in plot fraction).",
-      "dflt": 0.5,
+      "description": "Sets the y position of the color bar (in plot fraction). Defaults to 0.5 when `orientation` is *v* and 1.02 when `orientation` is *h*.",
       "editType": "calc",
       "max": 3,
       "min": -2,
       "valType": "number"
      },
      "yanchor": {
-      "description": "Sets this color bar's vertical position anchor This anchor binds the `y` position to the *top*, *middle* or *bottom* of the color bar.",
-      "dflt": "middle",
+      "description": "Sets this color bar's vertical position anchor This anchor binds the `y` position to the *top*, *middle* or *bottom* of the color bar. Defaults to *middle* when `orientation` is *v* and *bottom* when `orientation` is *h*.",
       "editType": "calc",
       "valType": "enumerated",
       "values": [
@@ -66289,6 +67180,16 @@
        "min": 0,
        "valType": "integer"
       },
+      "orientation": {
+       "description": "Sets the orientation of the colorbar.",
+       "dflt": "v",
+       "editType": "colorbars",
+       "valType": "enumerated",
+       "values": [
+        "h",
+        "v"
+       ]
+      },
       "outlinecolor": {
        "description": "Sets the axis line color.",
        "dflt": "#444",
@@ -66472,7 +67373,7 @@
        ]
       },
       "ticklabelposition": {
-       "description": "Determines where tick labels are drawn.",
+       "description": "Determines where tick labels are drawn relative to the ticks. Left and right options are used when `orientation` is *h*, top and bottom when `orientation` is *v*.",
        "dflt": "outside",
        "editType": "colorbars",
        "valType": "enumerated",
@@ -66481,9 +67382,20 @@
         "inside",
         "outside top",
         "inside top",
+        "outside left",
+        "inside left",
+        "outside right",
+        "inside right",
         "outside bottom",
         "inside bottom"
        ]
+      },
+      "ticklabelstep": {
+       "description": "Sets the spacing between tick labels as compared to the spacing between ticks. A value of 1 (default) means each tick gets a label. A value of 2 means shows every 2nd label. A larger value n means only every nth tick is labeled. `tick0` determines which labels are shown. Not implemented for axes with `type` *log* or *multicategory*, or when `tickmode` is *array*.",
+       "dflt": 1,
+       "editType": "colorbars",
+       "min": 1,
+       "valType": "integer"
       },
       "ticklen": {
        "description": "Sets the tick length (in px).",
@@ -66578,8 +67490,7 @@
        },
        "role": "object",
        "side": {
-        "description": "Determines the location of color bar's title with respect to the color bar. Note that the title's location used to be set by the now deprecated `titleside` attribute.",
-        "dflt": "top",
+        "description": "Determines the location of color bar's title with respect to the color bar. Defaults to *top* when `orientation` if *v* and  defaults to *right* when `orientation` if *h*. Note that the title's location used to be set by the now deprecated `titleside` attribute.",
         "editType": "colorbars",
         "valType": "enumerated",
         "values": [
@@ -66595,16 +67506,14 @@
        }
       },
       "x": {
-       "description": "Sets the x position of the color bar (in plot fraction).",
-       "dflt": 1.02,
+       "description": "Sets the x position of the color bar (in plot fraction). Defaults to 1.02 when `orientation` is *v* and 0.5 when `orientation` is *h*.",
        "editType": "colorbars",
        "max": 3,
        "min": -2,
        "valType": "number"
       },
       "xanchor": {
-       "description": "Sets this color bar's horizontal position anchor. This anchor binds the `x` position to the *left*, *center* or *right* of the color bar.",
-       "dflt": "left",
+       "description": "Sets this color bar's horizontal position anchor. This anchor binds the `x` position to the *left*, *center* or *right* of the color bar. Defaults to *left* when `orientation` is *v* and *center* when `orientation` is *h*.",
        "editType": "colorbars",
        "valType": "enumerated",
        "values": [
@@ -66621,16 +67530,14 @@
        "valType": "number"
       },
       "y": {
-       "description": "Sets the y position of the color bar (in plot fraction).",
-       "dflt": 0.5,
+       "description": "Sets the y position of the color bar (in plot fraction). Defaults to 0.5 when `orientation` is *v* and 1.02 when `orientation` is *h*.",
        "editType": "colorbars",
        "max": 3,
        "min": -2,
        "valType": "number"
       },
       "yanchor": {
-       "description": "Sets this color bar's vertical position anchor This anchor binds the `y` position to the *top*, *middle* or *bottom* of the color bar.",
-       "dflt": "middle",
+       "description": "Sets this color bar's vertical position anchor This anchor binds the `y` position to the *top*, *middle* or *bottom* of the color bar. Defaults to *middle* when `orientation` is *v* and *bottom* when `orientation` is *h*.",
        "editType": "colorbars",
        "valType": "enumerated",
        "values": [
@@ -68569,6 +69476,16 @@
       "min": 0,
       "valType": "integer"
      },
+     "orientation": {
+      "description": "Sets the orientation of the colorbar.",
+      "dflt": "v",
+      "editType": "calc",
+      "valType": "enumerated",
+      "values": [
+       "h",
+       "v"
+      ]
+     },
      "outlinecolor": {
       "description": "Sets the axis line color.",
       "dflt": "#444",
@@ -68752,7 +69669,7 @@
       ]
      },
      "ticklabelposition": {
-      "description": "Determines where tick labels are drawn.",
+      "description": "Determines where tick labels are drawn relative to the ticks. Left and right options are used when `orientation` is *h*, top and bottom when `orientation` is *v*.",
       "dflt": "outside",
       "editType": "calc",
       "valType": "enumerated",
@@ -68761,9 +69678,20 @@
        "inside",
        "outside top",
        "inside top",
+       "outside left",
+       "inside left",
+       "outside right",
+       "inside right",
        "outside bottom",
        "inside bottom"
       ]
+     },
+     "ticklabelstep": {
+      "description": "Sets the spacing between tick labels as compared to the spacing between ticks. A value of 1 (default) means each tick gets a label. A value of 2 means shows every 2nd label. A larger value n means only every nth tick is labeled. `tick0` determines which labels are shown. Not implemented for axes with `type` *log* or *multicategory*, or when `tickmode` is *array*.",
+      "dflt": 1,
+      "editType": "calc",
+      "min": 1,
+      "valType": "integer"
      },
      "ticklen": {
       "description": "Sets the tick length (in px).",
@@ -68858,8 +69786,7 @@
       },
       "role": "object",
       "side": {
-       "description": "Determines the location of color bar's title with respect to the color bar. Note that the title's location used to be set by the now deprecated `titleside` attribute.",
-       "dflt": "top",
+       "description": "Determines the location of color bar's title with respect to the color bar. Defaults to *top* when `orientation` if *v* and  defaults to *right* when `orientation` if *h*. Note that the title's location used to be set by the now deprecated `titleside` attribute.",
        "editType": "calc",
        "valType": "enumerated",
        "values": [
@@ -68875,16 +69802,14 @@
       }
      },
      "x": {
-      "description": "Sets the x position of the color bar (in plot fraction).",
-      "dflt": 1.02,
+      "description": "Sets the x position of the color bar (in plot fraction). Defaults to 1.02 when `orientation` is *v* and 0.5 when `orientation` is *h*.",
       "editType": "calc",
       "max": 3,
       "min": -2,
       "valType": "number"
      },
      "xanchor": {
-      "description": "Sets this color bar's horizontal position anchor. This anchor binds the `x` position to the *left*, *center* or *right* of the color bar.",
-      "dflt": "left",
+      "description": "Sets this color bar's horizontal position anchor. This anchor binds the `x` position to the *left*, *center* or *right* of the color bar. Defaults to *left* when `orientation` is *v* and *center* when `orientation` is *h*.",
       "editType": "calc",
       "valType": "enumerated",
       "values": [
@@ -68901,16 +69826,14 @@
       "valType": "number"
      },
      "y": {
-      "description": "Sets the y position of the color bar (in plot fraction).",
-      "dflt": 0.5,
+      "description": "Sets the y position of the color bar (in plot fraction). Defaults to 0.5 when `orientation` is *v* and 1.02 when `orientation` is *h*.",
       "editType": "calc",
       "max": 3,
       "min": -2,
       "valType": "number"
      },
      "yanchor": {
-      "description": "Sets this color bar's vertical position anchor This anchor binds the `y` position to the *top*, *middle* or *bottom* of the color bar.",
-      "dflt": "middle",
+      "description": "Sets this color bar's vertical position anchor This anchor binds the `y` position to the *top*, *middle* or *bottom* of the color bar. Defaults to *middle* when `orientation` is *v* and *bottom* when `orientation` is *h*.",
       "editType": "calc",
       "valType": "enumerated",
       "values": [

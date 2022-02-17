@@ -1,6 +1,6 @@
 /**
-* plotly.js (cartesian) v2.6.1
-* Copyright 2012-2021, Plotly, Inc.
+* plotly.js (cartesian) v2.9.0
+* Copyright 2012-2022, Plotly, Inc.
 * All rights reserved.
 * Licensed under the MIT license
 */
@@ -77,7 +77,7 @@ for(var selector in rules) {
 
 module.exports = _dereq_('../src/transforms/aggregate');
 
-},{"../src/transforms/aggregate":546}],3:[function(_dereq_,module,exports){
+},{"../src/transforms/aggregate":547}],3:[function(_dereq_,module,exports){
 'use strict';
 
 module.exports = _dereq_('../src/traces/bar');
@@ -107,12 +107,12 @@ module.exports = _dereq_('../src/core');
 
 module.exports = _dereq_('../src/transforms/filter');
 
-},{"../src/transforms/filter":547}],9:[function(_dereq_,module,exports){
+},{"../src/transforms/filter":548}],9:[function(_dereq_,module,exports){
 'use strict';
 
 module.exports = _dereq_('../src/transforms/groupby');
 
-},{"../src/transforms/groupby":548}],10:[function(_dereq_,module,exports){
+},{"../src/transforms/groupby":549}],10:[function(_dereq_,module,exports){
 'use strict';
 
 module.exports = _dereq_('../src/traces/heatmap');
@@ -122,22 +122,22 @@ module.exports = _dereq_('../src/traces/heatmap');
 
 module.exports = _dereq_('../src/traces/histogram');
 
-},{"../src/traces/histogram":465}],12:[function(_dereq_,module,exports){
+},{"../src/traces/histogram":466}],12:[function(_dereq_,module,exports){
 'use strict';
 
 module.exports = _dereq_('../src/traces/histogram2d');
 
-},{"../src/traces/histogram2d":471}],13:[function(_dereq_,module,exports){
+},{"../src/traces/histogram2d":472}],13:[function(_dereq_,module,exports){
 'use strict';
 
 module.exports = _dereq_('../src/traces/histogram2dcontour');
 
-},{"../src/traces/histogram2dcontour":475}],14:[function(_dereq_,module,exports){
+},{"../src/traces/histogram2dcontour":476}],14:[function(_dereq_,module,exports){
 'use strict';
 
 module.exports = _dereq_('../src/traces/image');
 
-},{"../src/traces/image":483}],15:[function(_dereq_,module,exports){
+},{"../src/traces/image":484}],15:[function(_dereq_,module,exports){
 'use strict';
 
 var Plotly = _dereq_('./core');
@@ -173,22 +173,22 @@ module.exports = Plotly;
 
 module.exports = _dereq_('../src/traces/pie');
 
-},{"../src/traces/pie":492}],17:[function(_dereq_,module,exports){
+},{"../src/traces/pie":493}],17:[function(_dereq_,module,exports){
 'use strict';
 
 module.exports = _dereq_('../src/traces/scatterternary');
 
-},{"../src/traces/scatterternary":533}],18:[function(_dereq_,module,exports){
+},{"../src/traces/scatterternary":534}],18:[function(_dereq_,module,exports){
 'use strict';
 
 module.exports = _dereq_('../src/transforms/sort');
 
-},{"../src/transforms/sort":550}],19:[function(_dereq_,module,exports){
+},{"../src/transforms/sort":551}],19:[function(_dereq_,module,exports){
 'use strict';
 
 module.exports = _dereq_('../src/traces/violin');
 
-},{"../src/traces/violin":541}],20:[function(_dereq_,module,exports){
+},{"../src/traces/violin":542}],20:[function(_dereq_,module,exports){
 !function() {
   var d3 = {
     version: "3.8.0"
@@ -15724,7 +15724,15 @@ exports.readUInt32BE = function (data, offset) {
 
 function ProbeError(message, code, statusCode) {
   Error.call(this);
-  Error.captureStackTrace(this, this.constructor);
+
+  // Include stack trace in error object
+  if (Error.captureStackTrace) {
+    // Chrome and NodeJS
+    Error.captureStackTrace(this, this.constructor);
+  } else {
+    // FF, IE 10+ and Safari 6+. Fallback for others
+    this.stack = (new Error()).stack || '';
+  }
 
   this.name = this.constructor.name;
 
@@ -16525,15 +16533,18 @@ var SIG_EXIF  = str2arr('Exif\0\0');
 module.exports = function (data) {
   if (data.length < 2) return;
 
-  // first marker of the file MUST be 0xFFD8
-  if (data[0] !== 0xFF || data[1] !== 0xD8) return;
+  // first marker of the file MUST be 0xFFD8,
+  // following by either 0xFFE0, 0xFFE2 or 0xFFE3
+  if (data[0] !== 0xFF || data[1] !== 0xD8 || data[2] !== 0xFF) return;
 
   var offset = 2;
 
   for (;;) {
-    if (data.length - offset < 2) return;
-    // not a JPEG marker
-    if (data[offset++] !== 0xFF) return;
+    // skip until we see 0xFF, see https://github.com/nodeca/probe-image-size/issues/68
+    for (;;) {
+      if (data.length - offset < 2) return;
+      if (data[offset++] === 0xFF) break;
+    }
 
     var code = data[offset++];
     var length;
@@ -30723,13 +30734,11 @@ var overrideAll = _dereq_('../../plot_api/edit_types').overrideAll;
 
 
 module.exports = overrideAll({
-// TODO: only right is supported currently
-//     orient: {
-//         valType: 'enumerated',
-//         values: ['left', 'right', 'top', 'bottom'],
-//         dflt: 'right',
-//
-//     },
+    orientation: {
+        valType: 'enumerated',
+        values: ['h', 'v'],
+        dflt: 'v',
+    },
     thicknessmode: {
         valType: 'enumerated',
         values: ['fraction', 'pixels'],
@@ -30752,14 +30761,12 @@ module.exports = overrideAll({
     },
     x: {
         valType: 'number',
-        dflt: 1.02,
         min: -2,
         max: 3,
     },
     xanchor: {
         valType: 'enumerated',
         values: ['left', 'center', 'right'],
-        dflt: 'left',
     },
     xpad: {
         valType: 'number',
@@ -30768,14 +30775,12 @@ module.exports = overrideAll({
     },
     y: {
         valType: 'number',
-        dflt: 0.5,
         min: -2,
         max: 3,
     },
     yanchor: {
         valType: 'enumerated',
         values: ['top', 'middle', 'bottom'],
-        dflt: 'middle',
     },
     ypad: {
         valType: 'number',
@@ -30807,18 +30812,25 @@ module.exports = overrideAll({
     ticks: extendFlat({}, axesAttrs.ticks, {dflt: ''}),
     ticklabeloverflow: extendFlat({}, axesAttrs.ticklabeloverflow, {
     }),
+
+    // ticklabelposition: not used directly, as values depend on orientation
+    // left/right options are for x axes, and top/bottom options are for y axes
     ticklabelposition: {
         valType: 'enumerated',
         values: [
             'outside', 'inside',
             'outside top', 'inside top',
+            'outside left', 'inside left',
+            'outside right', 'inside right',
             'outside bottom', 'inside bottom'
         ],
         dflt: 'outside',
     },
+
     ticklen: axesAttrs.ticklen,
     tickwidth: axesAttrs.tickwidth,
     tickcolor: axesAttrs.tickcolor,
+    ticklabelstep: axesAttrs.ticklabelstep,
     showticklabels: axesAttrs.showticklabels,
     tickfont: fontAttrs({
     }),
@@ -30842,7 +30854,6 @@ module.exports = overrideAll({
         side: {
             valType: 'enumerated',
             values: ['right', 'top', 'bottom'],
-            dflt: 'top',
         }
     },
 
@@ -30901,23 +30912,30 @@ module.exports = function colorbarDefaults(containerIn, containerOut, layout) {
         return Lib.coerce(colorbarIn, colorbarOut, attributes, attr, dflt);
     }
 
+    var margin = layout.margin || {t: 0, b: 0, l: 0, r: 0};
+    var w = layout.width - margin.l - margin.r;
+    var h = layout.height - margin.t - margin.b;
+
+    var orientation = coerce('orientation');
+    var isVertical = orientation === 'v';
+
     var thicknessmode = coerce('thicknessmode');
     coerce('thickness', (thicknessmode === 'fraction') ?
-        30 / (layout.width - layout.margin.l - layout.margin.r) :
+        30 / (isVertical ? w : h) :
         30
     );
 
     var lenmode = coerce('lenmode');
     coerce('len', (lenmode === 'fraction') ?
         1 :
-        layout.height - layout.margin.t - layout.margin.b
+        isVertical ? h : w
     );
 
-    coerce('x');
-    coerce('xanchor');
+    coerce('x', isVertical ? 1.02 : 0.5);
+    coerce('xanchor', isVertical ? 'left' : 'center');
     coerce('xpad');
-    coerce('y');
-    coerce('yanchor');
+    coerce('y', isVertical ? 0.5 : 1.02);
+    coerce('yanchor', isVertical ? 'middle' : 'bottom');
     coerce('ypad');
     Lib.noneOrAll(colorbarIn, colorbarOut, ['x', 'y']);
 
@@ -30927,7 +30945,22 @@ module.exports = function colorbarDefaults(containerIn, containerOut, layout) {
     coerce('borderwidth');
     coerce('bgcolor');
 
-    var ticklabelposition = coerce('ticklabelposition');
+    var ticklabelposition = Lib.coerce(colorbarIn, colorbarOut, {
+        ticklabelposition: {
+            valType: 'enumerated',
+            dflt: 'outside',
+            values: isVertical ? [
+                'outside', 'inside',
+                'outside top', 'inside top',
+                'outside bottom', 'inside bottom'
+            ] : [
+                'outside', 'inside',
+                'outside left', 'inside left',
+                'outside right', 'inside right'
+            ]
+        }
+    }, 'ticklabelposition');
+
     coerce('ticklabeloverflow', ticklabelposition.indexOf('inside') !== -1 ? 'hide past domain' : 'hide past div');
 
     handleTickValueDefaults(colorbarIn, colorbarOut, coerce, 'linear');
@@ -30949,7 +30982,7 @@ module.exports = function colorbarDefaults(containerIn, containerOut, layout) {
         size: Lib.bigFont(tickFont.size)
     });
     Lib.coerceFont(coerce, 'title.font', dfltTitleFont);
-    coerce('title.side');
+    coerce('title.side', isVertical ? 'top' : 'right');
 };
 
 },{"../../lib":287,"../../plot_api/plot_template":323,"../../plots/cartesian/prefix_suffix_defaults":353,"../../plots/cartesian/tick_label_defaults":358,"../../plots/cartesian/tick_mark_defaults":359,"../../plots/cartesian/tick_value_defaults":360,"./attributes":158}],161:[function(_dereq_,module,exports){
@@ -31122,6 +31155,21 @@ function makeColorBarData(gd) {
 }
 
 function drawColorBar(g, opts, gd) {
+    var isVertical = opts.orientation === 'v';
+    var len = opts.len;
+    var lenmode = opts.lenmode;
+    var thickness = opts.thickness;
+    var thicknessmode = opts.thicknessmode;
+    var outlinewidth = opts.outlinewidth;
+    var borderwidth = opts.borderwidth;
+    var bgcolor = opts.bgcolor;
+    var xanchor = opts.xanchor;
+    var yanchor = opts.yanchor;
+    var xpad = opts.xpad;
+    var ypad = opts.ypad;
+    var optsX = opts.x;
+    var optsY = isVertical ? opts.y : 1 - opts.y;
+
     var fullLayout = gd._fullLayout;
     var gs = fullLayout._size;
 
@@ -31151,42 +31199,64 @@ function drawColorBar(g, opts, gd) {
     // when the colorbar itself is pushing the margins.
     // but then the fractional size is calculated based on the
     // actual graph size, so that the axes will size correctly.
-    var thickPx = Math.round(opts.thickness * (opts.thicknessmode === 'fraction' ? gs.w : 1));
-    var thickFrac = thickPx / gs.w;
-    var lenPx = Math.round(opts.len * (opts.lenmode === 'fraction' ? gs.h : 1));
-    var lenFrac = lenPx / gs.h;
-    var xpadFrac = opts.xpad / gs.w;
-    var yExtraPx = (opts.borderwidth + opts.outlinewidth) / 2;
-    var ypadFrac = opts.ypad / gs.h;
+    var thickPx = Math.round(thickness * (thicknessmode === 'fraction' ? (isVertical ? gs.w : gs.h) : 1));
+    var thickFrac = thickPx / (isVertical ? gs.w : gs.h);
+    var lenPx = Math.round(len * (lenmode === 'fraction' ? (isVertical ? gs.h : gs.w) : 1));
+    var lenFrac = lenPx / (isVertical ? gs.h : gs.w);
 
     // x positioning: do it initially just for left anchor,
     // then fix at the end (since we don't know the width yet)
-    var xLeft = Math.round(opts.x * gs.w + opts.xpad);
-    // for dragging... this is getting a little muddled...
-    var xLeftFrac = opts.x - thickFrac * ({center: 0.5, right: 1}[opts.xanchor] || 0);
+    var uPx = Math.round(isVertical ?
+        optsX * gs.w + xpad :
+        optsY * gs.h + ypad
+    );
 
-    // y positioning we can do correctly from the start
-    var yBottomFrac = opts.y + lenFrac * (({top: -0.5, bottom: 0.5}[opts.yanchor] || 0) - 0.5);
-    var yBottomPx = Math.round(gs.h * (1 - yBottomFrac));
-    var yTopPx = yBottomPx - lenPx;
+    var xRatio = {center: 0.5, right: 1}[xanchor] || 0;
+    var yRatio = {top: 1, middle: 0.5}[yanchor] || 0;
+
+    // for dragging... this is getting a little muddled...
+    var uFrac = isVertical ?
+        optsX - xRatio * thickFrac :
+        optsY - yRatio * thickFrac;
+
+    // y/x positioning (for v/h) we can do correctly from the start
+    var vFrac = isVertical ?
+        optsY - yRatio * lenFrac :
+        optsX - xRatio * lenFrac;
+
+    var vPx = Math.round(isVertical ?
+        gs.h * (1 - vFrac) :
+        gs.w * vFrac
+    );
 
     // stash a few things for makeEditable
     opts._lenFrac = lenFrac;
     opts._thickFrac = thickFrac;
-    opts._xLeftFrac = xLeftFrac;
-    opts._yBottomFrac = yBottomFrac;
+    opts._uFrac = uFrac;
+    opts._vFrac = vFrac;
 
     // stash mocked axis for contour label formatting
     var ax = opts._axis = mockColorBarAxis(gd, opts, zrange);
 
     // position can't go in through supplyDefaults
     // because that restricts it to [0,1]
-    ax.position = opts.x + xpadFrac + thickFrac;
+    ax.position = thickFrac + (isVertical ?
+        optsX + xpad / gs.w :
+        optsY + ypad / gs.h
+    );
 
-    if(['top', 'bottom'].indexOf(titleSide) !== -1) {
+    var topOrBottom = ['top', 'bottom'].indexOf(titleSide) !== -1;
+
+    if(isVertical && topOrBottom) {
         ax.title.side = titleSide;
-        ax.titlex = opts.x + xpadFrac;
-        ax.titley = yBottomFrac + (title.side === 'top' ? lenFrac - ypadFrac : ypadFrac);
+        ax.titlex = optsX + xpad / gs.w;
+        ax.titley = vFrac + (title.side === 'top' ? lenFrac - ypad / gs.h : ypad / gs.h);
+    }
+
+    if(!isVertical && !topOrBottom) {
+        ax.title.side = titleSide;
+        ax.titley = optsY + ypad / gs.h;
+        ax.titlex = vFrac + xpad / gs.w; // right side
     }
 
     if(line.color && opts.tickmode === 'auto') {
@@ -31194,7 +31264,7 @@ function drawColorBar(g, opts, gd) {
         ax.tick0 = levelsIn.start;
         var dtick = levelsIn.size;
         // expand if too many contours, so we don't get too many ticks
-        var autoNtick = Lib.constrain((yBottomPx - yTopPx) / 50, 4, 15) + 1;
+        var autoNtick = Lib.constrain(lenPx / 50, 4, 15) + 1;
         var dtFactor = (zrange[1] - zrange[0]) / ((opts.nticks || autoNtick) * dtick);
         if(dtFactor > 1) {
             var dtexp = Math.pow(10, Math.floor(Math.log(dtFactor) / Math.LN10));
@@ -31211,9 +31281,12 @@ function drawColorBar(g, opts, gd) {
 
     // set domain after init, because we may want to
     // allow it outside [0,1]
-    ax.domain = [
-        yBottomFrac + ypadFrac,
-        yBottomFrac + lenFrac - ypadFrac
+    ax.domain = isVertical ? [
+        vFrac + ypad / gs.h,
+        vFrac + lenFrac - ypad / gs.h
+    ] : [
+        vFrac + xpad / gs.w,
+        vFrac + lenFrac - xpad / gs.w
     ];
 
     ax.setScale();
@@ -31223,9 +31296,13 @@ function drawColorBar(g, opts, gd) {
     var titleCont = g.select('.' + cn.cbtitleunshift)
         .attr('transform', strTranslate(-Math.round(gs.l), -Math.round(gs.t)));
 
+    var ticklabelposition = ax.ticklabelposition;
+    var titleFontSize = ax.title.font.size;
+
     var axLayer = g.select('.' + cn.cbaxis);
     var titleEl;
     var titleHeight = 0;
+    var titleWidth = 0;
 
     function drawTitle(titleClass, titleOpts) {
         var dfltTitleOpts = {
@@ -31250,58 +31327,102 @@ function drawColorBar(g, opts, gd) {
     }
 
     function drawDummyTitle() {
-        if(['top', 'bottom'].indexOf(titleSide) !== -1) {
-            // draw the title so we know how much room it needs
-            // when we squish the axis. This one only applies to
-            // top or bottom titles, not right side.
-            var x = gs.l + (opts.x + xpadFrac) * gs.w;
-            var fontSize = ax.title.font.size;
-            var y;
+        // draw the title so we know how much room it needs
+        // when we squish the axis.
+        // On vertical colorbars this only applies to top or bottom titles, not right side.
+        // On horizontal colorbars this only applies to right, etc.
+
+        if(
+            (isVertical && topOrBottom) ||
+            (!isVertical && !topOrBottom)
+        ) {
+            var x, y;
 
             if(titleSide === 'top') {
-                y = (1 - (yBottomFrac + lenFrac - ypadFrac)) * gs.h +
-                    gs.t + 3 + fontSize * 0.75;
-            } else {
-                y = (1 - (yBottomFrac + ypadFrac)) * gs.h +
-                    gs.t - 3 - fontSize * 0.25;
+                x = xpad + gs.l + gs.w * optsX;
+                y = ypad + gs.t + gs.h * (1 - vFrac - lenFrac) + 3 + titleFontSize * 0.75;
             }
+
+            if(titleSide === 'bottom') {
+                x = xpad + gs.l + gs.w * optsX;
+                y = ypad + gs.t + gs.h * (1 - vFrac) - 3 - titleFontSize * 0.25;
+            }
+
+            if(titleSide === 'right') {
+                y = ypad + gs.t + gs.h * optsY + 3 + titleFontSize * 0.75;
+                x = xpad + gs.l + gs.w * vFrac;
+            }
+
             drawTitle(ax._id + 'title', {
-                attributes: {x: x, y: y, 'text-anchor': 'start'}
+                attributes: {x: x, y: y, 'text-anchor': isVertical ? 'start' : 'middle'}
             });
         }
     }
 
     function drawCbTitle() {
-        if(['top', 'bottom'].indexOf(titleSide) === -1) {
-            var fontSize = ax.title.font.size;
-            var y = ax._offset + ax._length / 2;
-            var x = gs.l + (ax.position || 0) * gs.w + ((ax.side === 'right') ?
-                10 + fontSize * ((ax.showticklabels ? 1 : 0.5)) :
-                -10 - fontSize * ((ax.showticklabels ? 0.5 : 0)));
+        if(
+            (isVertical && !topOrBottom) ||
+            (!isVertical && topOrBottom)
+        ) {
+            var pos = ax.position || 0;
+            var mid = ax._offset + ax._length / 2;
+            var x, y;
 
-            // the 'h' + is a hack to get around the fact that
-            // convertToTspans rotates any 'y...' class by 90 degrees.
-            // TODO: find a better way to control this.
-            drawTitle('h' + ax._id + 'title', {
+            if(titleSide === 'right') {
+                y = mid;
+                x = gs.l + gs.w * pos + 10 + titleFontSize * (
+                    ax.showticklabels ? 1 : 0.5
+                );
+            } else {
+                x = mid;
+
+                if(titleSide === 'bottom') {
+                    y = gs.t + gs.h * pos + 10 + (
+                        ticklabelposition.indexOf('inside') === -1 ?
+                            ax.tickfont.size :
+                            0
+                    ) + (
+                        ax.ticks !== 'intside' ?
+                            opts.ticklen || 0 :
+                            0
+                    );
+                }
+
+                if(titleSide === 'top') {
+                    var nlines = title.text.split('<br>').length;
+                    y = gs.t + gs.h * pos + 10 - thickPx - LINE_SPACING * titleFontSize * nlines;
+                }
+            }
+
+            drawTitle((isVertical ?
+                // the 'h' + is a hack to get around the fact that
+                // convertToTspans rotates any 'y...' class by 90 degrees.
+                // TODO: find a better way to control this.
+                'h' :
+                'v'
+            ) + ax._id + 'title', {
                 avoid: {
                     selection: d3.select(gd).selectAll('g.' + ax._id + 'tick'),
                     side: titleSide,
-                    offsetLeft: gs.l,
-                    offsetTop: 0,
-                    maxShift: fullLayout.width
+                    offsetTop: isVertical ? 0 : gs.t,
+                    offsetLeft: isVertical ? gs.l : 0,
+                    maxShift: isVertical ? fullLayout.width : fullLayout.height
                 },
                 attributes: {x: x, y: y, 'text-anchor': 'middle'},
-                transform: {rotate: '-90', offset: 0}
+                transform: {rotate: isVertical ? -90 : 0, offset: 0}
             });
         }
     }
 
     function drawAxis() {
-        if(['top', 'bottom'].indexOf(titleSide) !== -1) {
+        if(
+            (!isVertical && !topOrBottom) ||
+            (isVertical && topOrBottom)
+        ) {
             // squish the axis top to make room for the title
             var titleGroup = g.select('.' + cn.cbtitle);
             var titleText = titleGroup.select('text');
-            var titleTrans = [-opts.outlinewidth / 2, opts.outlinewidth / 2];
+            var titleTrans = [-outlinewidth / 2, outlinewidth / 2];
             var mathJaxNode = titleGroup
                 .select('.h' + ax._id + 'title-math-group')
                 .node();
@@ -31309,39 +31430,63 @@ function drawColorBar(g, opts, gd) {
             if(titleText.node()) {
                 lineSize = parseInt(titleText.node().style.fontSize, 10) * LINE_SPACING;
             }
+
+            var bb;
             if(mathJaxNode) {
-                titleHeight = Drawing.bBox(mathJaxNode).height;
+                bb = Drawing.bBox(mathJaxNode);
+                titleWidth = bb.width;
+                titleHeight = bb.height;
                 if(titleHeight > lineSize) {
                     // not entirely sure how mathjax is doing
                     // vertical alignment, but this seems to work.
                     titleTrans[1] -= (titleHeight - lineSize) / 2;
                 }
             } else if(titleText.node() && !titleText.classed(cn.jsPlaceholder)) {
-                titleHeight = Drawing.bBox(titleText.node()).height;
+                bb = Drawing.bBox(titleText.node());
+                titleWidth = bb.width;
+                titleHeight = bb.height;
             }
-            if(titleHeight) {
-                // buffer btwn colorbar and title
-                // TODO: configurable
-                titleHeight += 5;
 
-                if(titleSide === 'top') {
-                    ax.domain[1] -= titleHeight / gs.h;
-                    titleTrans[1] *= -1;
-                } else {
-                    ax.domain[0] += titleHeight / gs.h;
-                    var nlines = svgTextUtils.lineCount(titleText);
-                    titleTrans[1] += (1 - nlines) * lineSize;
+            if(isVertical) {
+                if(titleHeight) {
+                    // buffer btwn colorbar and title
+                    // TODO: configurable
+                    titleHeight += 5;
+
+                    if(titleSide === 'top') {
+                        ax.domain[1] -= titleHeight / gs.h;
+                        titleTrans[1] *= -1;
+                    } else {
+                        ax.domain[0] += titleHeight / gs.h;
+                        var nlines = svgTextUtils.lineCount(titleText);
+                        titleTrans[1] += (1 - nlines) * lineSize;
+                    }
+
+                    titleGroup.attr('transform', strTranslate(titleTrans[0], titleTrans[1]));
+                    ax.setScale();
                 }
+            } else { // horizontal colorbars
+                if(titleWidth) {
+                    if(titleSide === 'right') {
+                        ax.domain[0] += (titleWidth + titleFontSize / 2) / gs.w;
+                    }
 
-                titleGroup.attr('transform', strTranslate(titleTrans[0], titleTrans[1]));
-                ax.setScale();
+                    titleGroup.attr('transform', strTranslate(titleTrans[0], titleTrans[1]));
+                    ax.setScale();
+                }
             }
         }
 
         g.selectAll('.' + cn.cbfills + ',.' + cn.cblines)
-            .attr('transform', strTranslate(0, Math.round(gs.h * (1 - ax.domain[1]))));
+            .attr('transform', isVertical ?
+                strTranslate(0, Math.round(gs.h * (1 - ax.domain[1]))) :
+                strTranslate(Math.round(gs.w * ax.domain[0]), 0)
+            );
 
-        axLayer.attr('transform', strTranslate(0, Math.round(-gs.t)));
+        axLayer.attr('transform', isVertical ?
+            strTranslate(0, Math.round(-gs.t)) :
+            strTranslate(Math.round(-gs.l), 0)
+        );
 
         var fills = g.select('.' + cn.cbfills)
             .selectAll('rect.' + cn.cbfill)
@@ -31367,20 +31512,22 @@ function drawColorBar(g, opts, gd) {
 
             // offset the side adjoining the next rectangle so they
             // overlap, to prevent antialiasing gaps
-            z[1] = Lib.constrain(z[1] + (z[1] > z[0]) ? 1 : -1, zBounds[0], zBounds[1]);
-
+            if(isVertical) {
+                z[1] = Lib.constrain(z[1] + (z[1] > z[0]) ? 1 : -1, zBounds[0], zBounds[1]);
+            } /* else {
+                // TODO: horizontal case
+            } */
 
             // Colorbar cannot currently support opacities so we
             // use an opaque fill even when alpha channels present
-            var fillEl = d3.select(this).attr({
-                x: xLeft,
-                width: Math.max(thickPx, 2),
-                y: d3.min(z),
-                height: Math.max(d3.max(z) - d3.min(z), 2),
-            });
+            var fillEl = d3.select(this)
+            .attr(isVertical ? 'x' : 'y', uPx)
+            .attr(isVertical ? 'y' : 'x', d3.min(z))
+            .attr(isVertical ? 'width' : 'height', Math.max(thickPx, 2))
+            .attr(isVertical ? 'height' : 'width', Math.max(d3.max(z) - d3.min(z), 2));
 
             if(opts._fillgradient) {
-                Drawing.gradient(fillEl, gd, opts._id, 'vertical', opts._fillgradient, 'fill');
+                Drawing.gradient(fillEl, gd, opts._id, isVertical ? 'vertical' : 'horizontalreversed', opts._fillgradient, 'fill');
             } else {
                 // tinycolor can't handle exponents and
                 // at this scale, removing it makes no difference.
@@ -31396,17 +31543,23 @@ function drawColorBar(g, opts, gd) {
             .classed(cn.cbline, true);
         lines.exit().remove();
         lines.each(function(d) {
+            var a = uPx;
+            var b = (Math.round(ax.c2p(d)) + (line.width / 2) % 1);
+
             d3.select(this)
-                .attr('d', 'M' + xLeft + ',' +
-                    (Math.round(ax.c2p(d)) + (line.width / 2) % 1) + 'h' + thickPx)
+                .attr('d', 'M' +
+                    (isVertical ? a + ',' + b : b + ',' + a) +
+                    (isVertical ? 'h' : 'v') +
+                    thickPx
+                )
                 .call(Drawing.lineGroupStyle, line.width, lineColormap(d), line.dash);
         });
 
         // force full redraw of labels and ticks
         axLayer.selectAll('g.' + ax._id + 'tick,path').remove();
 
-        var shift = xLeft + thickPx +
-            (opts.outlinewidth || 0) / 2 - (opts.ticks === 'outside' ? 1 : 0);
+        var shift = uPx + thickPx +
+            (outlinewidth || 0) / 2 - (opts.ticks === 'outside' ? 1 : 0);
 
         var vals = Axes.calcTicks(ax);
         var tickSign = Axes.getTickSigns(ax)[2];
@@ -31431,83 +31584,211 @@ function drawColorBar(g, opts, gd) {
     // TODO: why are we redrawing multiple times now with this?
     // I guess autoMargin doesn't like being post-promise?
     function positionCB() {
-        var innerWidth = thickPx + opts.outlinewidth / 2;
-        if(ax.ticklabelposition.indexOf('inside') === -1) {
-            innerWidth += Drawing.bBox(axLayer.node()).width;
+        var bb;
+        var innerThickness = thickPx + outlinewidth / 2;
+        if(ticklabelposition.indexOf('inside') === -1) {
+            bb = Drawing.bBox(axLayer.node());
+            innerThickness += isVertical ? bb.width : bb.height;
         }
 
         titleEl = titleCont.select('text');
 
+        var titleWidth = 0;
+
+        var topSideVertical = isVertical && titleSide === 'top';
+        var rightSideHorizontal = !isVertical && titleSide === 'right';
+
+        var moveY = 0;
+
         if(titleEl.node() && !titleEl.classed(cn.jsPlaceholder)) {
+            var _titleHeight;
+
             var mathJaxNode = titleCont.select('.h' + ax._id + 'title-math-group').node();
-            var titleWidth;
-            if(mathJaxNode && ['top', 'bottom'].indexOf(titleSide) !== -1) {
-                titleWidth = Drawing.bBox(mathJaxNode).width;
+            if(mathJaxNode && (
+                (isVertical && topOrBottom) ||
+                (!isVertical && !topOrBottom)
+            )) {
+                bb = Drawing.bBox(mathJaxNode);
+                titleWidth = bb.width;
+                _titleHeight = bb.height;
             } else {
                 // note: the formula below works for all title sides,
                 // (except for top/bottom mathjax, above)
                 // but the weird gs.l is because the titleunshift
                 // transform gets removed by Drawing.bBox
-                titleWidth = Drawing.bBox(titleCont.node()).right - xLeft - gs.l;
+                bb = Drawing.bBox(titleCont.node());
+                titleWidth = bb.right - gs.l - (isVertical ? uPx : vPx);
+                _titleHeight = bb.bottom - gs.t - (isVertical ? vPx : uPx);
+
+                if(
+                    !isVertical && titleSide === 'top'
+                ) {
+                    innerThickness += bb.height;
+                    moveY = bb.height;
+                }
             }
-            innerWidth = Math.max(innerWidth, titleWidth);
+
+            if(rightSideHorizontal) {
+                titleEl.attr('transform', strTranslate(titleWidth / 2 + titleFontSize / 2, 0));
+
+                titleWidth *= 2;
+            }
+
+            innerThickness = Math.max(innerThickness,
+                isVertical ? titleWidth : _titleHeight
+            );
         }
 
-        var outerwidth = 2 * opts.xpad + innerWidth + opts.borderwidth + opts.outlinewidth / 2;
-        var outerheight = yBottomPx - yTopPx;
+        var outerThickness = (isVertical ?
+            xpad :
+            ypad
+        ) * 2 + innerThickness + borderwidth + outlinewidth / 2;
 
-        g.select('.' + cn.cbbg).attr({
-            x: xLeft - opts.xpad - (opts.borderwidth + opts.outlinewidth) / 2,
-            y: yTopPx - yExtraPx,
-            width: Math.max(outerwidth, 2),
-            height: Math.max(outerheight + 2 * yExtraPx, 2)
-        })
-        .call(Color.fill, opts.bgcolor)
+        var hColorbarMoveTitle = 0;
+        if(!isVertical && title.text && yanchor === 'bottom' && optsY <= 0) {
+            hColorbarMoveTitle = outerThickness / 2;
+
+            outerThickness += hColorbarMoveTitle;
+            moveY += hColorbarMoveTitle;
+        }
+        fullLayout._hColorbarMoveTitle = hColorbarMoveTitle;
+        fullLayout._hColorbarMoveCBTitle = moveY;
+
+        var extraW = borderwidth + outlinewidth;
+
+        g.select('.' + cn.cbbg)
+        .attr('x', (isVertical ? uPx : vPx) - extraW / 2 - (isVertical ? xpad : 0))
+        .attr('y', (isVertical ? vPx : uPx) - (isVertical ? lenPx : ypad + moveY - hColorbarMoveTitle))
+        .attr(isVertical ? 'width' : 'height', Math.max(outerThickness - hColorbarMoveTitle, 2))
+        .attr(isVertical ? 'height' : 'width', Math.max(lenPx + extraW, 2))
+        .call(Color.fill, bgcolor)
         .call(Color.stroke, opts.bordercolor)
-        .style('stroke-width', opts.borderwidth);
+        .style('stroke-width', borderwidth);
 
-        g.selectAll('.' + cn.cboutline).attr({
-            x: xLeft,
-            y: yTopPx + opts.ypad + (titleSide === 'top' ? titleHeight : 0),
-            width: Math.max(thickPx, 2),
-            height: Math.max(outerheight - 2 * opts.ypad - titleHeight, 2)
-        })
+        var moveX = rightSideHorizontal ? Math.max(titleWidth - 10, 0) : 0;
+
+        g.selectAll('.' + cn.cboutline)
+        .attr('x', (isVertical ? uPx : vPx + xpad) + moveX)
+        .attr('y', (isVertical ? vPx + ypad - lenPx : uPx) + (topSideVertical ? titleHeight : 0))
+        .attr(isVertical ? 'width' : 'height', Math.max(thickPx, 2))
+        .attr(isVertical ? 'height' : 'width', Math.max(lenPx - (isVertical ?
+            2 * ypad + titleHeight :
+            2 * xpad + moveX
+        ), 2))
         .call(Color.stroke, opts.outlinecolor)
         .style({
             fill: 'none',
-            'stroke-width': opts.outlinewidth
+            'stroke-width': outlinewidth
         });
 
-        // fix positioning for xanchor!='left'
-        var xoffset = ({center: 0.5, right: 1}[opts.xanchor] || 0) * outerwidth;
-        g.attr('transform', strTranslate(gs.l - xoffset, gs.t));
+        g.attr('transform', strTranslate(
+            gs.l - (isVertical ? xRatio * outerThickness : 0),
+            gs.t - (isVertical ? 0 : (1 - yRatio) * outerThickness - moveY)
+        ));
+
+        if(!isVertical && (
+            borderwidth || (
+                tinycolor(bgcolor).getAlpha() &&
+                !tinycolor.equals(fullLayout.paper_bgcolor, bgcolor)
+            )
+        )) {
+            // for horizontal colorbars when there is a border line or having different background color
+            // hide/adjust x positioning for the first/last tick labels if they go outside the border
+            var tickLabels = axLayer.selectAll('text');
+            var numTicks = tickLabels[0].length;
+
+            var border = g.select('.' + cn.cbbg).node();
+            var oBb = Drawing.bBox(border);
+            var oTr = Drawing.getTranslate(g);
+
+            var TEXTPAD = 2;
+
+            tickLabels.each(function(d, i) {
+                var first = 0;
+                var last = numTicks - 1;
+                if(i === first || i === last) {
+                    var iBb = Drawing.bBox(this);
+                    var iTr = Drawing.getTranslate(this);
+                    var deltaX;
+
+                    if(i === last) {
+                        var iRight = iBb.right + iTr.x;
+                        var oRight = oBb.right + oTr.x + vPx - borderwidth - TEXTPAD + optsX;
+
+                        deltaX = oRight - iRight;
+                        if(deltaX > 0) deltaX = 0;
+                    } else if(i === first) {
+                        var iLeft = iBb.left + iTr.x;
+                        var oLeft = oBb.left + oTr.x + vPx + borderwidth + TEXTPAD;
+
+                        deltaX = oLeft - iLeft;
+                        if(deltaX < 0) deltaX = 0;
+                    }
+
+                    if(deltaX) {
+                        if(numTicks < 3) { // adjust position
+                            this.setAttribute('transform',
+                                'translate(' + deltaX + ',0) ' +
+                                this.getAttribute('transform')
+                            );
+                        } else { // hide
+                            this.setAttribute('visibility', 'hidden');
+                        }
+                    }
+                }
+            });
+        }
 
         // auto margin adjustment
         var marginOpts = {};
-        var tFrac = FROM_TL[opts.yanchor];
-        var bFrac = FROM_BR[opts.yanchor];
-        if(opts.lenmode === 'pixels') {
-            marginOpts.y = opts.y;
-            marginOpts.t = outerheight * tFrac;
-            marginOpts.b = outerheight * bFrac;
-        } else {
-            marginOpts.t = marginOpts.b = 0;
-            marginOpts.yt = opts.y + opts.len * tFrac;
-            marginOpts.yb = opts.y - opts.len * bFrac;
-        }
+        var lFrac = FROM_TL[xanchor];
+        var rFrac = FROM_BR[xanchor];
+        var tFrac = FROM_TL[yanchor];
+        var bFrac = FROM_BR[yanchor];
 
-        var lFrac = FROM_TL[opts.xanchor];
-        var rFrac = FROM_BR[opts.xanchor];
-        if(opts.thicknessmode === 'pixels') {
-            marginOpts.x = opts.x;
-            marginOpts.l = outerwidth * lFrac;
-            marginOpts.r = outerwidth * rFrac;
-        } else {
-            var extraThickness = outerwidth - thickPx;
-            marginOpts.l = extraThickness * lFrac;
-            marginOpts.r = extraThickness * rFrac;
-            marginOpts.xl = opts.x - opts.thickness * lFrac;
-            marginOpts.xr = opts.x + opts.thickness * rFrac;
+        var extraThickness = outerThickness - thickPx;
+        if(isVertical) {
+            if(lenmode === 'pixels') {
+                marginOpts.y = optsY;
+                marginOpts.t = lenPx * tFrac;
+                marginOpts.b = lenPx * bFrac;
+            } else {
+                marginOpts.t = marginOpts.b = 0;
+                marginOpts.yt = optsY + len * tFrac;
+                marginOpts.yb = optsY - len * bFrac;
+            }
+
+            if(thicknessmode === 'pixels') {
+                marginOpts.x = optsX;
+                marginOpts.l = outerThickness * lFrac;
+                marginOpts.r = outerThickness * rFrac;
+            } else {
+                marginOpts.l = extraThickness * lFrac;
+                marginOpts.r = extraThickness * rFrac;
+                marginOpts.xl = optsX - thickness * lFrac;
+                marginOpts.xr = optsX + thickness * rFrac;
+            }
+        } else { // horizontal colorbars
+            if(lenmode === 'pixels') {
+                marginOpts.x = optsX;
+                marginOpts.l = lenPx * lFrac;
+                marginOpts.r = lenPx * rFrac;
+            } else {
+                marginOpts.l = marginOpts.r = 0;
+                marginOpts.xl = optsX + len * lFrac;
+                marginOpts.xr = optsX - len * rFrac;
+            }
+
+            if(thicknessmode === 'pixels') {
+                marginOpts.y = 1 - optsY;
+                marginOpts.t = outerThickness * tFrac;
+                marginOpts.b = outerThickness * bFrac;
+            } else {
+                marginOpts.t = extraThickness * tFrac;
+                marginOpts.b = extraThickness * bFrac;
+                marginOpts.yt = optsY - thickness * tFrac;
+                marginOpts.yb = optsY + thickness * bFrac;
+            }
         }
 
         Plots.autoMargin(gd, opts._id, marginOpts);
@@ -31524,6 +31805,7 @@ function drawColorBar(g, opts, gd) {
 }
 
 function makeEditable(g, opts, gd) {
+    var isVertical = opts.orientation === 'v';
     var fullLayout = gd._fullLayout;
     var gs = fullLayout._size;
     var t0, xf, yf;
@@ -31538,9 +31820,13 @@ function makeEditable(g, opts, gd) {
         moveFn: function(dx, dy) {
             g.attr('transform', t0 + strTranslate(dx, dy));
 
-            xf = dragElement.align(opts._xLeftFrac + (dx / gs.w), opts._thickFrac,
+            xf = dragElement.align(
+                (isVertical ? opts._uFrac : opts._vFrac) + (dx / gs.w),
+                isVertical ? opts._thickFrac : opts._lenFrac,
                 0, 1, opts.xanchor);
-            yf = dragElement.align(opts._yBottomFrac - (dy / gs.h), opts._lenFrac,
+            yf = dragElement.align(
+                (isVertical ? opts._vFrac : (1 - opts._uFrac)) - (dy / gs.h),
+                isVertical ? opts._lenFrac : opts._thickFrac,
                 0, 1, opts.yanchor);
 
             var csr = dragElement.getCursor(xf, yf, opts.xanchor, opts.yanchor);
@@ -31617,6 +31903,8 @@ function calcLevels(gd, opts, zrange) {
 function mockColorBarAxis(gd, opts, zrange) {
     var fullLayout = gd._fullLayout;
 
+    var isVertical = opts.orientation === 'v';
+
     var cbAxisIn = {
         type: 'linear',
         range: zrange,
@@ -31633,6 +31921,7 @@ function mockColorBarAxis(gd, opts, zrange) {
         showticklabels: opts.showticklabels,
         ticklabelposition: opts.ticklabelposition,
         ticklabeloverflow: opts.ticklabeloverflow,
+        ticklabelstep: opts.ticklabelstep,
         tickfont: opts.tickfont,
         tickangle: opts.tickangle,
         tickformat: opts.tickformat,
@@ -31647,17 +31936,19 @@ function mockColorBarAxis(gd, opts, zrange) {
         title: opts.title,
         showline: true,
         anchor: 'free',
-        side: 'right',
+        side: isVertical ? 'right' : 'bottom',
         position: 1
     };
 
+    var letter = isVertical ? 'y' : 'x';
+
     var cbAxisOut = {
         type: 'linear',
-        _id: 'y' + opts._id
+        _id: letter + opts._id
     };
 
     var axisOptions = {
-        letter: 'y',
+        letter: letter,
         font: fullLayout.font,
         noHover: true,
         noTickson: true,
@@ -34119,7 +34410,7 @@ var TEXTOFFSETSIGN = {
     start: 1, end: -1, middle: 0, bottom: 1, top: -1
 };
 
-function textPointPosition(s, textPosition, fontSize, markerRadius) {
+function textPointPosition(s, textPosition, fontSize, markerRadius, dontTouchParent) {
     var group = d3.select(s.node().parentNode);
 
     var v = textPosition.indexOf('top') !== -1 ?
@@ -34141,7 +34432,9 @@ function textPointPosition(s, textPosition, fontSize, markerRadius) {
 
     // fix the overall text group position
     s.attr('text-anchor', h);
-    group.attr('transform', strTranslate(dx, dy));
+    if(!dontTouchParent) {
+        group.attr('transform', strTranslate(dx, dy));
+    }
 }
 
 function extracTextFontSize(d, trace) {
@@ -34211,7 +34504,8 @@ drawing.selectedTextStyle = function(s, trace) {
         var fontSize = extracTextFontSize(d, trace);
 
         Color.fill(tx, tc);
-        textPointPosition(tx, tp, fontSize, d.mrc2 || d.mrc);
+        var dontTouchParent = Registry.traceIs(trace, 'bar-like');
+        textPointPosition(tx, tp, fontSize, d.mrc2 || d.mrc, dontTouchParent);
     });
 };
 
@@ -34633,7 +34927,7 @@ drawing.setTextPointsScale = function(selection, xScale, yScale) {
     });
 };
 
-},{"../../components/fx/helpers":193,"../../constants/alignment":262,"../../constants/interactions":266,"../../constants/xmlns_namespaces":268,"../../lib":287,"../../lib/svg_text_utils":310,"../../registry":378,"../../traces/scatter/make_bubble_size_func":516,"../../traces/scatter/subtypes":524,"../color":157,"../colorscale":169,"./symbol_defs":180,"@plotly/d3":20,"fast-isnumeric":33,"tinycolor2":121}],180:[function(_dereq_,module,exports){
+},{"../../components/fx/helpers":193,"../../constants/alignment":262,"../../constants/interactions":266,"../../constants/xmlns_namespaces":268,"../../lib":287,"../../lib/svg_text_utils":310,"../../registry":378,"../../traces/scatter/make_bubble_size_func":517,"../../traces/scatter/subtypes":525,"../color":157,"../colorscale":169,"./symbol_defs":180,"@plotly/d3":20,"fast-isnumeric":33,"tinycolor2":121}],180:[function(_dereq_,module,exports){
 'use strict';
 
 var d3 = _dereq_('@plotly/d3');
@@ -35732,7 +36026,7 @@ function errorCoords(d, xa, ya) {
     return out;
 }
 
-},{"../../traces/scatter/subtypes":524,"../drawing":179,"@plotly/d3":20,"fast-isnumeric":33}],187:[function(_dereq_,module,exports){
+},{"../../traces/scatter/subtypes":525,"../drawing":179,"@plotly/d3":20,"fast-isnumeric":33}],187:[function(_dereq_,module,exports){
 'use strict';
 
 var d3 = _dereq_('@plotly/d3');
@@ -36242,11 +36536,13 @@ var cartesianScatterPoints = {
 // The actual rendering is done by private function _hover.
 exports.hover = function hover(gd, evt, subplot, noHoverEvent) {
     gd = Lib.getGraphDiv(gd);
-
+    // The 'target' property changes when bubbling out of Shadow DOM.
+    // Throttling can delay reading the target, so we save the current value.
+    var eventTarget = evt.target;
     Lib.throttle(
         gd._fullLayout._uid + constants.HOVERID,
         constants.HOVERMINTIME,
-        function() { _hover(gd, evt, subplot, noHoverEvent); }
+        function() { _hover(gd, evt, subplot, noHoverEvent, eventTarget); }
     );
 };
 
@@ -36411,7 +36707,7 @@ exports.loneHover = function loneHover(hoverItems, opts) {
 };
 
 // The actual implementation is here:
-function _hover(gd, evt, subplot, noHoverEvent) {
+function _hover(gd, evt, subplot, noHoverEvent, eventTarget) {
     if(!subplot) subplot = 'xy';
 
     // if the user passed in an array of subplots,
@@ -36530,7 +36826,7 @@ function _hover(gd, evt, subplot, noHoverEvent) {
         // [x|y]px: the pixels (from top left) of the mouse location
         // on the currently selected plot area
         // add pointerX|Y property for drawing the spikes in spikesnap 'cursor' situation
-        var hasUserCalledHover = !evt.target;
+        var hasUserCalledHover = !eventTarget;
         var xpx, ypx;
 
         if(hasUserCalledHover) {
@@ -36547,13 +36843,7 @@ function _hover(gd, evt, subplot, noHoverEvent) {
                 return;
             }
 
-            // Discover event target, traversing open shadow roots.
-            var target = evt.composedPath && evt.composedPath()[0];
-            if(!target) {
-                // Fallback for browsers not supporting composedPath
-                target = evt.target;
-            }
-            var dbb = target.getBoundingClientRect();
+            var dbb = eventTarget.getBoundingClientRect();
 
             xpx = evt.clientX - dbb.left;
             ypx = evt.clientY - dbb.top;
@@ -37001,15 +37291,15 @@ function _hover(gd, evt, subplot, noHoverEvent) {
     if(!helpers.isUnifiedHover(hovermode)) {
         hoverAvoidOverlaps(hoverLabels, rotateLabels ? 'xa' : 'ya', fullLayout);
         alignHoverText(hoverLabels, rotateLabels, fullLayout._invScaleX, fullLayout._invScaleY);
-    }    // TODO: tagName hack is needed to appease geo.js's hack of using evt.target=true
+    }    // TODO: tagName hack is needed to appease geo.js's hack of using eventTarget=true
     // we should improve the "fx" API so other plots can use it without these hack.
-    if(evt.target && evt.target.tagName) {
+    if(eventTarget && eventTarget.tagName) {
         var hasClickToShow = Registry.getComponentMethod('annotations', 'hasClickToShow')(gd, newhoverdata);
-        overrideCursor(d3.select(evt.target), hasClickToShow ? 'pointer' : '');
+        overrideCursor(d3.select(eventTarget), hasClickToShow ? 'pointer' : '');
     }
 
     // don't emit events if called manually
-    if(!evt.target || noHoverEvent || !hoverChanged(gd, evt, oldhoverdata)) return;
+    if(!eventTarget || noHoverEvent || !hoverChanged(gd, evt, oldhoverdata)) return;
 
     if(oldhoverdata) {
         gd.emit('plotly_unhover', {
@@ -37271,7 +37561,9 @@ function createHoverText(hoverData, opts) {
                 orientation: 'v'
             }
         };
-        var mockLayoutOut = {};
+        var mockLayoutOut = {
+            font: font
+        };
         legendSupplyDefaults(mockLayoutIn, mockLayoutOut, gd._fullData);
         var mockLegend = mockLayoutOut.legend;
 
@@ -37312,7 +37604,8 @@ function createHoverText(hoverData, opts) {
 
         // Draw unified hover label
         mockLegend._inHover = true;
-        mockLegend._groupTitleFont = font;
+        mockLegend._groupTitleFont = hoverlabel.grouptitlefont;
+
         legendDraw(gd, mockLegend);
 
         // Position the hover
@@ -38314,9 +38607,11 @@ var isUnifiedHover = _dereq_('./helpers').isUnifiedHover;
 module.exports = function handleHoverLabelDefaults(contIn, contOut, coerce, opts) {
     opts = opts || {};
 
+    var hasLegend = contOut.legend;
+
     function inheritFontAttr(attr) {
         if(!opts.font[attr]) {
-            opts.font[attr] = contOut.legend ? contOut.legend.font[attr] : contOut.font[attr];
+            opts.font[attr] = hasLegend ? contOut.legend.font[attr] : contOut.font[attr];
         }
     }
 
@@ -38327,7 +38622,7 @@ module.exports = function handleHoverLabelDefaults(contIn, contOut, coerce, opts
         inheritFontAttr('family');
         inheritFontAttr('color');
 
-        if(contOut.legend) {
+        if(hasLegend) {
             if(!opts.bgcolor) opts.bgcolor = Color.combine(contOut.legend.bgcolor, contOut.paper_bgcolor);
             if(!opts.bordercolor) opts.bordercolor = contOut.legend.bordercolor;
         } else {
@@ -38436,11 +38731,13 @@ function castHoverinfo(trace, fullLayout, ptNumber) {
 
 var constants = _dereq_('./constants');
 
-var fontAttrs = _dereq_('../../plots/font_attributes')({
+var fontAttrs = _dereq_('../../plots/font_attributes');
+
+var font = fontAttrs({
     editType: 'none',
 });
-fontAttrs.family.dflt = constants.HOVERFONT;
-fontAttrs.size.dflt = constants.HOVERFONTSIZE;
+font.family.dflt = constants.HOVERFONT;
+font.size.dflt = constants.HOVERFONTSIZE;
 
 module.exports = {
     clickmode: {
@@ -38496,7 +38793,10 @@ module.exports = {
             valType: 'color',
             editType: 'none',
         },
-        font: fontAttrs,
+        font: font,
+        grouptitlefont: fontAttrs({
+            editType: 'none',
+        }),
         align: {
             valType: 'enumerated',
             values: ['left', 'right', 'auto'],
@@ -38509,6 +38809,7 @@ module.exports = {
             dflt: 15,
             editType: 'none',
         },
+
         editType: 'none'
     },
     selectdirection: {
@@ -38556,6 +38857,8 @@ module.exports = function supplyLayoutDefaults(layoutIn, layoutOut) {
     }
 
     handleHoverLabelDefaults(layoutIn, layoutOut, coerce);
+
+    Lib.coerceFont(coerce, 'hoverlabel.grouptitlefont', layoutOut.hoverlabel.font);
 };
 
 },{"../../lib":287,"./hoverlabel_defaults":195,"./hovermode_defaults":196,"./layout_attributes":198}],200:[function(_dereq_,module,exports){
@@ -39439,6 +39742,9 @@ module.exports = {
     font: fontAttrs({
         editType: 'legend',
     }),
+    grouptitlefont: fontAttrs({
+        editType: 'legend',
+    }),
     orientation: {
         valType: 'enumerated',
         values: ['v', 'h'],
@@ -39562,6 +39868,7 @@ var Registry = _dereq_('../../registry');
 var Lib = _dereq_('../../lib');
 var Template = _dereq_('../../plot_api/plot_template');
 
+var plotsAttrs = _dereq_('../../plots/attributes');
 var attributes = _dereq_('./attributes');
 var basePlotLayoutAttributes = _dereq_('../../plots/layout_attributes');
 var helpers = _dereq_('./helpers');
@@ -39569,13 +39876,30 @@ var helpers = _dereq_('./helpers');
 
 module.exports = function legendDefaults(layoutIn, layoutOut, fullData) {
     var containerIn = layoutIn.legend || {};
+    var containerOut = Template.newContainer(layoutOut, 'legend');
+
+    function coerce(attr, dflt) {
+        return Lib.coerce(containerIn, containerOut, attributes, attr, dflt);
+    }
+
+    var trace;
+    var traceCoerce = function(attr, dflt) {
+        var traceIn = trace._input;
+        var traceOut = trace;
+        return Lib.coerce(traceIn, traceOut, plotsAttrs, attr, dflt);
+    };
+
+    var globalFont = layoutOut.font || {};
+    var grouptitlefont = Lib.coerceFont(coerce, 'grouptitlefont', Lib.extendFlat({}, globalFont, {
+        size: Math.round(globalFont.size * 1.1)
+    }));
 
     var legendTraceCount = 0;
     var legendReallyHasATrace = false;
     var defaultOrder = 'normal';
 
     for(var i = 0; i < fullData.length; i++) {
-        var trace = fullData[i];
+        trace = fullData[i];
 
         if(!trace.visible) continue;
 
@@ -39602,6 +39926,8 @@ module.exports = function legendDefaults(layoutIn, layoutOut, fullData) {
                     legendTraceCount++;
                 }
             }
+
+            Lib.coerceFont(traceCoerce, 'legendgrouptitle.font', grouptitlefont);
         }
 
         if((Registry.traceIs(trace, 'bar') && layoutOut.barmode === 'stack') ||
@@ -39620,13 +39946,10 @@ module.exports = function legendDefaults(layoutIn, layoutOut, fullData) {
         basePlotLayoutAttributes, 'showlegend',
         legendReallyHasATrace && legendTraceCount > 1);
 
+    // delete legend
+    if(showLegend === false) layoutOut.legend = undefined;
+
     if(showLegend === false && !containerIn.uirevision) return;
-
-    var containerOut = Template.newContainer(layoutOut, 'legend');
-
-    function coerce(attr, dflt) {
-        return Lib.coerce(containerIn, containerOut, attributes, attr, dflt);
-    }
 
     coerce('uirevision', layoutOut.uirevision);
 
@@ -39688,7 +40011,7 @@ module.exports = function legendDefaults(layoutIn, layoutOut, fullData) {
     }
 };
 
-},{"../../lib":287,"../../plot_api/plot_template":323,"../../plots/layout_attributes":369,"../../registry":378,"./attributes":207,"./helpers":213}],210:[function(_dereq_,module,exports){
+},{"../../lib":287,"../../plot_api/plot_template":323,"../../plots/attributes":330,"../../plots/layout_attributes":369,"../../registry":378,"./attributes":207,"./helpers":213}],210:[function(_dereq_,module,exports){
 'use strict';
 
 var d3 = _dereq_('@plotly/d3');
@@ -40405,7 +40728,6 @@ function computeLegendDimensions(gd, groups, traces, legendObj) {
                     offsetY += h;
                     maxWidthInGroup = Math.max(maxWidthInGroup, textGap + w);
                 });
-                maxGroupHeightInRow = Math.max(maxGroupHeightInRow, offsetY);
 
                 var next = maxWidthInGroup + itemGap;
 
@@ -40421,6 +40743,8 @@ function computeLegendDimensions(gd, groups, traces, legendObj) {
                     groupOffsetX = 0;
                     groupOffsetY += maxGroupHeightInRow + traceGroupGap;
                     maxGroupHeightInRow = offsetY;
+                } else {
+                    maxGroupHeightInRow = Math.max(maxGroupHeightInRow, offsetY);
                 }
 
                 Drawing.setTranslate(this, groupOffsetX, groupOffsetY);
@@ -41661,7 +41985,7 @@ function dimAttr(v, dflt, max) {
     return v;
 }
 
-},{"../../lib":287,"../../registry":378,"../../traces/pie/helpers":491,"../../traces/pie/style_one":497,"../../traces/scatter/subtypes":524,"../color":157,"../colorscale/helpers":168,"../drawing":179,"./constants":208,"@plotly/d3":20}],216:[function(_dereq_,module,exports){
+},{"../../lib":287,"../../registry":378,"../../traces/pie/helpers":492,"../../traces/pie/style_one":498,"../../traces/scatter/subtypes":525,"../color":157,"../colorscale/helpers":168,"../drawing":179,"./constants":208,"@plotly/d3":20}],216:[function(_dereq_,module,exports){
 'use strict';
 
 var constants = _dereq_('./constants');
@@ -42895,7 +43219,7 @@ function fillCustomButton(customButtons) {
     return customButtons;
 }
 
-},{"../../plots/cartesian/axis_ids":338,"../../registry":378,"../../traces/scatter/subtypes":524,"../fx/helpers":193,"./buttons":217,"./constants":218,"./modebar":222}],222:[function(_dereq_,module,exports){
+},{"../../plots/cartesian/axis_ids":338,"../../registry":378,"../../traces/scatter/subtypes":525,"../fx/helpers":193,"./buttons":217,"./constants":218,"./modebar":222}],222:[function(_dereq_,module,exports){
 'use strict';
 
 var d3 = _dereq_('@plotly/d3');
@@ -42903,6 +43227,8 @@ var isNumeric = _dereq_('fast-isnumeric');
 
 var Lib = _dereq_('../../lib');
 var Icons = _dereq_('../../fonts/ploticon');
+var version = _dereq_('../../version').version;
+
 var Parser = new DOMParser();
 
 /**
@@ -43181,6 +43507,10 @@ proto.hasButtons = function(buttons) {
     return true;
 };
 
+function jsVersion(str) {
+    return str + ' (v' + version + ')';
+}
+
 /**
  * @return {HTMLDivElement} The logo image wrapped in a group
  */
@@ -43190,7 +43520,7 @@ proto.getLogo = function() {
 
     a.href = 'https://plotly.com/';
     a.target = '_blank';
-    a.setAttribute('data-title', Lib._(this.graphInfo, 'Produced with Plotly'));
+    a.setAttribute('data-title', jsVersion(Lib._(this.graphInfo, 'Produced with Plotly.js')));
     a.className = 'modebar-btn plotlyjsicon modebar-btn--logo';
 
     a.appendChild(this.createIcon(Icons.newplotlylogo));
@@ -43232,7 +43562,7 @@ function createModeBar(gd, buttons) {
 
 module.exports = createModeBar;
 
-},{"../../fonts/ploticon":270,"../../lib":287,"@plotly/d3":20,"fast-isnumeric":33}],223:[function(_dereq_,module,exports){
+},{"../../fonts/ploticon":270,"../../lib":287,"../../version":552,"@plotly/d3":20,"fast-isnumeric":33}],223:[function(_dereq_,module,exports){
 'use strict';
 
 var fontAttrs = _dereq_('../../plots/font_attributes');
@@ -44824,7 +45154,7 @@ module.exports = templatedArray('shape', {
     editType: 'arraydraw'
 });
 
-},{"../../constants/axis_placeable_objects":263,"../../lib/extend":281,"../../plot_api/plot_template":323,"../../traces/scatter/attributes":499,"../annotations/attributes":140,"../drawing/attributes":178}],238:[function(_dereq_,module,exports){
+},{"../../constants/axis_placeable_objects":263,"../../lib/extend":281,"../../plot_api/plot_template":323,"../../traces/scatter/attributes":500,"../annotations/attributes":140,"../drawing/attributes":178}],238:[function(_dereq_,module,exports){
 'use strict';
 
 var Lib = _dereq_('../../lib');
@@ -48140,8 +48470,10 @@ function draw(gd, titleClass, options) {
 
     var elShouldExist = txt || editable;
 
+    var hColorbarMoveTitle;
     if(!group) {
         group = Lib.ensureSingle(fullLayout._infolayer, 'g', 'g-' + titleClass);
+        hColorbarMoveTitle = fullLayout._hColorbarMoveTitle;
     }
 
     var el = group.selectAll('text')
@@ -48165,13 +48497,17 @@ function draw(gd, titleClass, options) {
     function drawTitle(titleEl) {
         var transformVal;
 
+        if(!transform && hColorbarMoveTitle) {
+            transform = {};
+        }
+
         if(transform) {
             transformVal = '';
             if(transform.rotate) {
                 transformVal += 'rotate(' + [transform.rotate, attributes.x, attributes.y] + ')';
             }
-            if(transform.offset) {
-                transformVal += strTranslate(0, transform.offset);
+            if(transform.offset || hColorbarMoveTitle) {
+                transformVal += strTranslate(0, (transform.offset || 0) - (hColorbarMoveTitle || 0));
             }
         } else {
             transformVal = null;
@@ -49968,7 +50304,7 @@ exports.Fx = {
 exports.Snapshot = _dereq_('./snapshot');
 exports.PlotSchema = _dereq_('./plot_api/plot_schema');
 
-},{"../build/plotcss":1,"./components/annotations":148,"./components/annotations3d":153,"./components/colorbar":163,"./components/colorscale":169,"./components/errorbars":185,"./components/fx":197,"./components/grid":201,"./components/images":206,"./components/legend":214,"./components/modebar":220,"./components/rangeselector":228,"./components/rangeslider":235,"./components/shapes":249,"./components/sliders":254,"./components/updatemenus":260,"./fonts/ploticon":270,"./locale-en":314,"./locale-en-us":313,"./plot_api":318,"./plot_api/plot_schema":322,"./plots/plots":371,"./registry":378,"./snapshot":383,"./traces/scatter":511,"./version":551,"native-promise-only":72}],270:[function(_dereq_,module,exports){
+},{"../build/plotcss":1,"./components/annotations":148,"./components/annotations3d":153,"./components/colorbar":163,"./components/colorscale":169,"./components/errorbars":185,"./components/fx":197,"./components/grid":201,"./components/images":206,"./components/legend":214,"./components/modebar":220,"./components/rangeselector":228,"./components/rangeslider":235,"./components/shapes":249,"./components/sliders":254,"./components/updatemenus":260,"./fonts/ploticon":270,"./locale-en":314,"./locale-en-us":313,"./plot_api":318,"./plot_api/plot_schema":322,"./plots/plots":371,"./registry":378,"./snapshot":383,"./traces/scatter":512,"./version":552,"native-promise-only":72}],270:[function(_dereq_,module,exports){
 'use strict';
 
 module.exports = {
@@ -59629,7 +59965,7 @@ function cleanDeprecatedAttributeKeys(aobj) {
         if((key === 'title' || oldAxisTitleRegex.test(key) || colorbarRegex.test(key)) &&
           (typeof value === 'string' || typeof value === 'number')) {
             replace(key, key.replace('title', 'title.text'));
-        } else if(key.indexOf('titlefont') > -1) {
+        } else if(key.indexOf('titlefont') > -1 && key.indexOf('grouptitlefont') === -1) {
             replace(key, key.replace('titlefont', 'title.font'));
         } else if(key.indexOf('titleposition') > -1) {
             replace(key, key.replace('titleposition', 'title.position'));
@@ -60306,7 +60642,8 @@ function findUIPattern(key, patternSpecs) {
         var spec = patternSpecs[i];
         var match = key.match(spec.pattern);
         if(match) {
-            return {head: match[1], attr: spec.attr};
+            var head = match[1] || '';
+            return {head: head, tail: key.substr(head.length + 1), attr: spec.attr};
         }
     }
 }
@@ -60358,26 +60695,54 @@ function valsMatch(v1, v2) {
 
 function applyUIRevisions(data, layout, oldFullData, oldFullLayout) {
     var layoutPreGUI = oldFullLayout._preGUI;
-    var key, revAttr, oldRev, newRev, match, preGUIVal, newNP, newVal;
+    var key, revAttr, oldRev, newRev, match, preGUIVal, newNP, newVal, head, tail;
     var bothInheritAutorange = [];
+    var newAutorangeIn = {};
     var newRangeAccepted = {};
     for(key in layoutPreGUI) {
         match = findUIPattern(key, layoutUIControlPatterns);
         if(match) {
-            revAttr = match.attr || (match.head + '.uirevision');
+            head = match.head;
+            tail = match.tail;
+            revAttr = match.attr || (head + '.uirevision');
             oldRev = nestedProperty(oldFullLayout, revAttr).get();
             newRev = oldRev && getNewRev(revAttr, layout);
+
             if(newRev && (newRev === oldRev)) {
                 preGUIVal = layoutPreGUI[key];
                 if(preGUIVal === null) preGUIVal = undefined;
                 newNP = nestedProperty(layout, key);
                 newVal = newNP.get();
+
                 if(valsMatch(newVal, preGUIVal)) {
-                    if(newVal === undefined && key.substr(key.length - 9) === 'autorange') {
-                        bothInheritAutorange.push(key.substr(0, key.length - 10));
+                    if(newVal === undefined && tail === 'autorange') {
+                        bothInheritAutorange.push(head);
                     }
                     newNP.set(undefinedToNull(nestedProperty(oldFullLayout, key).get()));
                     continue;
+                } else if(tail === 'autorange' || tail.substr(0, 6) === 'range[') {
+                    // Special case for (auto)range since we push it back into the layout
+                    // so all null should be treated equivalently to autorange: true with any range
+                    var pre0 = layoutPreGUI[head + '.range[0]'];
+                    var pre1 = layoutPreGUI[head + '.range[1]'];
+                    var preAuto = layoutPreGUI[head + '.autorange'];
+                    if(preAuto || (preAuto === null && pre0 === null && pre1 === null)) {
+                        // Only read the input layout once and stash the result,
+                        // so we get it before we start modifying it
+                        if(!(head in newAutorangeIn)) {
+                            var newContainer = nestedProperty(layout, head).get();
+                            newAutorangeIn[head] = newContainer && (
+                                newContainer.autorange ||
+                                (newContainer.autorange !== false && (
+                                    !newContainer.range || newContainer.range.length !== 2)
+                                )
+                            );
+                        }
+                        if(newAutorangeIn[head]) {
+                            newNP.set(undefinedToNull(nestedProperty(oldFullLayout, key).get()));
+                            continue;
+                        }
+                    }
                 }
             }
         } else {
@@ -60388,12 +60753,12 @@ function applyUIRevisions(data, layout, oldFullData, oldFullLayout) {
         // so remove it from _preGUI for next time.
         delete layoutPreGUI[key];
 
-        if(key.substr(key.length - 8, 6) === 'range[') {
-            newRangeAccepted[key.substr(0, key.length - 9)] = 1;
+        if(match && match.tail.substr(0, 6) === 'range[') {
+            newRangeAccepted[match.head] = 1;
         }
     }
 
-    // Special logic for `autorange`, since it interacts with `range`:
+    // More special logic for `autorange`, since it interacts with `range`:
     // If the new figure's matching `range` was kept, and `autorange`
     // wasn't supplied explicitly in either the original or the new figure,
     // we shouldn't alter that - but we may just have done that, so fix it.
@@ -64325,7 +64690,7 @@ function toImage(gd, opts) {
 
 module.exports = toImage;
 
-},{"../lib":287,"../plots/plots":371,"../snapshot/helpers":382,"../snapshot/svgtoimg":384,"../snapshot/tosvg":386,"../version":551,"./plot_api":320,"fast-isnumeric":33}],327:[function(_dereq_,module,exports){
+},{"../lib":287,"../plots/plots":371,"../snapshot/helpers":382,"../snapshot/svgtoimg":384,"../snapshot/tosvg":386,"../version":552,"./plot_api":320,"fast-isnumeric":33}],327:[function(_dereq_,module,exports){
 'use strict';
 
 var Lib = _dereq_('../lib');
@@ -66590,7 +66955,8 @@ axes.calcTicks = function calcTicks(ax, opts) {
     var minRange = Math.min(rng[0], rng[1]);
     var maxRange = Math.max(rng[0], rng[1]);
 
-    var isDLog = (ax.type === 'log') && !(isNumeric(ax.dtick) || ax.dtick.charAt(0) === 'L');
+    var numDtick = isNumeric(ax.dtick);
+    var isDLog = (ax.type === 'log') && !(numDtick || ax.dtick.charAt(0) === 'L');
     var isPeriod = ax.ticklabelmode === 'period';
 
     // find the first tick
@@ -66621,13 +66987,36 @@ axes.calcTicks = function calcTicks(ax, opts) {
         x = axes.tickIncrement(x, ax.dtick, !axrev, ax.calendar);
     }
 
+    var ticklabelstep = ax.ticklabelstep;
+
     var maxTicks = Math.max(1000, ax._length || 0);
     var tickVals = [];
     var xPrevious = null;
+
+    var dTick;
+    if(numDtick) {
+        dTick = ax.dtick;
+    } else {
+        if(ax.type === 'date') {
+            if(typeof ax.dtick === 'string' && ax.dtick.charAt(0) === 'M') {
+                dTick = ONEAVGMONTH * ax.dtick.substring(1);
+            }
+        } else {
+            dTick = ax._roughDTick;
+        }
+    }
+
+    var id = Math.round((
+        ax.r2l(x) -
+        ax.r2l(ax.tick0)
+    ) / dTick) - 1;
+
     for(;
         (axrev) ? (x >= endTick) : (x <= endTick);
         x = axes.tickIncrement(x, ax.dtick, axrev, ax.calendar)
     ) {
+        id++;
+
         if(ax.rangebreaks) {
             if(!axrev) {
                 if(x < startTick) continue;
@@ -66645,10 +67034,16 @@ axes.calcTicks = function calcTicks(ax, opts) {
             minor = true;
         }
 
-        tickVals.push({
+        var obj = {
             minor: minor,
             value: x
-        });
+        };
+
+        if(ticklabelstep > 1 && id % ticklabelstep) {
+            obj.skipLabel = true;
+        }
+
+        tickVals.push(obj);
     }
 
     if(isPeriod) positionPeriodTicks(tickVals, ax, ax._definedDelta);
@@ -66701,11 +67096,19 @@ axes.calcTicks = function calcTicks(ax, opts) {
     ax._prevDateHead = '';
     ax._inCalcTicks = true;
 
+    var lastVisibleHead;
+    var hideLabel = function(tick) {
+        tick.text = ' '; // don't use an empty string here which can confuse automargin (issue 5132)
+        ax._prevDateHead = lastVisibleHead;
+    };
+
     var ticksOut = [];
     var t, p;
     for(i = 0; i < tickVals.length; i++) {
         var _minor = tickVals[i].minor;
         var _value = tickVals[i].value;
+
+        lastVisibleHead = ax._prevDateHead;
 
         t = axes.tickText(
             ax,
@@ -66721,9 +67124,12 @@ axes.calcTicks = function calcTicks(ax, opts) {
                 if(p > maxRange) t.periodX = maxRange;
                 if(p < minRange) t.periodX = minRange;
 
-                t.text = ' '; // don't use an empty string here which can confuse automargin (issue 5132)
-                ax._prevDateHead = '';
+                hideLabel(t);
             }
+        }
+
+        if(tickVals[i].skipLabel) {
+            hideLabel(t);
         }
 
         ticksOut.push(t);
@@ -68753,6 +69159,7 @@ axes.drawLabels = function(gd, ax, opts) {
     var axId = ax._id;
     var axLetter = axId.charAt(0);
     var cls = opts.cls || axId + 'tick';
+
     var vals = opts.vals;
 
     var labelFns = opts.labelFns;
@@ -73609,6 +74016,12 @@ module.exports = {
         editType: 'ticks',
         impliedEdits: {tickmode: 'linear'},
     },
+    ticklabelstep: {
+        valType: 'integer',
+        min: 1,
+        dflt: 1,
+        editType: 'ticks',
+    },
     tickvals: {
         valType: 'data_array',
         editType: 'ticks',
@@ -76473,6 +76886,14 @@ module.exports = function handleTickLabelDefaults(containerIn, containerOut, coe
             color: dfltFontColor
         });
 
+        if(
+            !options.noTicklabelstep &&
+            axType !== 'multicategory' &&
+            axType !== 'log'
+        ) {
+            coerce('ticklabelstep');
+        }
+
         if(!options.noAng) coerce('tickangle');
 
         if(axType !== 'category') {
@@ -77468,6 +77889,9 @@ module.exports = function(opts) {
         // TODO - that's uber hacky... better solution?
     };
 
+    if(opts.autoSize) attrs.size.dflt = 'auto';
+    if(opts.autoColor) attrs.color.dflt = 'auto';
+
     if(opts.arrayOk) {
         attrs.family.arrayOk = true;
         attrs.size.arrayOk = true;
@@ -77827,6 +78251,7 @@ module.exports = {
         valType: 'boolean',
         editType: 'legend',
     },
+
     colorway: {
         valType: 'colorlist',
         dflt: colorAttrs.defaults,
@@ -79239,13 +79664,7 @@ plots.supplyTraceDefaults = function(traceIn, traceOut, colorIndex, layout, trac
             );
 
             coerce('legendgroup');
-            var titleText = coerce('legendgrouptitle.text');
-            if(titleText) {
-                Lib.coerceFont(coerce, 'legendgrouptitle.font', Lib.extendFlat({}, layout.font, {
-                    size: Math.round(layout.font.size * 1.1) // default to larger font size
-                }));
-            }
-
+            coerce('legendgrouptitle.text');
             coerce('legendrank');
 
             traceOut._dfltShowLegend = true;
@@ -79393,16 +79812,14 @@ plots.supplyLayoutGlobalDefaults = function(layoutIn, layoutOut, formatObj) {
 
     coerce('autotypenumbers');
 
-    var globalFont = Lib.coerceFont(coerce, 'font');
+    var font = Lib.coerceFont(coerce, 'font');
+    var fontSize = font.size;
+
+    Lib.coerceFont(coerce, 'title.font', Lib.extendFlat({}, font, {
+        size: Math.round(fontSize * 1.4)
+    }));
 
     coerce('title.text', layoutOut._dfltTitle.plot);
-
-    Lib.coerceFont(coerce, 'title.font', {
-        family: globalFont.family,
-        size: Math.round(globalFont.size * 1.4),
-        color: globalFont.color
-    });
-
     coerce('title.xref');
     coerce('title.yref');
     coerce('title.x');
@@ -81595,6 +82012,7 @@ var ternaryAxesAttrs = {
     ticklen: axesAttrs.ticklen,
     tickwidth: axesAttrs.tickwidth,
     tickcolor: axesAttrs.tickcolor,
+    ticklabelstep: axesAttrs.ticklabelstep,
     showticklabels: axesAttrs.showticklabels,
     showtickprefix: axesAttrs.showtickprefix,
     tickprefix: axesAttrs.tickprefix,
@@ -83970,7 +84388,7 @@ module.exports = {
     }
 };
 
-},{"../../components/colorscale/attributes":164,"../../components/drawing/attributes":178,"../../lib/extend":281,"../../plots/cartesian/axis_format_attributes":337,"../../plots/font_attributes":365,"../../plots/template_attributes":373,"../scatter/attributes":499,"./constants":390}],389:[function(_dereq_,module,exports){
+},{"../../components/colorscale/attributes":164,"../../components/drawing/attributes":178,"../../lib/extend":281,"../../plots/cartesian/axis_format_attributes":337,"../../plots/font_attributes":365,"../../plots/template_attributes":373,"../scatter/attributes":500,"./constants":390}],389:[function(_dereq_,module,exports){
 'use strict';
 
 var Axes = _dereq_('../../plots/cartesian/axes');
@@ -84045,7 +84463,7 @@ module.exports = function calc(gd, trace) {
     return cd;
 };
 
-},{"../../components/colorscale/calc":165,"../../components/colorscale/helpers":168,"../../plots/cartesian/align_period":331,"../../plots/cartesian/axes":334,"../scatter/calc_selection":501,"./arrays_to_calcdata":387}],390:[function(_dereq_,module,exports){
+},{"../../components/colorscale/calc":165,"../../components/colorscale/helpers":168,"../../plots/cartesian/align_period":331,"../../plots/cartesian/axes":334,"../scatter/calc_selection":502,"./arrays_to_calcdata":387}],390:[function(_dereq_,module,exports){
 'use strict';
 
 module.exports = {
@@ -85012,7 +85430,7 @@ module.exports = {
     handleText: handleText
 };
 
-},{"../../components/color":157,"../../lib":287,"../../plots/cartesian/constraints":342,"../../registry":378,"../scatter/period_defaults":519,"../scatter/xy_defaults":526,"./attributes":388,"./style_defaults":403}],393:[function(_dereq_,module,exports){
+},{"../../components/color":157,"../../lib":287,"../../plots/cartesian/constraints":342,"../../registry":378,"../scatter/period_defaults":520,"../scatter/xy_defaults":527,"./attributes":388,"./style_defaults":403}],393:[function(_dereq_,module,exports){
 'use strict';
 
 module.exports = function eventData(out, pt, trace) {
@@ -85357,7 +85775,7 @@ module.exports = {
     }
 };
 
-},{"../../plots/cartesian":348,"../scatter/marker_colorbar":517,"./arrays_to_calcdata":387,"./attributes":388,"./calc":389,"./cross_trace_calc":391,"./defaults":392,"./event_data":393,"./hover":395,"./layout_attributes":397,"./layout_defaults":398,"./plot":399,"./select":400,"./style":402}],397:[function(_dereq_,module,exports){
+},{"../../plots/cartesian":348,"../scatter/marker_colorbar":518,"./arrays_to_calcdata":387,"./attributes":388,"./calc":389,"./cross_trace_calc":391,"./defaults":392,"./event_data":393,"./hover":395,"./layout_attributes":397,"./layout_defaults":398,"./plot":399,"./select":400,"./style":402}],397:[function(_dereq_,module,exports){
 'use strict';
 
 
@@ -85872,7 +86290,7 @@ function appendBarText(gd, plotinfo, bar, cd, i, x0, x1, y0, y1, opts, makeOnCom
     }
 
     transform.fontSize = font.size;
-    recordMinTextSize(trace.type, transform, fullLayout);
+    recordMinTextSize(trace.type === 'histogram' ? 'bar' : trace.type, transform, fullLayout);
     calcBar.transform = transform;
 
     transition(textSelection, fullLayout, opts, makeOnCompleteCallback)
@@ -86073,12 +86491,14 @@ function calcTexttemplate(fullLayout, cd, index, xa, ya) {
     var trace = cd[0].trace;
     var texttemplate = Lib.castOption(trace, index, 'texttemplate');
     if(!texttemplate) return '';
+    var isHistogram = (trace.type === 'histogram');
     var isWaterfall = (trace.type === 'waterfall');
     var isFunnel = (trace.type === 'funnel');
+    var isHorizontal = trace.orientation === 'h';
 
     var pLetter, pAxis;
     var vLetter, vAxis;
-    if(trace.orientation === 'h') {
+    if(isHorizontal) {
         pLetter = 'y';
         pAxis = ya;
         vLetter = 'x';
@@ -86112,6 +86532,11 @@ function calcTexttemplate(fullLayout, cd, index, xa, ya) {
 
     var pt = {};
     appendArrayPointValue(pt, trace, cdi.i);
+
+    if(isHistogram || pt.x === undefined) pt.x = isHorizontal ? obj.value : obj.label;
+    if(isHistogram || pt.y === undefined) pt.y = isHorizontal ? obj.label : obj.value;
+    if(isHistogram || pt.xLabel === undefined) pt.xLabel = isHorizontal ? obj.valueLabel : obj.labelLabel;
+    if(isHistogram || pt.yLabel === undefined) pt.yLabel = isHorizontal ? obj.labelLabel : obj.valueLabel;
 
     if(isWaterfall) {
         obj.delta = +cdi.rawS || cdi.s;
@@ -86903,7 +87328,7 @@ module.exports = {
     }
 };
 
-},{"../../components/color/attributes":156,"../../lib/extend":281,"../../plots/cartesian/axis_format_attributes":337,"../../plots/template_attributes":373,"../bar/attributes":388,"../scatter/attributes":499}],406:[function(_dereq_,module,exports){
+},{"../../components/color/attributes":156,"../../lib/extend":281,"../../plots/cartesian/axis_format_attributes":337,"../../plots/template_attributes":373,"../bar/attributes":388,"../scatter/attributes":500}],406:[function(_dereq_,module,exports){
 'use strict';
 
 var isNumeric = _dereq_('fast-isnumeric');
@@ -87884,7 +88309,7 @@ module.exports = {
     handlePointsDefaults: handlePointsDefaults
 };
 
-},{"../../components/color":157,"../../lib":287,"../../plots/cartesian/axis_autotype":335,"../../registry":378,"../bar/defaults":392,"../scatter/period_defaults":519,"./attributes":405}],409:[function(_dereq_,module,exports){
+},{"../../components/color":157,"../../lib":287,"../../plots/cartesian/axis_autotype":335,"../../registry":378,"../bar/defaults":392,"../scatter/period_defaults":520,"./attributes":405}],409:[function(_dereq_,module,exports){
 'use strict';
 
 module.exports = function eventData(out, pt) {
@@ -88765,6 +89190,10 @@ module.exports = extendFlat({
     yhoverformat: axisHoverFormat('y'),
     zhoverformat: axisHoverFormat('z', 1),
     hovertemplate: heatmapAttrs.hovertemplate,
+    texttemplate: extendFlat({}, heatmapAttrs.texttemplate, {
+    }),
+    textfont: extendFlat({}, heatmapAttrs.textfont, {
+    }),
     hoverongaps: heatmapAttrs.hoverongaps,
     connectgaps: extendFlat({}, heatmapAttrs.connectgaps, {
     }),
@@ -88880,7 +89309,7 @@ module.exports = extendFlat({
     })
 );
 
-},{"../../components/colorscale/attributes":164,"../../components/drawing/attributes":178,"../../constants/filter_ops":265,"../../lib/extend":281,"../../plots/cartesian/axis_format_attributes":337,"../../plots/font_attributes":365,"../heatmap/attributes":439,"../scatter/attributes":499}],418:[function(_dereq_,module,exports){
+},{"../../components/colorscale/attributes":164,"../../components/drawing/attributes":178,"../../constants/filter_ops":265,"../../lib/extend":281,"../../plots/cartesian/axis_format_attributes":337,"../../plots/font_attributes":365,"../heatmap/attributes":439,"../scatter/attributes":500}],418:[function(_dereq_,module,exports){
 'use strict';
 
 var Colorscale = _dereq_('../../components/colorscale');
@@ -89399,6 +89828,7 @@ var handlePeriodDefaults = _dereq_('../scatter/period_defaults');
 var handleConstraintDefaults = _dereq_('./constraint_defaults');
 var handleContoursDefaults = _dereq_('./contours_defaults');
 var handleStyleDefaults = _dereq_('./style_defaults');
+var handleHeatmapLabelDefaults = _dereq_('../heatmap/label_defaults');
 var attributes = _dereq_('./attributes');
 
 
@@ -89423,8 +89853,8 @@ module.exports = function supplyDefaults(traceIn, traceOut, defaultColor, layout
 
     coerce('text');
     coerce('hovertext');
-    coerce('hovertemplate');
     coerce('hoverongaps');
+    coerce('hovertemplate');
 
     var isConstraint = (coerce('contours.type') === 'constraint');
     coerce('connectgaps', Lib.isArray1D(traceOut.z));
@@ -89435,9 +89865,16 @@ module.exports = function supplyDefaults(traceIn, traceOut, defaultColor, layout
         handleContoursDefaults(traceIn, traceOut, coerce, coerce2);
         handleStyleDefaults(traceIn, traceOut, coerce, layout);
     }
+
+    if(
+        traceOut.contours &&
+        traceOut.contours.coloring === 'heatmap'
+    ) {
+        handleHeatmapLabelDefaults(coerce, layout);
+    }
 };
 
-},{"../../lib":287,"../heatmap/xyz_defaults":453,"../scatter/period_defaults":519,"./attributes":417,"./constraint_defaults":422,"./contours_defaults":424,"./style_defaults":438}],427:[function(_dereq_,module,exports){
+},{"../../lib":287,"../heatmap/label_defaults":449,"../heatmap/xyz_defaults":454,"../scatter/period_defaults":520,"./attributes":417,"./constraint_defaults":422,"./contours_defaults":424,"./style_defaults":438}],427:[function(_dereq_,module,exports){
 'use strict';
 
 var Lib = _dereq_('../../lib');
@@ -90711,7 +91148,7 @@ function makeClipMask(cd0) {
     return z;
 }
 
-},{"../../components/colorscale":169,"../../components/drawing":179,"../../lib":287,"../../lib/svg_text_utils":310,"../../plots/cartesian/axes":334,"../../plots/cartesian/set_convert":356,"../heatmap/plot":450,"./close_boundaries":419,"./constants":421,"./convert_to_constraints":425,"./empty_pathinfo":427,"./find_all_paths":429,"./make_crossings":434,"@plotly/d3":20}],436:[function(_dereq_,module,exports){
+},{"../../components/colorscale":169,"../../components/drawing":179,"../../lib":287,"../../lib/svg_text_utils":310,"../../plots/cartesian/axes":334,"../../plots/cartesian/set_convert":356,"../heatmap/plot":451,"./close_boundaries":419,"./constants":421,"./convert_to_constraints":425,"./empty_pathinfo":427,"./find_all_paths":429,"./make_crossings":434,"@plotly/d3":20}],436:[function(_dereq_,module,exports){
 'use strict';
 
 var Axes = _dereq_('../../plots/cartesian/axes');
@@ -90879,7 +91316,7 @@ module.exports = function style(gd) {
     heatmapStyle(gd);
 };
 
-},{"../../components/drawing":179,"../heatmap/style":451,"./make_color_map":433,"@plotly/d3":20}],438:[function(_dereq_,module,exports){
+},{"../../components/drawing":179,"../heatmap/style":452,"./make_color_map":433,"@plotly/d3":20}],438:[function(_dereq_,module,exports){
 'use strict';
 
 var colorscaleDefaults = _dereq_('../../components/colorscale/defaults');
@@ -90920,8 +91357,10 @@ module.exports = function handleStyleDefaults(traceIn, traceOut, coerce, layout,
 
 var scatterAttrs = _dereq_('../scatter/attributes');
 var baseAttrs = _dereq_('../../plots/attributes');
+var fontAttrs = _dereq_('../../plots/font_attributes');
 var axisHoverFormat = _dereq_('../../plots/cartesian/axis_format_attributes').axisHoverFormat;
 var hovertemplateAttrs = _dereq_('../../plots/template_attributes').hovertemplateAttrs;
+var texttemplateAttrs = _dereq_('../../plots/template_attributes').texttemplateAttrs;
 var colorScaleAttrs = _dereq_('../../components/colorscale/attributes');
 
 var extendFlat = _dereq_('../../lib/extend').extendFlat;
@@ -91000,6 +91439,19 @@ module.exports = extendFlat({
     zhoverformat: axisHoverFormat('z', 1),
 
     hovertemplate: hovertemplateAttrs(),
+    texttemplate: texttemplateAttrs({
+        arrayOk: false,
+        editType: 'plot'
+    }, {
+        keys: ['x', 'y', 'z', 'text']
+    }),
+    textfont: fontAttrs({
+        editType: 'plot',
+        autoSize: true,
+        autoColor: true,
+        colorEditType: 'style',
+    }),
+
     showlegend: extendFlat({}, baseAttrs.showlegend, {dflt: false})
 }, {
     transforms: undefined
@@ -91007,7 +91459,7 @@ module.exports = extendFlat({
     colorScaleAttrs('', {cLetter: 'z', autoColorDflt: false})
 );
 
-},{"../../components/colorscale/attributes":164,"../../lib/extend":281,"../../plots/attributes":330,"../../plots/cartesian/axis_format_attributes":337,"../../plots/template_attributes":373,"../scatter/attributes":499}],440:[function(_dereq_,module,exports){
+},{"../../components/colorscale/attributes":164,"../../lib/extend":281,"../../plots/attributes":330,"../../plots/cartesian/axis_format_attributes":337,"../../plots/font_attributes":365,"../../plots/template_attributes":373,"../scatter/attributes":500}],440:[function(_dereq_,module,exports){
 'use strict';
 
 var Registry = _dereq_('../../registry');
@@ -91208,7 +91660,7 @@ function dropZonBreaks(x, y, z) {
     return newZ;
 }
 
-},{"../../components/colorscale/calc":165,"../../constants/numerical":267,"../../lib":287,"../../plots/cartesian/align_period":331,"../../plots/cartesian/axes":334,"../../registry":378,"../histogram2d/calc":468,"./clean_2d_array":441,"./convert_column_xyz":443,"./find_empties":445,"./interp2d":448,"./make_bound_array":449}],441:[function(_dereq_,module,exports){
+},{"../../components/colorscale/calc":165,"../../constants/numerical":267,"../../lib":287,"../../plots/cartesian/align_period":331,"../../plots/cartesian/axes":334,"../../registry":378,"../histogram2d/calc":469,"./clean_2d_array":441,"./convert_column_xyz":443,"./find_empties":445,"./interp2d":448,"./make_bound_array":450}],441:[function(_dereq_,module,exports){
 'use strict';
 
 var isNumeric = _dereq_('fast-isnumeric');
@@ -91372,6 +91824,7 @@ module.exports = function convertColumnData(trace, ax1, ax2, var1Name, var2Name,
 var Lib = _dereq_('../../lib');
 
 var handleXYZDefaults = _dereq_('./xyz_defaults');
+var handleHeatmapLabelDefaults = _dereq_('./label_defaults');
 var handlePeriodDefaults = _dereq_('../scatter/period_defaults');
 var handleStyleDefaults = _dereq_('./style_defaults');
 var colorscaleDefaults = _dereq_('../../components/colorscale/defaults');
@@ -91397,6 +91850,7 @@ module.exports = function supplyDefaults(traceIn, traceOut, defaultColor, layout
     coerce('hovertext');
     coerce('hovertemplate');
 
+    handleHeatmapLabelDefaults(coerce, layout);
     handleStyleDefaults(traceIn, traceOut, coerce, layout);
 
     coerce('hoverongaps');
@@ -91405,7 +91859,7 @@ module.exports = function supplyDefaults(traceIn, traceOut, defaultColor, layout
     colorscaleDefaults(traceIn, traceOut, layout, coerce, {prefix: '', cLetter: 'z'});
 };
 
-},{"../../components/colorscale/defaults":167,"../../lib":287,"../scatter/period_defaults":519,"./attributes":439,"./style_defaults":452,"./xyz_defaults":453}],445:[function(_dereq_,module,exports){
+},{"../../components/colorscale/defaults":167,"../../lib":287,"../scatter/period_defaults":520,"./attributes":439,"./label_defaults":449,"./style_defaults":453,"./xyz_defaults":454}],445:[function(_dereq_,module,exports){
 'use strict';
 
 var maxRowLength = _dereq_('../../lib').maxRowLength;
@@ -91655,7 +92109,7 @@ module.exports = {
     }
 };
 
-},{"../../plots/cartesian":348,"./attributes":439,"./calc":440,"./colorbar":442,"./defaults":444,"./hover":446,"./plot":450,"./style":451}],448:[function(_dereq_,module,exports){
+},{"../../plots/cartesian":348,"./attributes":439,"./calc":440,"./colorbar":442,"./defaults":444,"./hover":446,"./plot":451,"./style":452}],448:[function(_dereq_,module,exports){
 'use strict';
 
 var Lib = _dereq_('../../lib');
@@ -91783,6 +92237,21 @@ function iterateInterp2d(z, emptyPoints, overshoot) {
 },{"../../lib":287}],449:[function(_dereq_,module,exports){
 'use strict';
 
+var Lib = _dereq_('../../lib');
+
+module.exports = function handleHeatmapLabelDefaults(coerce, layout) {
+    coerce('texttemplate');
+
+    var fontDflt = Lib.extendFlat({}, layout.font, {
+        color: 'auto',
+        size: 'auto'
+    });
+    Lib.coerceFont(coerce, 'textfont', fontDflt);
+};
+
+},{"../../lib":287}],450:[function(_dereq_,module,exports){
+'use strict';
+
 var Registry = _dereq_('../../registry');
 var isArrayOrTypedArray = _dereq_('../../lib').isArrayOrTypedArray;
 
@@ -91860,16 +92329,34 @@ module.exports = function makeBoundArray(trace, arrayIn, v0In, dvIn, numbricks, 
     return arrayOut;
 };
 
-},{"../../lib":287,"../../registry":378}],450:[function(_dereq_,module,exports){
+},{"../../lib":287,"../../registry":378}],451:[function(_dereq_,module,exports){
 'use strict';
 
 var d3 = _dereq_('@plotly/d3');
 var tinycolor = _dereq_('tinycolor2');
 
 var Registry = _dereq_('../../registry');
+var Drawing = _dereq_('../../components/drawing');
+var Axes = _dereq_('../../plots/cartesian/axes');
 var Lib = _dereq_('../../lib');
+var svgTextUtils = _dereq_('../../lib/svg_text_utils');
+var formatLabels = _dereq_('../scatter/format_labels');
+var Color = _dereq_('../../components/color');
+var extractOpts = _dereq_('../../components/colorscale').extractOpts;
 var makeColorScaleFuncFromTrace = _dereq_('../../components/colorscale').makeColorScaleFuncFromTrace;
 var xmlnsNamespaces = _dereq_('../../constants/xmlns_namespaces');
+var alignmentConstants = _dereq_('../../constants/alignment');
+var LINE_SPACING = alignmentConstants.LINE_SPACING;
+
+var labelClass = 'heatmap-label';
+
+function selectLabels(plotGroup) {
+    return plotGroup.selectAll('g.' + labelClass);
+}
+
+function removeLabels(plotGroup) {
+    selectLabels(plotGroup).remove();
+}
 
 module.exports = function(gd, plotinfo, cdheatmaps, heatmapLayer) {
     var xa = plotinfo.xaxis;
@@ -91879,6 +92366,8 @@ module.exports = function(gd, plotinfo, cdheatmaps, heatmapLayer) {
         var plotGroup = d3.select(this);
         var cd0 = cd[0];
         var trace = cd0.trace;
+        var xGap = trace.xgap || 0;
+        var yGap = trace.ygap || 0;
 
         var z = cd0.z;
         var x = cd0.x;
@@ -91894,7 +92383,7 @@ module.exports = function(gd, plotinfo, cdheatmaps, heatmapLayer) {
         var xrev = false;
         var yrev = false;
 
-        var left, right, temp, top, bottom, i;
+        var left, right, temp, top, bottom, i, j, k;
 
         // TODO: if there are multiple overlapping categorical heatmaps,
         // or if we allow category sorting, then the categories may not be
@@ -91975,6 +92464,8 @@ module.exports = function(gd, plotinfo, cdheatmaps, heatmapLayer) {
         if(isOffScreen) {
             var noImage = plotGroup.selectAll('image').data([]);
             noImage.exit().remove();
+
+            removeLabels(plotGroup);
             return;
         }
 
@@ -92030,7 +92521,7 @@ module.exports = function(gd, plotinfo, cdheatmaps, heatmapLayer) {
         var gcount = 0;
         var bcount = 0;
 
-        var xb, j, xi, v, row, c;
+        var xb, xi, v, row, c;
 
         function setColor(v, pixsize) {
             if(v !== undefined) {
@@ -92141,8 +92632,6 @@ module.exports = function(gd, plotinfo, cdheatmaps, heatmapLayer) {
         } else { // zsmooth = false -> filling potentially large bricks works fastest with fillRect
             // gaps do not need to be exact integers, but if they *are* we will get
             // cleaner edges by rounding at least one edge
-            var xGap = trace.xgap;
-            var yGap = trace.ygap;
             var xGapLeft = Math.floor(xGap / 2);
             var yGapTop = Math.floor(yGap / 2);
 
@@ -92195,6 +92684,187 @@ module.exports = function(gd, plotinfo, cdheatmaps, heatmapLayer) {
             y: top,
             'xlink:href': canvas.toDataURL('image/png')
         });
+
+        removeLabels(plotGroup);
+
+        var texttemplate = trace.texttemplate;
+        if(texttemplate) {
+            // dummy axis for formatting the z value
+            var cOpts = extractOpts(trace);
+            var dummyAx = {
+                type: 'linear',
+                range: [cOpts.min, cOpts.max],
+                _separators: xa._separators,
+                _numFormat: xa._numFormat
+            };
+
+            var aHistogram2dContour = trace.type === 'histogram2dcontour';
+            var aContour = trace.type === 'contour';
+            var iStart = aContour ? 1 : 0;
+            var iStop = aContour ? m - 1 : m;
+            var jStart = aContour ? 1 : 0;
+            var jStop = aContour ? n - 1 : n;
+
+            var textData = [];
+            for(i = iStart; i < iStop; i++) {
+                var yVal;
+                if(aContour) {
+                    yVal = cd0.y[i];
+                } else if(aHistogram2dContour) {
+                    if(i === 0 || i === m - 1) continue;
+                    yVal = cd0.y[i];
+                } else if(cd0.yCenter) {
+                    yVal = cd0.yCenter[i];
+                } else {
+                    if(i + 1 === m && cd0.y[i + 1] === undefined) continue;
+                    yVal = (cd0.y[i] + cd0.y[i + 1]) / 2;
+                }
+
+                var _y = Math.round(ya.c2p(yVal));
+                if(0 > _y || _y > ya._length) continue;
+
+                for(j = jStart; j < jStop; j++) {
+                    var xVal;
+                    if(aContour) {
+                        xVal = cd0.x[j];
+                    } else if(aHistogram2dContour) {
+                        if(j === 0 || j === n - 1) continue;
+                        xVal = cd0.x[j];
+                    } else if(cd0.xCenter) {
+                        xVal = cd0.xCenter[j];
+                    } else {
+                        if(j + 1 === n && cd0.x[j + 1] === undefined) continue;
+                        xVal = (cd0.x[j] + cd0.x[j + 1]) / 2;
+                    }
+
+                    var _x = Math.round(xa.c2p(xVal));
+                    if(0 > _x || _x > xa._length) continue;
+
+                    var obj = formatLabels({
+                        x: xVal,
+                        y: yVal
+                    }, trace, gd._fullLayout);
+
+                    obj.x = xVal;
+                    obj.y = yVal;
+
+                    var zVal = cd0.z[i][j];
+                    if(zVal === undefined) {
+                        obj.z = '';
+                        obj.zLabel = '';
+                    } else {
+                        obj.z = zVal;
+                        obj.zLabel = Axes.tickText(dummyAx, zVal, 'hover').text;
+                    }
+
+                    var theText = cd0.text && cd0.text[i] && cd0.text[i][j];
+                    if(theText === undefined || theText === false) theText = '';
+                    obj.text = theText;
+
+                    var _t = Lib.texttemplateString(texttemplate, obj, gd._fullLayout._d3locale, obj, trace._meta || {});
+                    if(!_t) continue;
+
+                    var lines = _t.split('<br>');
+                    var nL = lines.length;
+                    var nC = 0;
+                    for(k = 0; k < nL; k++) {
+                        nC = Math.max(nC, lines[k].length);
+                    }
+
+                    textData.push({
+                        l: nL, // number of lines
+                        c: nC, // maximum number of chars in a line
+                        t: _t, // text
+                        x: _x,
+                        y: _y,
+                        z: zVal
+                    });
+                }
+            }
+
+            var font = trace.textfont;
+            var fontFamily = font.family;
+            var fontSize = font.size;
+            var globalFontSize = gd._fullLayout.font.size;
+
+            if(!fontSize || fontSize === 'auto') {
+                var minW = Infinity;
+                var minH = Infinity;
+                var maxL = 0;
+                var maxC = 0;
+
+                for(k = 0; k < textData.length; k++) {
+                    var d = textData[k];
+                    maxL = Math.max(maxL, d.l);
+                    maxC = Math.max(maxC, d.c);
+
+                    if(k < textData.length - 1) {
+                        var nextD = textData[k + 1];
+                        var dx = Math.abs(nextD.x - d.x);
+                        var dy = Math.abs(nextD.y - d.y);
+
+                        if(dx) minW = Math.min(minW, dx);
+                        if(dy) minH = Math.min(minH, dy);
+                    }
+                }
+
+                if(
+                    !isFinite(minW) ||
+                    !isFinite(minH)
+                ) {
+                    fontSize = globalFontSize;
+                } else {
+                    minW -= xGap;
+                    minH -= yGap;
+
+                    minW /= maxC;
+                    minH /= maxL;
+
+                    minW /= LINE_SPACING / 2;
+                    minH /= LINE_SPACING;
+
+                    fontSize = Math.min(
+                        Math.floor(minW),
+                        Math.floor(minH),
+                        globalFontSize
+                    );
+                }
+            }
+            if(fontSize <= 0 || !isFinite(fontSize)) return;
+
+            var xFn = function(d) { return d.x; };
+            var yFn = function(d) {
+                return d.y - fontSize * ((d.l * LINE_SPACING) / 2 - 1);
+            };
+
+            var labels = selectLabels(plotGroup).data(textData);
+
+            labels
+                .enter()
+                .append('g')
+                .classed(labelClass, 1)
+                .append('text')
+                .attr('text-anchor', 'middle')
+                .each(function(d) {
+                    var thisLabel = d3.select(this);
+
+                    var fontColor = font.color;
+                    if(!fontColor || fontColor === 'auto') {
+                        fontColor = Color.contrast(
+                            'rgba(' +
+                                sclFunc(d.z).join() +
+                            ')'
+                        );
+                    }
+
+                    thisLabel
+                        .attr('data-notex', 1)
+                        .call(svgTextUtils.positionText, xFn(d), yFn(d))
+                        .call(Drawing.font, fontFamily, fontSize, fontColor)
+                        .text(d.t)
+                        .call(svgTextUtils.convertToTspans, gd);
+                });
+        }
     });
 };
 
@@ -92256,7 +92926,7 @@ function putColor(pixels, pxIndex, c) {
     pixels[pxIndex + 3] = Math.round(c[3] * 255);
 }
 
-},{"../../components/colorscale":169,"../../constants/xmlns_namespaces":268,"../../lib":287,"../../registry":378,"@plotly/d3":20,"tinycolor2":121}],451:[function(_dereq_,module,exports){
+},{"../../components/color":157,"../../components/colorscale":169,"../../components/drawing":179,"../../constants/alignment":262,"../../constants/xmlns_namespaces":268,"../../lib":287,"../../lib/svg_text_utils":310,"../../plots/cartesian/axes":334,"../../registry":378,"../scatter/format_labels":509,"@plotly/d3":20,"tinycolor2":121}],452:[function(_dereq_,module,exports){
 'use strict';
 
 var d3 = _dereq_('@plotly/d3');
@@ -92268,7 +92938,7 @@ module.exports = function style(gd) {
         });
 };
 
-},{"@plotly/d3":20}],452:[function(_dereq_,module,exports){
+},{"@plotly/d3":20}],453:[function(_dereq_,module,exports){
 'use strict';
 
 module.exports = function handleStyleDefaults(traceIn, traceOut, coerce) {
@@ -92282,7 +92952,7 @@ module.exports = function handleStyleDefaults(traceIn, traceOut, coerce) {
     coerce('zhoverformat');
 };
 
-},{}],453:[function(_dereq_,module,exports){
+},{}],454:[function(_dereq_,module,exports){
 'use strict';
 
 var isNumeric = _dereq_('fast-isnumeric');
@@ -92373,12 +93043,14 @@ function isValidZ(z) {
     return (allRowsAreArrays && oneRowIsFilled && hasOneNumber);
 }
 
-},{"../../lib":287,"../../registry":378,"fast-isnumeric":33}],454:[function(_dereq_,module,exports){
+},{"../../lib":287,"../../registry":378,"fast-isnumeric":33}],455:[function(_dereq_,module,exports){
 'use strict';
 
 var barAttrs = _dereq_('../bar/attributes');
 var axisHoverFormat = _dereq_('../../plots/cartesian/axis_format_attributes').axisHoverFormat;
 var hovertemplateAttrs = _dereq_('../../plots/template_attributes').hovertemplateAttrs;
+var texttemplateAttrs = _dereq_('../../plots/template_attributes').texttemplateAttrs;
+var fontAttrs = _dereq_('../../plots/font_attributes');
 var makeBinAttrs = _dereq_('./bin_attributes');
 var constants = _dereq_('./constants');
 var extendFlat = _dereq_('../../lib/extend').extendFlat;
@@ -92473,6 +93145,41 @@ module.exports = {
         keys: constants.eventDataKeys
     }),
 
+    texttemplate: texttemplateAttrs({
+        arrayOk: false,
+        editType: 'plot'
+    }, {
+        keys: ['label', 'value']
+    }),
+
+    textposition: extendFlat({}, barAttrs.textposition, {
+        arrayOk: false
+    }),
+
+    textfont: fontAttrs({
+        arrayOk: false,
+        editType: 'plot',
+        colorEditType: 'style',
+    }),
+
+    outsidetextfont: fontAttrs({
+        arrayOk: false,
+        editType: 'plot',
+        colorEditType: 'style',
+    }),
+
+    insidetextfont: fontAttrs({
+        arrayOk: false,
+        editType: 'plot',
+        colorEditType: 'style',
+    }),
+
+    insidetextanchor: barAttrs.insidetextanchor,
+
+    textangle: barAttrs.textangle,
+    cliponaxis: barAttrs.cliponaxis,
+    constraintext: barAttrs.constraintext,
+
     marker: barAttrs.marker,
 
     offsetgroup: barAttrs.offsetgroup,
@@ -92486,7 +93193,7 @@ module.exports = {
     }
 };
 
-},{"../../lib/extend":281,"../../plots/cartesian/axis_format_attributes":337,"../../plots/template_attributes":373,"../bar/attributes":388,"./bin_attributes":456,"./constants":460}],455:[function(_dereq_,module,exports){
+},{"../../lib/extend":281,"../../plots/cartesian/axis_format_attributes":337,"../../plots/font_attributes":365,"../../plots/template_attributes":373,"../bar/attributes":388,"./bin_attributes":457,"./constants":461}],456:[function(_dereq_,module,exports){
 'use strict';
 
 
@@ -92502,7 +93209,7 @@ module.exports = function doAvg(size, counts) {
     return total;
 };
 
-},{}],456:[function(_dereq_,module,exports){
+},{}],457:[function(_dereq_,module,exports){
 'use strict';
 
 module.exports = function makeBinAttrs(axLetter, match) {
@@ -92523,7 +93230,7 @@ module.exports = function makeBinAttrs(axLetter, match) {
     };
 };
 
-},{}],457:[function(_dereq_,module,exports){
+},{}],458:[function(_dereq_,module,exports){
 'use strict';
 
 var isNumeric = _dereq_('fast-isnumeric');
@@ -92588,7 +93295,7 @@ module.exports = {
     }
 };
 
-},{"fast-isnumeric":33}],458:[function(_dereq_,module,exports){
+},{"fast-isnumeric":33}],459:[function(_dereq_,module,exports){
 'use strict';
 
 var numConstants = _dereq_('../../constants/numerical');
@@ -92755,7 +93462,7 @@ function dateParts(v, pa, calendar) {
     return parts;
 }
 
-},{"../../constants/numerical":267,"../../plots/cartesian/axes":334}],459:[function(_dereq_,module,exports){
+},{"../../constants/numerical":267,"../../plots/cartesian/axes":334}],460:[function(_dereq_,module,exports){
 'use strict';
 
 var isNumeric = _dereq_('fast-isnumeric');
@@ -92773,8 +93480,9 @@ var getBinSpanLabelRound = _dereq_('./bin_label_vals');
 function calc(gd, trace) {
     var pos = [];
     var size = [];
-    var pa = Axes.getFromId(gd, trace.orientation === 'h' ? trace.yaxis : trace.xaxis);
-    var mainData = trace.orientation === 'h' ? 'y' : 'x';
+    var isHorizontal = trace.orientation === 'h';
+    var pa = Axes.getFromId(gd, isHorizontal ? trace.yaxis : trace.xaxis);
+    var mainData = isHorizontal ? 'y' : 'x';
     var counterData = {x: 'y', y: 'x'}[mainData];
     var calendar = trace[mainData + 'calendar'];
     var cumulativeSpec = trace.cumulative;
@@ -93326,14 +94034,14 @@ module.exports = {
     calcAllAutoBins: calcAllAutoBins
 };
 
-},{"../../lib":287,"../../plots/cartesian/axes":334,"../../registry":378,"../bar/arrays_to_calcdata":387,"./average":455,"./bin_functions":457,"./bin_label_vals":458,"./norm_functions":466,"fast-isnumeric":33}],460:[function(_dereq_,module,exports){
+},{"../../lib":287,"../../plots/cartesian/axes":334,"../../registry":378,"../bar/arrays_to_calcdata":387,"./average":456,"./bin_functions":458,"./bin_label_vals":459,"./norm_functions":467,"fast-isnumeric":33}],461:[function(_dereq_,module,exports){
 'use strict';
 
 module.exports = {
     eventDataKeys: ['binNumber']
 };
 
-},{}],461:[function(_dereq_,module,exports){
+},{}],462:[function(_dereq_,module,exports){
 'use strict';
 
 var Lib = _dereq_('../../lib');
@@ -93602,13 +94310,14 @@ module.exports = function crossTraceDefaults(fullData, fullLayout) {
     }
 };
 
-},{"../../lib":287,"../../plots/cartesian/axis_ids":338,"../../plots/cartesian/constraints":342,"../../registry":378,"../bar/defaults":392}],462:[function(_dereq_,module,exports){
+},{"../../lib":287,"../../plots/cartesian/axis_ids":338,"../../plots/cartesian/constraints":342,"../../registry":378,"../bar/defaults":392}],463:[function(_dereq_,module,exports){
 'use strict';
 
 var Registry = _dereq_('../../registry');
 var Lib = _dereq_('../../lib');
 var Color = _dereq_('../../components/color');
 
+var handleText = _dereq_('../bar/defaults').handleText;
 var handleStyleDefaults = _dereq_('../bar/style_defaults');
 var attributes = _dereq_('./attributes');
 
@@ -93627,6 +94336,16 @@ module.exports = function supplyDefaults(traceIn, traceOut, defaultColor, layout
     }
 
     coerce('text');
+    var textposition = coerce('textposition');
+    handleText(traceIn, traceOut, layout, coerce, textposition, {
+        moduleHasSelected: true,
+        moduleHasUnselected: true,
+        moduleHasConstrain: true,
+        moduleHasCliponaxis: true,
+        moduleHasTextangle: true,
+        moduleHasInsideanchor: true
+    });
+
     coerce('hovertext');
     coerce('hovertemplate');
     coerce('xhoverformat');
@@ -93670,7 +94389,7 @@ module.exports = function supplyDefaults(traceIn, traceOut, defaultColor, layout
     errorBarsSupplyDefaults(traceIn, traceOut, lineColor || Color.defaultLine, {axis: 'x', inherit: 'y'});
 };
 
-},{"../../components/color":157,"../../lib":287,"../../registry":378,"../bar/style_defaults":403,"./attributes":454}],463:[function(_dereq_,module,exports){
+},{"../../components/color":157,"../../lib":287,"../../registry":378,"../bar/defaults":392,"../bar/style_defaults":403,"./attributes":455}],464:[function(_dereq_,module,exports){
 'use strict';
 
 module.exports = function eventData(out, pt, trace, cd, pointNumber) {
@@ -93711,7 +94430,7 @@ module.exports = function eventData(out, pt, trace, cd, pointNumber) {
     return out;
 };
 
-},{}],464:[function(_dereq_,module,exports){
+},{}],465:[function(_dereq_,module,exports){
 'use strict';
 
 var barHover = _dereq_('../bar/hover').hoverPoints;
@@ -93735,7 +94454,7 @@ module.exports = function hoverPoints(pointData, xval, yval, hovermode, opts) {
     return pts;
 };
 
-},{"../../plots/cartesian/axes":334,"../bar/hover":395}],465:[function(_dereq_,module,exports){
+},{"../../plots/cartesian/axes":334,"../bar/hover":395}],466:[function(_dereq_,module,exports){
 'use strict';
 
 /**
@@ -93776,7 +94495,7 @@ module.exports = {
     }
 };
 
-},{"../../plots/cartesian":348,"../bar/cross_trace_calc":391,"../bar/layout_attributes":397,"../bar/layout_defaults":398,"../bar/plot":399,"../bar/select":400,"../bar/style":402,"../scatter/marker_colorbar":517,"./attributes":454,"./calc":459,"./cross_trace_defaults":461,"./defaults":462,"./event_data":463,"./hover":464}],466:[function(_dereq_,module,exports){
+},{"../../plots/cartesian":348,"../bar/cross_trace_calc":391,"../bar/layout_attributes":397,"../bar/layout_defaults":398,"../bar/plot":399,"../bar/select":400,"../bar/style":402,"../scatter/marker_colorbar":518,"./attributes":455,"./calc":460,"./cross_trace_defaults":462,"./defaults":463,"./event_data":464,"./hover":465}],467:[function(_dereq_,module,exports){
 'use strict';
 
 
@@ -93802,7 +94521,7 @@ module.exports = {
     }
 };
 
-},{}],467:[function(_dereq_,module,exports){
+},{}],468:[function(_dereq_,module,exports){
 'use strict';
 
 var histogramAttrs = _dereq_('../histogram/attributes');
@@ -93811,6 +94530,7 @@ var heatmapAttrs = _dereq_('../heatmap/attributes');
 var baseAttrs = _dereq_('../../plots/attributes');
 var axisHoverFormat = _dereq_('../../plots/cartesian/axis_format_attributes').axisHoverFormat;
 var hovertemplateAttrs = _dereq_('../../plots/template_attributes').hovertemplateAttrs;
+var texttemplateAttrs = _dereq_('../../plots/template_attributes').texttemplateAttrs;
 var colorScaleAttrs = _dereq_('../../components/colorscale/attributes');
 
 var extendFlat = _dereq_('../../lib/extend').extendFlat;
@@ -93855,12 +94575,19 @@ module.exports = extendFlat(
         yhoverformat: axisHoverFormat('y'),
         zhoverformat: axisHoverFormat('z', 1),
         hovertemplate: hovertemplateAttrs({}, {keys: 'z'}),
+        texttemplate: texttemplateAttrs({
+            arrayOk: false,
+            editType: 'plot'
+        }, {
+            keys: 'z'
+        }),
+        textfont: heatmapAttrs.textfont,
         showlegend: extendFlat({}, baseAttrs.showlegend, {dflt: false})
     },
     colorScaleAttrs('', {cLetter: 'z', autoColorDflt: false})
 );
 
-},{"../../components/colorscale/attributes":164,"../../lib/extend":281,"../../plots/attributes":330,"../../plots/cartesian/axis_format_attributes":337,"../../plots/template_attributes":373,"../heatmap/attributes":439,"../histogram/attributes":454,"../histogram/bin_attributes":456}],468:[function(_dereq_,module,exports){
+},{"../../components/colorscale/attributes":164,"../../lib/extend":281,"../../plots/attributes":330,"../../plots/cartesian/axis_format_attributes":337,"../../plots/template_attributes":373,"../heatmap/attributes":439,"../histogram/attributes":455,"../histogram/bin_attributes":457}],469:[function(_dereq_,module,exports){
 'use strict';
 
 var Lib = _dereq_('../../lib');
@@ -94071,7 +94798,7 @@ function getRanges(edges, uniqueVals, gapLow, gapHigh, ax, calendar) {
     return out;
 }
 
-},{"../../lib":287,"../../plots/cartesian/axes":334,"../histogram/average":455,"../histogram/bin_functions":457,"../histogram/bin_label_vals":458,"../histogram/calc":459,"../histogram/norm_functions":466}],469:[function(_dereq_,module,exports){
+},{"../../lib":287,"../../plots/cartesian/axes":334,"../histogram/average":456,"../histogram/bin_functions":458,"../histogram/bin_label_vals":459,"../histogram/calc":460,"../histogram/norm_functions":467}],470:[function(_dereq_,module,exports){
 'use strict';
 
 var Lib = _dereq_('../../lib');
@@ -94079,6 +94806,7 @@ var Lib = _dereq_('../../lib');
 var handleSampleDefaults = _dereq_('./sample_defaults');
 var handleStyleDefaults = _dereq_('../heatmap/style_defaults');
 var colorscaleDefaults = _dereq_('../../components/colorscale/defaults');
+var handleHeatmapLabelDefaults = _dereq_('../heatmap/label_defaults');
 var attributes = _dereq_('./attributes');
 
 
@@ -94093,11 +94821,14 @@ module.exports = function supplyDefaults(traceIn, traceOut, defaultColor, layout
     handleStyleDefaults(traceIn, traceOut, coerce, layout);
     colorscaleDefaults(traceIn, traceOut, layout, coerce, {prefix: '', cLetter: 'z'});
     coerce('hovertemplate');
+
+    handleHeatmapLabelDefaults(coerce, layout);
+
     coerce('xhoverformat');
     coerce('yhoverformat');
 };
 
-},{"../../components/colorscale/defaults":167,"../../lib":287,"../heatmap/style_defaults":452,"./attributes":467,"./sample_defaults":472}],470:[function(_dereq_,module,exports){
+},{"../../components/colorscale/defaults":167,"../../lib":287,"../heatmap/label_defaults":449,"../heatmap/style_defaults":453,"./attributes":468,"./sample_defaults":473}],471:[function(_dereq_,module,exports){
 'use strict';
 
 var heatmapHover = _dereq_('../heatmap/hover');
@@ -94123,7 +94854,7 @@ module.exports = function hoverPoints(pointData, xval, yval, hovermode, opts) {
     return pts;
 };
 
-},{"../../plots/cartesian/axes":334,"../heatmap/hover":446}],471:[function(_dereq_,module,exports){
+},{"../../plots/cartesian/axes":334,"../heatmap/hover":446}],472:[function(_dereq_,module,exports){
 'use strict';
 
 module.exports = {
@@ -94146,7 +94877,7 @@ module.exports = {
     }
 };
 
-},{"../../plots/cartesian":348,"../heatmap/calc":440,"../heatmap/colorbar":442,"../heatmap/plot":450,"../heatmap/style":451,"../histogram/cross_trace_defaults":461,"../histogram/event_data":463,"./attributes":467,"./defaults":469,"./hover":470}],472:[function(_dereq_,module,exports){
+},{"../../plots/cartesian":348,"../heatmap/calc":440,"../heatmap/colorbar":442,"../heatmap/plot":451,"../heatmap/style":452,"../histogram/cross_trace_defaults":462,"../histogram/event_data":464,"./attributes":468,"./defaults":470,"./hover":471}],473:[function(_dereq_,module,exports){
 'use strict';
 
 var Registry = _dereq_('../../registry');
@@ -94183,7 +94914,7 @@ module.exports = function handleSampleDefaults(traceIn, traceOut, coerce, layout
     coerce('autobiny');
 };
 
-},{"../../lib":287,"../../registry":378}],473:[function(_dereq_,module,exports){
+},{"../../lib":287,"../../registry":378}],474:[function(_dereq_,module,exports){
 'use strict';
 
 var histogram2dAttrs = _dereq_('../histogram2d/attributes');
@@ -94227,7 +94958,9 @@ module.exports = extendFlat({
     xhoverformat: axisHoverFormat('x'),
     yhoverformat: axisHoverFormat('y'),
     zhoverformat: axisHoverFormat('z', 1),
-    hovertemplate: histogram2dAttrs.hovertemplate
+    hovertemplate: histogram2dAttrs.hovertemplate,
+    texttemplate: contourAttrs.texttemplate,
+    textfont: contourAttrs.textfont
 },
     colorScaleAttrs('', {
         cLetter: 'z',
@@ -94235,7 +94968,7 @@ module.exports = extendFlat({
     })
 );
 
-},{"../../components/colorscale/attributes":164,"../../lib/extend":281,"../../plots/cartesian/axis_format_attributes":337,"../contour/attributes":417,"../histogram2d/attributes":467}],474:[function(_dereq_,module,exports){
+},{"../../components/colorscale/attributes":164,"../../lib/extend":281,"../../plots/cartesian/axis_format_attributes":337,"../contour/attributes":417,"../histogram2d/attributes":468}],475:[function(_dereq_,module,exports){
 'use strict';
 
 var Lib = _dereq_('../../lib');
@@ -94243,6 +94976,7 @@ var Lib = _dereq_('../../lib');
 var handleSampleDefaults = _dereq_('../histogram2d/sample_defaults');
 var handleContoursDefaults = _dereq_('../contour/contours_defaults');
 var handleStyleDefaults = _dereq_('../contour/style_defaults');
+var handleHeatmapLabelDefaults = _dereq_('../heatmap/label_defaults');
 var attributes = _dereq_('./attributes');
 
 
@@ -94260,12 +94994,18 @@ module.exports = function supplyDefaults(traceIn, traceOut, defaultColor, layout
 
     handleContoursDefaults(traceIn, traceOut, coerce, coerce2);
     handleStyleDefaults(traceIn, traceOut, coerce, layout);
-    coerce('hovertemplate');
     coerce('xhoverformat');
     coerce('yhoverformat');
+    coerce('hovertemplate');
+    if(
+        traceOut.contours &&
+        traceOut.contours.coloring === 'heatmap'
+    ) {
+        handleHeatmapLabelDefaults(coerce, layout);
+    }
 };
 
-},{"../../lib":287,"../contour/contours_defaults":424,"../contour/style_defaults":438,"../histogram2d/sample_defaults":472,"./attributes":473}],475:[function(_dereq_,module,exports){
+},{"../../lib":287,"../contour/contours_defaults":424,"../contour/style_defaults":438,"../heatmap/label_defaults":449,"../histogram2d/sample_defaults":473,"./attributes":474}],476:[function(_dereq_,module,exports){
 'use strict';
 
 module.exports = {
@@ -94287,7 +95027,7 @@ module.exports = {
     }
 };
 
-},{"../../plots/cartesian":348,"../contour/calc":418,"../contour/colorbar":420,"../contour/hover":430,"../contour/plot":435,"../contour/style":437,"../histogram/cross_trace_defaults":461,"./attributes":473,"./defaults":474}],476:[function(_dereq_,module,exports){
+},{"../../plots/cartesian":348,"../contour/calc":418,"../contour/colorbar":420,"../contour/hover":430,"../contour/plot":435,"../contour/style":437,"../histogram/cross_trace_defaults":462,"./attributes":474,"./defaults":475}],477:[function(_dereq_,module,exports){
 'use strict';
 
 var baseAttrs = _dereq_('../../plots/attributes');
@@ -94383,7 +95123,7 @@ module.exports = extendFlat({
     transforms: undefined
 });
 
-},{"../../lib/extend":281,"../../plots/attributes":330,"../../plots/template_attributes":373,"./constants":478}],477:[function(_dereq_,module,exports){
+},{"../../lib/extend":281,"../../plots/attributes":330,"../../plots/template_attributes":373,"./constants":479}],478:[function(_dereq_,module,exports){
 'use strict';
 
 var Lib = _dereq_('../../lib');
@@ -94473,7 +95213,7 @@ function makeScaler(trace) {
     };
 }
 
-},{"../../lib":287,"../../plots/cartesian/axes":334,"./constants":478,"./helpers":481,"fast-isnumeric":33}],478:[function(_dereq_,module,exports){
+},{"../../lib":287,"../../plots/cartesian/axes":334,"./constants":479,"./helpers":482,"fast-isnumeric":33}],479:[function(_dereq_,module,exports){
 'use strict';
 
 module.exports = {
@@ -94539,7 +95279,7 @@ module.exports = {
     ].join('; ')
 };
 
-},{}],479:[function(_dereq_,module,exports){
+},{}],480:[function(_dereq_,module,exports){
 'use strict';
 
 var Lib = _dereq_('../../lib');
@@ -94589,7 +95329,7 @@ module.exports = function supplyDefaults(traceIn, traceOut) {
     traceOut._length = null;
 };
 
-},{"../../lib":287,"../../snapshot/helpers":382,"./attributes":476,"./constants":478}],480:[function(_dereq_,module,exports){
+},{"../../lib":287,"../../snapshot/helpers":382,"./attributes":477,"./constants":479}],481:[function(_dereq_,module,exports){
 'use strict';
 
 module.exports = function eventData(out, pt) {
@@ -94603,7 +95343,7 @@ module.exports = function eventData(out, pt) {
     return out;
 };
 
-},{}],481:[function(_dereq_,module,exports){
+},{}],482:[function(_dereq_,module,exports){
 'use strict';
 
 var probeSync = _dereq_('probe-image-size/sync');
@@ -94616,7 +95356,7 @@ exports.getImageSize = function(src) {
     return probeSync(buff);
 };
 
-},{"../../snapshot/helpers":382,"buffer/":28,"probe-image-size/sync":97}],482:[function(_dereq_,module,exports){
+},{"../../snapshot/helpers":382,"buffer/":28,"probe-image-size/sync":97}],483:[function(_dereq_,module,exports){
 'use strict';
 
 var Fx = _dereq_('../../components/fx');
@@ -94708,7 +95448,7 @@ module.exports = function hoverPoints(pointData, xval, yval) {
     })];
 };
 
-},{"../../components/fx":197,"../../lib":287,"./constants":478}],483:[function(_dereq_,module,exports){
+},{"../../components/fx":197,"../../lib":287,"./constants":479}],484:[function(_dereq_,module,exports){
 'use strict';
 
 module.exports = {
@@ -94729,7 +95469,7 @@ module.exports = {
     }
 };
 
-},{"../../plots/cartesian":348,"./attributes":476,"./calc":477,"./defaults":479,"./event_data":480,"./hover":482,"./plot":484,"./style":485}],484:[function(_dereq_,module,exports){
+},{"../../plots/cartesian":348,"./attributes":477,"./calc":478,"./defaults":480,"./event_data":481,"./hover":483,"./plot":485,"./style":486}],485:[function(_dereq_,module,exports){
 'use strict';
 
 var d3 = _dereq_('@plotly/d3');
@@ -94952,7 +95692,7 @@ module.exports = function plot(gd, plotinfo, cdimage, imageLayer) {
     });
 };
 
-},{"../../constants/xmlns_namespaces":268,"../../lib":287,"./constants":478,"@plotly/d3":20}],485:[function(_dereq_,module,exports){
+},{"../../constants/xmlns_namespaces":268,"../../lib":287,"./constants":479,"@plotly/d3":20}],486:[function(_dereq_,module,exports){
 'use strict';
 
 var d3 = _dereq_('@plotly/d3');
@@ -94964,7 +95704,7 @@ module.exports = function style(gd) {
         });
 };
 
-},{"@plotly/d3":20}],486:[function(_dereq_,module,exports){
+},{"@plotly/d3":20}],487:[function(_dereq_,module,exports){
 'use strict';
 
 var baseAttrs = _dereq_('../../plots/attributes');
@@ -95179,7 +95919,7 @@ module.exports = {
     }
 };
 
-},{"../../components/color/attributes":156,"../../lib/extend":281,"../../plots/attributes":330,"../../plots/domain":364,"../../plots/font_attributes":365,"../../plots/template_attributes":373}],487:[function(_dereq_,module,exports){
+},{"../../components/color/attributes":156,"../../lib/extend":281,"../../plots/attributes":330,"../../plots/domain":364,"../../plots/font_attributes":365,"../../plots/template_attributes":373}],488:[function(_dereq_,module,exports){
 'use strict';
 
 var plots = _dereq_('../../plots/plots');
@@ -95194,7 +95934,7 @@ exports.clean = function(newFullData, newFullLayout, oldFullData, oldFullLayout)
     plots.cleanBasePlot(exports.name, newFullData, newFullLayout, oldFullData, oldFullLayout);
 };
 
-},{"../../plots/plots":371}],488:[function(_dereq_,module,exports){
+},{"../../plots/plots":371}],489:[function(_dereq_,module,exports){
 'use strict';
 
 var isNumeric = _dereq_('fast-isnumeric');
@@ -95236,7 +95976,6 @@ function calc(gd, trace) {
             v = vals[i];
             if(!isNumeric(v)) continue;
             v = +v;
-            if(v < 0) continue;
         } else v = 1;
 
         label = labels[i];
@@ -95272,6 +96011,9 @@ function calc(gd, trace) {
             }
         }
     }
+
+    // Drop aggregate sums of value 0 or less
+    cd = cd.filter(function(elem) { return elem.v >= 0; });
 
     var shouldSort = (trace.type === 'funnelarea') ? isAggregated : trace.sort;
     if(shouldSort) cd.sort(function(a, b) { return b.v - a.v; });
@@ -95369,7 +96111,7 @@ module.exports = {
     generateExtendedColors: generateExtendedColors
 };
 
-},{"../../components/color":157,"fast-isnumeric":33,"tinycolor2":121}],489:[function(_dereq_,module,exports){
+},{"../../components/color":157,"fast-isnumeric":33,"tinycolor2":121}],490:[function(_dereq_,module,exports){
 'use strict';
 
 var isNumeric = _dereq_('fast-isnumeric');
@@ -95492,7 +96234,7 @@ module.exports = {
     supplyDefaults: supplyDefaults
 };
 
-},{"../../lib":287,"../../plots/domain":364,"../bar/defaults":392,"./attributes":486,"fast-isnumeric":33}],490:[function(_dereq_,module,exports){
+},{"../../lib":287,"../../plots/domain":364,"../bar/defaults":392,"./attributes":487,"fast-isnumeric":33}],491:[function(_dereq_,module,exports){
 'use strict';
 
 var appendArrayMultiPointValues = _dereq_('../../components/fx/helpers').appendArrayMultiPointValues;
@@ -95534,7 +96276,7 @@ module.exports = function eventData(pt, trace) {
     return out;
 };
 
-},{"../../components/fx/helpers":193}],491:[function(_dereq_,module,exports){
+},{"../../components/fx/helpers":193}],492:[function(_dereq_,module,exports){
 'use strict';
 
 var Lib = _dereq_('../../lib');
@@ -95574,7 +96316,7 @@ exports.getRotationAngle = function(rotation) {
     return (rotation === 'auto' ? 0 : rotation) * Math.PI / 180;
 };
 
-},{"../../lib":287}],492:[function(_dereq_,module,exports){
+},{"../../lib":287}],493:[function(_dereq_,module,exports){
 'use strict';
 
 module.exports = {
@@ -95598,7 +96340,7 @@ module.exports = {
     }
 };
 
-},{"./attributes":486,"./base_plot":487,"./calc":488,"./defaults":489,"./layout_attributes":493,"./layout_defaults":494,"./plot":495,"./style":496,"./style_one":497}],493:[function(_dereq_,module,exports){
+},{"./attributes":487,"./base_plot":488,"./calc":489,"./defaults":490,"./layout_attributes":494,"./layout_defaults":495,"./plot":496,"./style":497,"./style_one":498}],494:[function(_dereq_,module,exports){
 'use strict';
 
 module.exports = {
@@ -95617,7 +96359,7 @@ module.exports = {
     }
 };
 
-},{}],494:[function(_dereq_,module,exports){
+},{}],495:[function(_dereq_,module,exports){
 'use strict';
 
 var Lib = _dereq_('../../lib');
@@ -95634,7 +96376,7 @@ module.exports = function supplyLayoutDefaults(layoutIn, layoutOut) {
     coerce('extendpiecolors');
 };
 
-},{"../../lib":287,"./layout_attributes":493}],495:[function(_dereq_,module,exports){
+},{"../../lib":287,"./layout_attributes":494}],496:[function(_dereq_,module,exports){
 'use strict';
 
 var d3 = _dereq_('@plotly/d3');
@@ -96814,7 +97556,7 @@ module.exports = {
     computeTransform: computeTransform
 };
 
-},{"../../components/color":157,"../../components/drawing":179,"../../components/fx":197,"../../lib":287,"../../lib/svg_text_utils":310,"../../plots/plots":371,"../bar/constants":390,"../bar/uniform_text":404,"./event_data":490,"./helpers":491,"@plotly/d3":20}],496:[function(_dereq_,module,exports){
+},{"../../components/color":157,"../../components/drawing":179,"../../components/fx":197,"../../lib":287,"../../lib/svg_text_utils":310,"../../plots/plots":371,"../bar/constants":390,"../bar/uniform_text":404,"./event_data":491,"./helpers":492,"@plotly/d3":20}],497:[function(_dereq_,module,exports){
 'use strict';
 
 var d3 = _dereq_('@plotly/d3');
@@ -96839,7 +97581,7 @@ module.exports = function style(gd) {
     });
 };
 
-},{"../bar/uniform_text":404,"./style_one":497,"@plotly/d3":20}],497:[function(_dereq_,module,exports){
+},{"../bar/uniform_text":404,"./style_one":498,"@plotly/d3":20}],498:[function(_dereq_,module,exports){
 'use strict';
 
 var Color = _dereq_('../../components/color');
@@ -96855,7 +97597,7 @@ module.exports = function styleOne(s, pt, trace) {
         .call(Color.stroke, lineColor);
 };
 
-},{"../../components/color":157,"./helpers":491}],498:[function(_dereq_,module,exports){
+},{"../../components/color":157,"./helpers":492}],499:[function(_dereq_,module,exports){
 'use strict';
 
 var Lib = _dereq_('../../lib');
@@ -96898,7 +97640,7 @@ module.exports = function arraysToCalcdata(cd, trace) {
     }
 };
 
-},{"../../lib":287}],499:[function(_dereq_,module,exports){
+},{"../../lib":287}],500:[function(_dereq_,module,exports){
 'use strict';
 
 var axisHoverFormat = _dereq_('../../plots/cartesian/axis_format_attributes').axisHoverFormat;
@@ -97248,7 +97990,7 @@ module.exports = {
     }),
 };
 
-},{"../../components/colorscale/attributes":164,"../../components/drawing":179,"../../components/drawing/attributes":178,"../../lib/extend":281,"../../plots/cartesian/axis_format_attributes":337,"../../plots/font_attributes":365,"../../plots/template_attributes":373,"./constants":503}],500:[function(_dereq_,module,exports){
+},{"../../components/colorscale/attributes":164,"../../components/drawing":179,"../../components/drawing/attributes":178,"../../lib/extend":281,"../../plots/cartesian/axis_format_attributes":337,"../../plots/font_attributes":365,"../../plots/template_attributes":373,"./constants":504}],501:[function(_dereq_,module,exports){
 'use strict';
 
 var isNumeric = _dereq_('fast-isnumeric');
@@ -97545,7 +98287,7 @@ module.exports = {
     getStackOpts: getStackOpts
 };
 
-},{"../../constants/numerical":267,"../../lib":287,"../../plots/cartesian/align_period":331,"../../plots/cartesian/axes":334,"./arrays_to_calcdata":498,"./calc_selection":501,"./colorscale_calc":502,"./subtypes":524,"fast-isnumeric":33}],501:[function(_dereq_,module,exports){
+},{"../../constants/numerical":267,"../../lib":287,"../../plots/cartesian/align_period":331,"../../plots/cartesian/axes":334,"./arrays_to_calcdata":499,"./calc_selection":502,"./colorscale_calc":503,"./subtypes":525,"fast-isnumeric":33}],502:[function(_dereq_,module,exports){
 'use strict';
 
 var Lib = _dereq_('../../lib');
@@ -97556,7 +98298,7 @@ module.exports = function calcSelection(cd, trace) {
     }
 };
 
-},{"../../lib":287}],502:[function(_dereq_,module,exports){
+},{"../../lib":287}],503:[function(_dereq_,module,exports){
 'use strict';
 
 var hasColorscale = _dereq_('../../components/colorscale/helpers').hasColorscale;
@@ -97591,7 +98333,7 @@ module.exports = function calcMarkerColorscale(gd, trace) {
     }
 };
 
-},{"../../components/colorscale/calc":165,"../../components/colorscale/helpers":168,"./subtypes":524}],503:[function(_dereq_,module,exports){
+},{"../../components/colorscale/calc":165,"../../components/colorscale/helpers":168,"./subtypes":525}],504:[function(_dereq_,module,exports){
 'use strict';
 
 module.exports = {
@@ -97611,7 +98353,7 @@ module.exports = {
     eventDataKeys: []
 };
 
-},{}],504:[function(_dereq_,module,exports){
+},{}],505:[function(_dereq_,module,exports){
 'use strict';
 
 var calc = _dereq_('./calc');
@@ -97783,7 +98525,7 @@ function getInterp(calcTrace, index, position, posAttr) {
     return pt0.s + (pt1.s - pt0.s) * (position - pt0[posAttr]) / (pt1[posAttr] - pt0[posAttr]);
 }
 
-},{"./calc":500}],505:[function(_dereq_,module,exports){
+},{"./calc":501}],506:[function(_dereq_,module,exports){
 'use strict';
 
 
@@ -97813,7 +98555,7 @@ module.exports = function crossTraceDefaults(fullData) {
     }
 };
 
-},{}],506:[function(_dereq_,module,exports){
+},{}],507:[function(_dereq_,module,exports){
 'use strict';
 
 var Lib = _dereq_('../../lib');
@@ -97900,7 +98642,7 @@ module.exports = function supplyDefaults(traceIn, traceOut, defaultColor, layout
     Lib.coerceSelectionMarkerOpacity(traceOut, coerce);
 };
 
-},{"../../lib":287,"../../registry":378,"./attributes":499,"./constants":503,"./fillcolor_defaults":507,"./line_defaults":512,"./line_shape_defaults":514,"./marker_defaults":518,"./period_defaults":519,"./stack_defaults":522,"./subtypes":524,"./text_defaults":525,"./xy_defaults":526}],507:[function(_dereq_,module,exports){
+},{"../../lib":287,"../../registry":378,"./attributes":500,"./constants":504,"./fillcolor_defaults":508,"./line_defaults":513,"./line_shape_defaults":515,"./marker_defaults":519,"./period_defaults":520,"./stack_defaults":523,"./subtypes":525,"./text_defaults":526,"./xy_defaults":527}],508:[function(_dereq_,module,exports){
 'use strict';
 
 var Color = _dereq_('../../components/color');
@@ -97928,7 +98670,7 @@ module.exports = function fillColorDefaults(traceIn, traceOut, defaultColor, coe
     ));
 };
 
-},{"../../components/color":157,"../../lib":287}],508:[function(_dereq_,module,exports){
+},{"../../components/color":157,"../../lib":287}],509:[function(_dereq_,module,exports){
 'use strict';
 
 var Axes = _dereq_('../../plots/cartesian/axes');
@@ -97946,7 +98688,7 @@ module.exports = function formatLabels(cdi, trace, fullLayout) {
     return labels;
 };
 
-},{"../../plots/cartesian/axes":334}],509:[function(_dereq_,module,exports){
+},{"../../plots/cartesian/axes":334}],510:[function(_dereq_,module,exports){
 'use strict';
 
 var Color = _dereq_('../../components/color');
@@ -97986,7 +98728,7 @@ module.exports = function getTraceColor(trace, di) {
     }
 };
 
-},{"../../components/color":157,"./subtypes":524}],510:[function(_dereq_,module,exports){
+},{"../../components/color":157,"./subtypes":525}],511:[function(_dereq_,module,exports){
 'use strict';
 
 var Lib = _dereq_('../../lib');
@@ -98197,7 +98939,7 @@ module.exports = function hoverPoints(pointData, xval, yval, hovermode) {
     }
 };
 
-},{"../../components/color":157,"../../components/fx":197,"../../lib":287,"../../registry":378,"./get_trace_color":509}],511:[function(_dereq_,module,exports){
+},{"../../components/color":157,"../../components/fx":197,"../../lib":287,"../../registry":378,"./get_trace_color":510}],512:[function(_dereq_,module,exports){
 'use strict';
 
 var subtypes = _dereq_('./subtypes');
@@ -98234,7 +98976,7 @@ module.exports = {
     }
 };
 
-},{"../../plots/cartesian":348,"./arrays_to_calcdata":498,"./attributes":499,"./calc":500,"./cross_trace_calc":504,"./cross_trace_defaults":505,"./defaults":506,"./format_labels":508,"./hover":510,"./marker_colorbar":517,"./plot":520,"./select":521,"./style":523,"./subtypes":524}],512:[function(_dereq_,module,exports){
+},{"../../plots/cartesian":348,"./arrays_to_calcdata":499,"./attributes":500,"./calc":501,"./cross_trace_calc":505,"./cross_trace_defaults":506,"./defaults":507,"./format_labels":509,"./hover":511,"./marker_colorbar":518,"./plot":521,"./select":522,"./style":524,"./subtypes":525}],513:[function(_dereq_,module,exports){
 'use strict';
 
 var isArrayOrTypedArray = _dereq_('../../lib').isArrayOrTypedArray;
@@ -98257,7 +98999,7 @@ module.exports = function lineDefaults(traceIn, traceOut, defaultColor, layout, 
     if(!(opts || {}).noDash) coerce('line.dash');
 };
 
-},{"../../components/colorscale/defaults":167,"../../components/colorscale/helpers":168,"../../lib":287}],513:[function(_dereq_,module,exports){
+},{"../../components/colorscale/defaults":167,"../../components/colorscale/helpers":168,"../../lib":287}],514:[function(_dereq_,module,exports){
 'use strict';
 
 var numConstants = _dereq_('../../constants/numerical');
@@ -98709,7 +99451,7 @@ module.exports = function linePoints(d, opts) {
     return segments;
 };
 
-},{"../../constants/numerical":267,"../../lib":287,"./constants":503}],514:[function(_dereq_,module,exports){
+},{"../../constants/numerical":267,"../../lib":287,"./constants":504}],515:[function(_dereq_,module,exports){
 'use strict';
 
 
@@ -98719,7 +99461,7 @@ module.exports = function handleLineShapeDefaults(traceIn, traceOut, coerce) {
     if(shape === 'spline') coerce('line.smoothing');
 };
 
-},{}],515:[function(_dereq_,module,exports){
+},{}],516:[function(_dereq_,module,exports){
 'use strict';
 
 var LINKEDFILLS = {tonextx: 1, tonexty: 1, tonext: 1};
@@ -98801,7 +99543,7 @@ module.exports = function linkTraces(gd, plotinfo, cdscatter) {
     return cdscatterSorted;
 };
 
-},{}],516:[function(_dereq_,module,exports){
+},{}],517:[function(_dereq_,module,exports){
 'use strict';
 
 var isNumeric = _dereq_('fast-isnumeric');
@@ -98837,7 +99579,7 @@ module.exports = function makeBubbleSizeFn(trace, factor) {
     };
 };
 
-},{"fast-isnumeric":33}],517:[function(_dereq_,module,exports){
+},{"fast-isnumeric":33}],518:[function(_dereq_,module,exports){
 'use strict';
 
 module.exports = {
@@ -98846,7 +99588,7 @@ module.exports = {
     max: 'cmax'
 };
 
-},{}],518:[function(_dereq_,module,exports){
+},{}],519:[function(_dereq_,module,exports){
 'use strict';
 
 var Color = _dereq_('../../components/color');
@@ -98919,7 +99661,7 @@ module.exports = function markerDefaults(traceIn, traceOut, defaultColor, layout
     }
 };
 
-},{"../../components/color":157,"../../components/colorscale/defaults":167,"../../components/colorscale/helpers":168,"./subtypes":524}],519:[function(_dereq_,module,exports){
+},{"../../components/color":157,"../../components/colorscale/defaults":167,"../../components/colorscale/helpers":168,"./subtypes":525}],520:[function(_dereq_,module,exports){
 'use strict';
 
 var dateTick0 = _dereq_('../../lib').dateTick0;
@@ -98958,7 +99700,7 @@ module.exports = function handlePeriodDefaults(traceIn, traceOut, layout, coerce
     }
 };
 
-},{"../../constants/numerical":267,"../../lib":287}],520:[function(_dereq_,module,exports){
+},{"../../constants/numerical":267,"../../lib":287}],521:[function(_dereq_,module,exports){
 'use strict';
 
 var d3 = _dereq_('@plotly/d3');
@@ -99510,7 +100252,7 @@ function selectMarkers(gd, idx, plotinfo, cdscatter, cdscatterAll) {
     });
 }
 
-},{"../../components/drawing":179,"../../lib":287,"../../lib/polygon":299,"../../registry":378,"./line_points":513,"./link_traces":515,"./subtypes":524,"@plotly/d3":20}],521:[function(_dereq_,module,exports){
+},{"../../components/drawing":179,"../../lib":287,"../../lib/polygon":299,"../../registry":378,"./line_points":514,"./link_traces":516,"./subtypes":525,"@plotly/d3":20}],522:[function(_dereq_,module,exports){
 'use strict';
 
 var subtypes = _dereq_('./subtypes');
@@ -99555,7 +100297,7 @@ module.exports = function selectPoints(searchInfo, selectionTester) {
     return selection;
 };
 
-},{"./subtypes":524}],522:[function(_dereq_,module,exports){
+},{"./subtypes":525}],523:[function(_dereq_,module,exports){
 'use strict';
 
 var perStackAttrs = ['orientation', 'groupnorm', 'stackgaps'];
@@ -99652,7 +100394,7 @@ module.exports = function handleStackDefaults(traceIn, traceOut, layout, coerce)
     }
 };
 
-},{}],523:[function(_dereq_,module,exports){
+},{}],524:[function(_dereq_,module,exports){
 'use strict';
 
 var d3 = _dereq_('@plotly/d3');
@@ -99714,7 +100456,7 @@ module.exports = {
     styleOnSelect: styleOnSelect
 };
 
-},{"../../components/drawing":179,"../../registry":378,"@plotly/d3":20}],524:[function(_dereq_,module,exports){
+},{"../../components/drawing":179,"../../registry":378,"@plotly/d3":20}],525:[function(_dereq_,module,exports){
 'use strict';
 
 var Lib = _dereq_('../../lib');
@@ -99744,7 +100486,7 @@ module.exports = {
     }
 };
 
-},{"../../lib":287}],525:[function(_dereq_,module,exports){
+},{"../../lib":287}],526:[function(_dereq_,module,exports){
 'use strict';
 
 var Lib = _dereq_('../../lib');
@@ -99765,7 +100507,7 @@ module.exports = function(traceIn, traceOut, layout, coerce, opts) {
     }
 };
 
-},{"../../lib":287}],526:[function(_dereq_,module,exports){
+},{"../../lib":287}],527:[function(_dereq_,module,exports){
 'use strict';
 
 var Lib = _dereq_('../../lib');
@@ -99801,7 +100543,7 @@ module.exports = function handleXYDefaults(traceIn, traceOut, layout, coerce) {
     return len;
 };
 
-},{"../../lib":287,"../../registry":378}],527:[function(_dereq_,module,exports){
+},{"../../lib":287,"../../registry":378}],528:[function(_dereq_,module,exports){
 'use strict';
 
 var hovertemplateAttrs = _dereq_('../../plots/template_attributes').hovertemplateAttrs;
@@ -99893,7 +100635,7 @@ module.exports = {
     hovertemplate: hovertemplateAttrs(),
 };
 
-},{"../../components/colorscale/attributes":164,"../../components/drawing/attributes":178,"../../lib/extend":281,"../../plots/attributes":330,"../../plots/template_attributes":373,"../scatter/attributes":499}],528:[function(_dereq_,module,exports){
+},{"../../components/colorscale/attributes":164,"../../components/drawing/attributes":178,"../../lib/extend":281,"../../plots/attributes":330,"../../plots/template_attributes":373,"../scatter/attributes":500}],529:[function(_dereq_,module,exports){
 'use strict';
 
 var isNumeric = _dereq_('fast-isnumeric');
@@ -99965,7 +100707,7 @@ module.exports = function calc(gd, trace) {
     return cd;
 };
 
-},{"../scatter/arrays_to_calcdata":498,"../scatter/calc":500,"../scatter/calc_selection":501,"../scatter/colorscale_calc":502,"fast-isnumeric":33}],529:[function(_dereq_,module,exports){
+},{"../scatter/arrays_to_calcdata":499,"../scatter/calc":501,"../scatter/calc_selection":502,"../scatter/colorscale_calc":503,"fast-isnumeric":33}],530:[function(_dereq_,module,exports){
 'use strict';
 
 var Lib = _dereq_('../../lib');
@@ -100060,7 +100802,7 @@ module.exports = function supplyDefaults(traceIn, traceOut, defaultColor, layout
     Lib.coerceSelectionMarkerOpacity(traceOut, coerce);
 };
 
-},{"../../lib":287,"../scatter/constants":503,"../scatter/fillcolor_defaults":507,"../scatter/line_defaults":512,"../scatter/line_shape_defaults":514,"../scatter/marker_defaults":518,"../scatter/subtypes":524,"../scatter/text_defaults":525,"./attributes":527}],530:[function(_dereq_,module,exports){
+},{"../../lib":287,"../scatter/constants":504,"../scatter/fillcolor_defaults":508,"../scatter/line_defaults":513,"../scatter/line_shape_defaults":515,"../scatter/marker_defaults":519,"../scatter/subtypes":525,"../scatter/text_defaults":526,"./attributes":528}],531:[function(_dereq_,module,exports){
 'use strict';
 
 module.exports = function eventData(out, pt, trace, cd, pointNumber) {
@@ -100084,7 +100826,7 @@ module.exports = function eventData(out, pt, trace, cd, pointNumber) {
     return out;
 };
 
-},{}],531:[function(_dereq_,module,exports){
+},{}],532:[function(_dereq_,module,exports){
 'use strict';
 
 var Axes = _dereq_('../../plots/cartesian/axes');
@@ -100100,7 +100842,7 @@ module.exports = function formatLabels(cdi, trace, fullLayout) {
     return labels;
 };
 
-},{"../../plots/cartesian/axes":334}],532:[function(_dereq_,module,exports){
+},{"../../plots/cartesian/axes":334}],533:[function(_dereq_,module,exports){
 'use strict';
 
 var scatterHover = _dereq_('../scatter/hover');
@@ -100166,7 +100908,7 @@ module.exports = function hoverPoints(pointData, xval, yval, hovermode) {
     return scatterPointData;
 };
 
-},{"../scatter/hover":510}],533:[function(_dereq_,module,exports){
+},{"../scatter/hover":511}],534:[function(_dereq_,module,exports){
 'use strict';
 
 module.exports = {
@@ -100190,7 +100932,7 @@ module.exports = {
     }
 };
 
-},{"../../plots/ternary":374,"../scatter/marker_colorbar":517,"../scatter/select":521,"../scatter/style":523,"./attributes":527,"./calc":528,"./defaults":529,"./event_data":530,"./format_labels":531,"./hover":532,"./plot":534}],534:[function(_dereq_,module,exports){
+},{"../../plots/ternary":374,"../scatter/marker_colorbar":518,"../scatter/select":522,"../scatter/style":524,"./attributes":528,"./calc":529,"./defaults":530,"./event_data":531,"./format_labels":532,"./hover":533,"./plot":535}],535:[function(_dereq_,module,exports){
 'use strict';
 
 var scatterPlot = _dereq_('../scatter/plot');
@@ -100214,7 +100956,7 @@ module.exports = function plot(gd, ternary, moduleCalcData) {
     scatterPlot(gd, plotinfo, moduleCalcData, scatterLayer);
 };
 
-},{"../scatter/plot":520}],535:[function(_dereq_,module,exports){
+},{"../scatter/plot":521}],536:[function(_dereq_,module,exports){
 'use strict';
 
 var boxAttrs = _dereq_('../box/attributes');
@@ -100370,7 +101112,7 @@ module.exports = {
     }
 };
 
-},{"../../lib/extend":281,"../../plots/cartesian/axis_format_attributes":337,"../box/attributes":405}],536:[function(_dereq_,module,exports){
+},{"../../lib/extend":281,"../../plots/cartesian/axis_format_attributes":337,"../box/attributes":405}],537:[function(_dereq_,module,exports){
 'use strict';
 
 var Lib = _dereq_('../../lib');
@@ -100538,7 +101280,7 @@ function calcSpan(trace, cdi, valAxis, bandwidth) {
     return spanOut;
 }
 
-},{"../../constants/numerical":267,"../../lib":287,"../../plots/cartesian/axes":334,"../box/calc":406,"./helpers":539}],537:[function(_dereq_,module,exports){
+},{"../../constants/numerical":267,"../../lib":287,"../../plots/cartesian/axes":334,"../box/calc":406,"./helpers":540}],538:[function(_dereq_,module,exports){
 'use strict';
 
 var setPositionOffset = _dereq_('../box/cross_trace_calc').setPositionOffset;
@@ -100573,7 +101315,7 @@ module.exports = function crossTraceCalc(gd, plotinfo) {
     }
 };
 
-},{"../box/cross_trace_calc":407}],538:[function(_dereq_,module,exports){
+},{"../box/cross_trace_calc":407}],539:[function(_dereq_,module,exports){
 'use strict';
 
 var Lib = _dereq_('../../lib');
@@ -100626,7 +101368,7 @@ module.exports = function supplyDefaults(traceIn, traceOut, defaultColor, layout
     if(!meanLineVisible) traceOut.meanline = {visible: false};
 };
 
-},{"../../components/color":157,"../../lib":287,"../box/defaults":408,"./attributes":535}],539:[function(_dereq_,module,exports){
+},{"../../components/color":157,"../../lib":287,"../box/defaults":408,"./attributes":536}],540:[function(_dereq_,module,exports){
 'use strict';
 
 var Lib = _dereq_('../../lib');
@@ -100691,7 +101433,7 @@ exports.getKdeValue = function(calcItem, trace, valueDist) {
 
 exports.extractVal = function(o) { return o.v; };
 
-},{"../../lib":287}],540:[function(_dereq_,module,exports){
+},{"../../lib":287}],541:[function(_dereq_,module,exports){
 'use strict';
 
 var Lib = _dereq_('../../lib');
@@ -100798,7 +101540,7 @@ module.exports = function hoverPoints(pointData, xval, yval, hovermode, opts) {
     return closeData;
 };
 
-},{"../../lib":287,"../../plots/cartesian/axes":334,"../box/hover":410,"./helpers":539}],541:[function(_dereq_,module,exports){
+},{"../../lib":287,"../../plots/cartesian/axes":334,"../box/hover":410,"./helpers":540}],542:[function(_dereq_,module,exports){
 'use strict';
 
 module.exports = {
@@ -100823,7 +101565,7 @@ module.exports = {
     }
 };
 
-},{"../../plots/cartesian":348,"../box/defaults":408,"../box/select":415,"../scatter/style":523,"./attributes":535,"./calc":536,"./cross_trace_calc":537,"./defaults":538,"./hover":540,"./layout_attributes":542,"./layout_defaults":543,"./plot":544,"./style":545}],542:[function(_dereq_,module,exports){
+},{"../../plots/cartesian":348,"../box/defaults":408,"../box/select":415,"../scatter/style":524,"./attributes":536,"./calc":537,"./cross_trace_calc":538,"./defaults":539,"./hover":541,"./layout_attributes":543,"./layout_defaults":544,"./plot":545,"./style":546}],543:[function(_dereq_,module,exports){
 'use strict';
 
 var boxLayoutAttrs = _dereq_('../box/layout_attributes');
@@ -100838,7 +101580,7 @@ module.exports = {
     })
 };
 
-},{"../../lib":287,"../box/layout_attributes":412}],543:[function(_dereq_,module,exports){
+},{"../../lib":287,"../box/layout_attributes":412}],544:[function(_dereq_,module,exports){
 'use strict';
 
 var Lib = _dereq_('../../lib');
@@ -100852,7 +101594,7 @@ module.exports = function supplyLayoutDefaults(layoutIn, layoutOut, fullData) {
     boxLayoutDefaults._supply(layoutIn, layoutOut, fullData, coerce, 'violin');
 };
 
-},{"../../lib":287,"../box/layout_defaults":413,"./layout_attributes":542}],544:[function(_dereq_,module,exports){
+},{"../../lib":287,"../box/layout_defaults":413,"./layout_attributes":543}],545:[function(_dereq_,module,exports){
 'use strict';
 
 var d3 = _dereq_('@plotly/d3');
@@ -101034,7 +101776,7 @@ module.exports = function plot(gd, plotinfo, cdViolins, violinLayer) {
     });
 };
 
-},{"../../components/drawing":179,"../../lib":287,"../box/plot":414,"../scatter/line_points":513,"./helpers":539,"@plotly/d3":20}],545:[function(_dereq_,module,exports){
+},{"../../components/drawing":179,"../../lib":287,"../box/plot":414,"../scatter/line_points":514,"./helpers":540,"@plotly/d3":20}],546:[function(_dereq_,module,exports){
 'use strict';
 
 var d3 = _dereq_('@plotly/d3');
@@ -101081,7 +101823,7 @@ module.exports = function style(gd) {
     });
 };
 
-},{"../../components/color":157,"../scatter/style":523,"@plotly/d3":20}],546:[function(_dereq_,module,exports){
+},{"../../components/color":157,"../scatter/style":524,"@plotly/d3":20}],547:[function(_dereq_,module,exports){
 'use strict';
 
 var Axes = _dereq_('../plots/cartesian/axes');
@@ -101485,7 +102227,7 @@ function last(array, indices) {
     return array[indices[indices.length - 1]];
 }
 
-},{"../constants/numerical":267,"../lib":287,"../plot_api/plot_schema":322,"../plots/cartesian/axes":334,"./helpers":549}],547:[function(_dereq_,module,exports){
+},{"../constants/numerical":267,"../lib":287,"../plot_api/plot_schema":322,"../plots/cartesian/axes":334,"./helpers":550}],548:[function(_dereq_,module,exports){
 'use strict';
 
 var Lib = _dereq_('../lib');
@@ -101745,7 +102487,7 @@ function getFilterFunc(opts, d2c, targetCalendar) {
     }
 }
 
-},{"../constants/filter_ops":265,"../lib":287,"../plots/cartesian/axes":334,"../registry":378,"./helpers":549}],548:[function(_dereq_,module,exports){
+},{"../constants/filter_ops":265,"../lib":287,"../plots/cartesian/axes":334,"../registry":378,"./helpers":550}],549:[function(_dereq_,module,exports){
 'use strict';
 
 var Lib = _dereq_('../lib');
@@ -101989,7 +102731,7 @@ function transformOne(trace, state) {
     return newData;
 }
 
-},{"../lib":287,"../plot_api/plot_schema":322,"../plots/plots":371,"./helpers":549}],549:[function(_dereq_,module,exports){
+},{"../lib":287,"../plot_api/plot_schema":322,"../plots/plots":371,"./helpers":550}],550:[function(_dereq_,module,exports){
 'use strict';
 
 exports.pointsAccessorFunction = function(transforms, opts) {
@@ -102007,7 +102749,7 @@ exports.pointsAccessorFunction = function(transforms, opts) {
     return originalPointsAccessor;
 };
 
-},{}],550:[function(_dereq_,module,exports){
+},{}],551:[function(_dereq_,module,exports){
 'use strict';
 
 var Lib = _dereq_('../lib');
@@ -102145,11 +102887,11 @@ function getSortFunc(opts, d2c) {
     }
 }
 
-},{"../constants/numerical":267,"../lib":287,"../plots/cartesian/axes":334,"./helpers":549}],551:[function(_dereq_,module,exports){
+},{"../constants/numerical":267,"../lib":287,"../plots/cartesian/axes":334,"./helpers":550}],552:[function(_dereq_,module,exports){
 'use strict';
 
 // package version injected by `npm run preprocess`
-exports.version = '2.6.1';
+exports.version = '2.9.0';
 
 },{}]},{},[15])(15)
 });
